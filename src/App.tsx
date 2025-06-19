@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2 } from 'lucide-react';
+import { ApiService } from './services/apiService';
+import { NotificationPopup } from './components/NotificationPopup';
 
 const translations = {
   en: {
@@ -10,6 +12,7 @@ const translations = {
     promptPlaceholder: "Tell our AI what you want to be notified about...",
     emailPlaceholder: "Enter your email address",
     getStarted: "Notificamy!",
+    processing: "Processing...",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
     multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, or Slack",
@@ -38,6 +41,8 @@ const translations = {
     enterpriseDesc: "For teams and organizations",
     enterpriseFeatures: ["Team management", "API access", "Priority support", "Custom integrations"],
     footer: "© 2025 Notificamy. Revolutionizing notifications with AI.",
+    errorGeneric: "An error occurred while processing your request. Please try again.",
+    errorNetwork: "Unable to connect to the server. Please check your connection and try again.",
   },
   it: {
     title: "Notificamy",
@@ -47,6 +52,7 @@ const translations = {
     promptPlaceholder: "Racconta alla nostra AI di cosa vuoi essere notificato...",
     emailPlaceholder: "Inserisci il tuo indirizzo email",
     getStarted: "Notificamy!",
+    processing: "Elaborazione...",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
     multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp o Slack",
@@ -75,19 +81,80 @@ const translations = {
     enterpriseDesc: "Per team e organizzazioni",
     enterpriseFeatures: ["Gestione team", "Accesso API", "Supporto prioritario", "Integrazioni personalizzate"],
     footer: "© 2025 Notificamy. Rivoluzione delle notifiche con AI.",
+    errorGeneric: "Si è verificato un errore durante l'elaborazione della richiesta. Riprova.",
+    errorNetwork: "Impossibile connettersi al server. Controlla la connessione e riprova.",
   }
 };
 
 function App() {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState<'en' | 'it'>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
-  const t = translations[language as keyof typeof translations];
+  const [isLoading, setIsLoading] = useState(false);
+  const [popup, setPopup] = useState<{
+    isOpen: boolean;
+    isSuccess: boolean;
+    message: string;
+  }>({
+    isOpen: false,
+    isSuccess: false,
+    message: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const t = translations[language];
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Prompt:', prompt, 'Email:', email);
+    
+    if (!prompt.trim() || !email.trim()) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const validationData = await ApiService.validatePrompt({
+        prompt: prompt.trim(),
+        email: email.trim()
+      });
+
+      const isValid = validationData.validity.valid_prompt;
+      const invalidReason = validationData.validity.invalid_reason;
+
+      setPopup({
+        isOpen: true,
+        isSuccess: isValid,
+        message: invalidReason || ''
+      });
+
+      // Clear form on success
+      if (isValid) {
+        setPrompt('');
+        setEmail('');
+      }
+
+    } catch (error) {
+      console.error('Validation failed:', error);
+      
+      let errorMessage = t.errorGeneric;
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = t.errorNetwork;
+        }
+      }
+
+      setPopup({
+        isOpen: true,
+        isSuccess: false,
+        message: errorMessage
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const closePopup = () => {
+    setPopup(prev => ({ ...prev, isOpen: false }));
   };
 
   return (
@@ -143,6 +210,8 @@ function App() {
                 placeholder={t.promptPlaceholder}
                 className="w-full h-32 px-6 py-4 bg-white/10 backdrop-blur-sm border border-fuchsia-500/30 rounded-2xl placeholder-gray-400 text-white resize-none focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 transition-all duration-300"
                 rows={4}
+                required
+                disabled={isLoading}
               />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
@@ -156,16 +225,22 @@ function App() {
                   placeholder={t.emailPlaceholder}
                   className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
               <button
                 type="submit"
-                className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25"
+                disabled={isLoading || !prompt.trim() || !email.trim()}
+                className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <span className="flex items-center space-x-2">
-                  <Zap className="w-5 h-5" />
-                  <span>{t.getStarted}</span>
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Zap className="w-5 h-5" />
+                  )}
+                  <span>{isLoading ? t.processing : t.getStarted}</span>
                 </span>
               </button>
             </div>
@@ -283,6 +358,15 @@ function App() {
           <p className="text-gray-400">{t.footer}</p>
         </div>
       </footer>
+
+      {/* Notification Popup */}
+      <NotificationPopup
+        isOpen={popup.isOpen}
+        onClose={closePopup}
+        isSuccess={popup.isSuccess}
+        message={popup.message}
+        language={language}
+      />
     </div>
   );
 }
