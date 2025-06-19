@@ -1,129 +1,75 @@
-# NotifyMe Backend
+<!-- TOC -->
+* [Web Application Project](#web-application-project)
+    * [Technology Stack](#technology-stack)
+        * [Backend](#backend)
+        * [Frontend](#frontend)
+    * [Prerequisites](#prerequisites)
+    * [Getting Started](#getting-started)
+<!-- TOC -->
 
-Spring Boot backend service for the NotifyMe application that processes user prompts and integrates with ChatGPT API.
+AUTHOR: Alain Kiesse Bindele
 
-## Features
+# Web Application Project
 
-- **Security First**: Built-in SQL injection protection and input validation
-- **ChatGPT Integration**: Seamless integration with OpenAI's ChatGPT API
-- **RESTful API**: Clean REST endpoints with proper error handling
-- **CORS Support**: Configured for frontend integration
-- **Validation**: Comprehensive input validation and sanitization
-- **Logging**: Structured logging for monitoring and debugging
+A modern web application built with Jakarta EE backend and React TypeScript frontend.
 
-## API Endpoints
+## Technology Stack
 
-### POST /api/v1/prompt
-Process a user prompt and get AI-generated response.
+### Backend
 
-**Request Body:**
-```json
-{
-  "prompt": "Notify me about my daily standup meeting",
-  "email": "user@example.com"
-}
-```
+- Jakarta EE
+- Java
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Prompt processed successfully",
-  "data": "AI generated response here"
-}
-```
+### Frontend
 
-### GET /api/v1/health
-Health check endpoint.
+- React 18.3.1
+- TypeScript 5.5.3
+- Tailwind CSS 3.4.1
+- Vite 5.4.2
 
-## Configuration
+## Prerequisites
 
-### Environment Variables
+- Node.js (Latest LTS version)
+- Java Development Kit (JDK)
+- npm package manager
+- IDE with Jakarta EE support
 
-- `OPENAI_API_KEY`: Your OpenAI API key (required)
+## Getting Started
 
-### Application Properties
-
-The application uses YAML configuration in `application.yml`. Key settings:
-
-- Server port: 8080
-- OpenAI API URL: https://api.openai.com/v1/chat/completions
-- CORS: Enabled for all origins
-- Security: CSRF disabled for API usage
-
-## Security Features
-
-### SQL Injection Protection
-- Pattern-based detection of common SQL injection attempts
-- Input sanitization and validation
-- Length limits on user input
-
-### Input Validation
-- Jakarta Bean Validation annotations
-- Custom security service for additional checks
-- Automatic sanitization of potentially dangerous characters
-
-### CORS Configuration
-- Configured to allow frontend integration
-- Supports all common HTTP methods
-- Credential support enabled
-
-## Running the Application
-
-### Prerequisites
-- Java 17 or higher
-- Maven 3.6+
-- OpenAI API key
-
-### Local Development
-1. Set your OpenAI API key:
+1. Clone the repository:
    ```bash
-   export OPENAI_API_KEY=your-api-key-here
+   git clone <repository-url>
+   cd <project-directory>
    ```
 
-2. Run the application:
+2. Install dependencies:
    ```bash
-   mvn spring-boot:run
+   npm install
    ```
 
-3. The API will be available at `http://localhost:8080`
+3. Start development server:
+   ```bash
+   npm run dev
+   ```
+   This will start the Vite development server at `http://localhost:5173`
 
-### Testing
-Run the test suite:
-```bash
-mvn test
-```
+4. Build for production:
+   ```bash
+   npm run build
+   ```
+   The built files will be in the `dist` directory
 
-## Project Structure
+5. Run tests:
+   ```bash
+   npm run test
+   ```
 
-```
-src/
-├── main/
-│   ├── java/com/notifyme/
-│   │   ├── controller/          # REST controllers
-│   │   ├── dto/                 # Data transfer objects
-│   │   ├── service/             # Business logic services
-│   │   ├── config/              # Configuration classes
-│   │   └── NotifymeBackendApplication.java
-│   └── resources/
-│       ├── application.yml      # Main configuration
-│       └── application-dev.yml  # Development profile
-└── test/                        # Unit tests
-```
+6. Lint code:
+   ```bash
+   npm run lint
+   ```
 
-## Integration with Frontend
+Note: Make sure you have all the prerequisites installed before running these commands.
 
-The backend is designed to work with the NotifyMe React frontend. Make sure to:
 
-1. Update the frontend API base URL to point to this backend
-2. Handle the API response format in your frontend code
-3. Implement proper error handling for validation failures
 
-## Deployment
-
-For production deployment:
-
-1. Set the `OPENAI_API_KEY` environment variable
-2. Configure appropriate logging levels
-3. Consider using HTTPS in production
-4. Set up proper monitoring and health checks

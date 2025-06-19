@@ -3,13 +3,13 @@ import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartpho
 
 const translations = {
   en: {
-    title: "NotifyMe",
+    title: "Notificamy",
     subtitle: "Never Miss What Matters",
     hero: "The Ultimate AI-Powered Notification System",
     description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, or Slack exactly when you need it.",
     promptPlaceholder: "Tell our AI what you want to be notified about...",
     emailPlaceholder: "Enter your email address",
-    getStarted: "Get Started Free",
+    getStarted: "Notificamy!",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
     multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, or Slack",
@@ -37,16 +37,16 @@ const translations = {
     enterprise: "Enterprise",
     enterpriseDesc: "For teams and organizations",
     enterpriseFeatures: ["Team management", "API access", "Priority support", "Custom integrations"],
-    footer: "© 2024 NotifyMe. Revolutionizing notifications with AI.",
+    footer: "© 2025 Notificamy. Revolutionizing notifications with AI.",
   },
   it: {
-    title: "NotifyMe",
+    title: "Notificamy",
     subtitle: "Non Perdere Mai Ciò Che Conta",
     hero: "Il Sistema di Notifiche Definitivo Basato su AI",
     description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp o Slack esattamente quando ne hai bisogno.",
     promptPlaceholder: "Racconta alla nostra AI di cosa vuoi essere notificato...",
     emailPlaceholder: "Inserisci il tuo indirizzo email",
-    getStarted: "Inizia Gratis",
+    getStarted: "Notificamy!",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
     multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp o Slack",
@@ -74,7 +74,7 @@ const translations = {
     enterprise: "Enterprise",
     enterpriseDesc: "Per team e organizzazioni",
     enterpriseFeatures: ["Gestione team", "Accesso API", "Supporto prioritario", "Integrazioni personalizzate"],
-    footer: "© 2024 NotifyMe. Rivoluzione delle notifiche con AI.",
+    footer: "© 2025 Notificamy. Rivoluzione delle notifiche con AI.",
   }
 };
 
