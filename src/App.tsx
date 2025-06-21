@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2 } from 'lucide-react';
 import { ApiService } from './services/apiService';
+import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
+import { AuthButton } from './components/AuthButton';
+import { SocialLoginModal } from './components/SocialLoginModal';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const translations = {
   en: {
@@ -13,6 +18,7 @@ const translations = {
     emailPlaceholder: "Enter your email address",
     getStarted: "Notificamy!",
     processing: "Processing...",
+    loginToUse: "Sign in to create notifications",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
     multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, or Slack",
@@ -43,6 +49,7 @@ const translations = {
     footer: "© 2025 Notificamy. Revolutionizing notifications with AI.",
     errorGeneric: "An error occurred while processing your request. Please try again.",
     errorNetwork: "Unable to connect to the server. Please check your connection and try again.",
+    errorAuth: "Authentication required. Please sign in to continue.",
   },
   it: {
     title: "Notificamy",
@@ -53,6 +60,7 @@ const translations = {
     emailPlaceholder: "Inserisci il tuo indirizzo email",
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
+    loginToUse: "Accedi per creare notifiche",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
     multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp o Slack",
@@ -83,14 +91,17 @@ const translations = {
     footer: "© 2025 Notificamy. Rivoluzione delle notifiche con AI.",
     errorGeneric: "Si è verificato un errore durante l'elaborazione della richiesta. Riprova.",
     errorNetwork: "Impossibile connettersi al server. Controlla la connessione e riprova.",
+    errorAuth: "Autenticazione richiesta. Effettua l'accesso per continuare.",
   }
 };
 
 function App() {
+  const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
   const [language, setLanguage] = useState<'en' | 'it'>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [popup, setPopup] = useState<{
     isOpen: boolean;
     isSuccess: boolean;
@@ -103,6 +114,13 @@ function App() {
 
   const t = translations[language];
 
+  // Auto-fill email from authenticated user
+  React.useEffect(() => {
+    if (isAuthenticated && user?.email && !email) {
+      setEmail(user.email);
+    }
+  }, [isAuthenticated, user, email]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -110,13 +128,20 @@ function App() {
       return;
     }
 
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const validationData = await ApiService.validatePrompt({
+      const token = await getAccessTokenSilently();
+      
+      const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim()
-      });
+      }, token);
 
       const isValid = validationData.validity.valid_prompt;
       const invalidReason = validationData.validity.invalid_reason;
@@ -130,7 +155,10 @@ function App() {
       // Clear form on success
       if (isValid) {
         setPrompt('');
-        setEmail('');
+        // Keep email for authenticated users
+        if (!isAuthenticated) {
+          setEmail('');
+        }
       }
 
     } catch (error) {
@@ -140,6 +168,9 @@ function App() {
       if (error instanceof Error) {
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
           errorMessage = t.errorNetwork;
+        } else if (error.message.includes('Authentication required')) {
+          errorMessage = t.errorAuth;
+          setShowLoginModal(true);
         }
       }
 
@@ -176,13 +207,17 @@ function App() {
             </h1>
           </div>
           
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
-            className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
-          >
-            <Globe className="w-4 h-4" />
-            <span className="text-sm font-medium">{language.toUpperCase()}</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+            >
+              <Globe className="w-4 h-4" />
+              <span className="text-sm font-medium">{language.toUpperCase()}</span>
+            </button>
+            
+            <AuthButton language={language} />
+          </div>
         </div>
       </header>
 
@@ -225,7 +260,7 @@ function App() {
                   placeholder={t.emailPlaceholder}
                   className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || (isAuthenticated && user?.email)}
                 />
               </div>
               
@@ -240,7 +275,7 @@ function App() {
                   ) : (
                     <Zap className="w-5 h-5" />
                   )}
-                  <span>{isLoading ? t.processing : t.getStarted}</span>
+                  <span>{isLoading ? t.processing : (isAuthenticated ? t.getStarted : t.loginToUse)}</span>
                 </span>
               </button>
             </div>
@@ -359,7 +394,13 @@ function App() {
         </div>
       </footer>
 
-      {/* Notification Popup */}
+      {/* Modals */}
+      <SocialLoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        language={language}
+      />
+
       <NotificationPopup
         isOpen={popup.isOpen}
         onClose={closePopup}
