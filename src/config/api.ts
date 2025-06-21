@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://notificamy.com:8080',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://notificamy.com',
   ENDPOINTS: {
     VALIDATE_PROMPT: '/api/v1/validate-prompt'
   }
