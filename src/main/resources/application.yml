@@ -8,7 +8,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://dev-xyz.eu.auth0.com/
+          issuer-uri: https://dev-ksochydsohqywqbm.us.auth0.com/
           audiences: https://notificamy.com/api
 
 # Server Configuration
@@ -20,7 +20,7 @@ server:
 # Auth0 Configuration
 auth0:
   audience: https://notificamy.com/api
-  domain: https://dev-xyz.eu.auth0.com/
+  domain: https://dev-ksochydsohqywqbm.us.auth0.com/
 
 # CORS Configuration
 cors:
