@@ -24,7 +24,7 @@ auth0:
 
 # CORS Configuration
 cors:
-  allowed-origins: https://notificamy.com
+  allowed-origins: https://notificamy.com,http://localhost:5173
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
   allowed-headers: "*"
   allow-credentials: true
