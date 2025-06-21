@@ -1,0 +1,23 @@
+Options -MultiViews
+RewriteEngine On
+
+# Handle client-side routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# CORS headers for Auth0
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, DELETE, PUT"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Cache static assets
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+</FilesMatch>
