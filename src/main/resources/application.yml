@@ -1,0 +1,38 @@
+# Spring Boot Configuration
+spring:
+  application:
+    name: notifyme-backend
+  
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-xyz.eu.auth0.com/
+          audiences: https://notificamy.com/api
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Auth0 Configuration
+auth0:
+  audience: https://notificamy.com/api
+  domain: https://dev-xyz.eu.auth0.com/
+
+# CORS Configuration
+cors:
+  allowed-origins: https://notificamy.com
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# Logging Configuration
+logging:
+  level:
+    com.notifyme: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.cors: DEBUG
