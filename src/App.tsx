@@ -272,7 +272,16 @@ function App() {
   };
 
   const handleChannelConfigSave = (configs: ChannelConfig) => {
-    setChannelConfigs(prev => ({ ...prev, ...configs }));
+    // Ensure we're storing clean string values
+    const cleanConfigs: ChannelConfig = {};
+    Object.keys(configs).forEach(key => {
+      const value = configs[key as NotificationChannel];
+      if (value && typeof value === 'string') {
+        cleanConfigs[key as NotificationChannel] = value;
+      }
+    });
+    
+    setChannelConfigs(prev => ({ ...prev, ...cleanConfigs }));
     setShowChannelConfigModal(false);
     
     // Now submit the form
@@ -405,7 +414,7 @@ function App() {
                   {selectedChannels.map((channel) => {
                     const Icon = channelIcons[channel];
                     const color = channelColors[channel];
-                    const hasConfig = channel === 'email' || channelConfigs[channel];
+                    const hasConfig = channel === 'email' || (channelConfigs[channel] && typeof channelConfigs[channel] === 'string');
                     
                     return (
                       <div

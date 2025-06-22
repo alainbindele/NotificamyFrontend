@@ -102,13 +102,40 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
   existingConfigs,
   language
 }) => {
-  const [configs, setConfigs] = useState<ChannelConfig>(existingConfigs);
+  const [configs, setConfigs] = useState<ChannelConfig>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const t = configTranslations[language];
 
+  // Initialize configs properly when modal opens
   useEffect(() => {
-    setConfigs(existingConfigs);
-  }, [existingConfigs]);
+    if (isOpen) {
+      // Initialize with clean string values, not objects
+      const initialConfigs: ChannelConfig = {};
+      
+      selectedChannels.forEach(channel => {
+        if (channel === 'email' && existingConfigs.email) {
+          initialConfigs.email = typeof existingConfigs.email === 'string' 
+            ? existingConfigs.email 
+            : '';
+        } else if (channel === 'whatsapp' && existingConfigs.whatsapp) {
+          initialConfigs.whatsapp = typeof existingConfigs.whatsapp === 'string' 
+            ? existingConfigs.whatsapp 
+            : '';
+        } else if (channel === 'slack' && existingConfigs.slack) {
+          initialConfigs.slack = typeof existingConfigs.slack === 'string' 
+            ? existingConfigs.slack 
+            : '';
+        } else if (channel === 'discord' && existingConfigs.discord) {
+          initialConfigs.discord = typeof existingConfigs.discord === 'string' 
+            ? existingConfigs.discord 
+            : '';
+        }
+      });
+      
+      setConfigs(initialConfigs);
+      setErrors({});
+    }
+  }, [isOpen, selectedChannels, existingConfigs]);
 
   if (!isOpen) return null;
 
@@ -145,17 +172,14 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
     }
   };
 
-  const handleInputChange = (channel: NotificationChannel, field: string, value: string) => {
+  const handleInputChange = (channel: NotificationChannel, value: string) => {
     setConfigs(prev => ({
       ...prev,
-      [channel]: {
-        ...prev[channel],
-        [field]: value
-      }
+      [channel]: value
     }));
 
     // Clear error when user starts typing
-    const errorKey = `${channel}.${field}`;
+    const errorKey = channel;
     if (errors[errorKey]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -172,30 +196,30 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
       if (channel === 'email') {
         const email = configs.email || '';
         if (!email) {
-          newErrors['email.email'] = t.validation.required;
+          newErrors['email'] = t.validation.required;
         } else if (!validateEmail(email)) {
-          newErrors['email.email'] = t.validation.emailInvalid;
+          newErrors['email'] = t.validation.emailInvalid;
         }
       } else if (channel === 'whatsapp') {
         const phone = configs.whatsapp || '';
         if (!phone) {
-          newErrors['whatsapp.phone'] = t.validation.required;
+          newErrors['whatsapp'] = t.validation.required;
         } else if (!validatePhone(phone)) {
-          newErrors['whatsapp.phone'] = t.validation.phoneInvalid;
+          newErrors['whatsapp'] = t.validation.phoneInvalid;
         }
       } else if (channel === 'slack') {
         const webhook = configs.slack || '';
         if (!webhook) {
-          newErrors['slack.webhook'] = t.validation.required;
+          newErrors['slack'] = t.validation.required;
         } else if (!validateWebhook(webhook)) {
-          newErrors['slack.webhook'] = t.validation.webhookInvalid;
+          newErrors['slack'] = t.validation.webhookInvalid;
         }
       } else if (channel === 'discord') {
         const webhook = configs.discord || '';
         if (!webhook) {
-          newErrors['discord.webhook'] = t.validation.required;
+          newErrors['discord'] = t.validation.required;
         } else if (!validateWebhook(webhook)) {
-          newErrors['discord.webhook'] = t.validation.webhookInvalid;
+          newErrors['discord'] = t.validation.webhookInvalid;
         }
       }
     });
@@ -206,7 +230,15 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
 
   const handleSave = () => {
     if (validateForm()) {
-      onSave(configs);
+      // Ensure we're passing clean string values
+      const cleanConfigs: ChannelConfig = {};
+      Object.keys(configs).forEach(key => {
+        const value = configs[key as NotificationChannel];
+        if (value && typeof value === 'string') {
+          cleanConfigs[key as NotificationChannel] = value;
+        }
+      });
+      onSave(cleanConfigs);
     }
   };
 
@@ -226,16 +258,16 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
         <input
           type="email"
           value={configs.email || ''}
-          onChange={(e) => handleInputChange('email', 'email', e.target.value)}
+          onChange={(e) => handleInputChange('email', e.target.value)}
           placeholder={t.fields.email.emailPlaceholder}
           className={`w-full px-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 transition-all duration-300 ${
-            errors['email.email'] 
+            errors['email'] 
               ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
               : 'border-red-500/30 focus:border-red-500 focus:ring-red-500/20'
           }`}
         />
-        {errors['email.email'] && (
-          <p className="text-red-400 text-sm mt-1">{errors['email.email']}</p>
+        {errors['email'] && (
+          <p className="text-red-400 text-sm mt-1">{errors['email']}</p>
         )}
       </div>
     </div>
@@ -259,17 +291,17 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
           <input
             type="tel"
             value={configs.whatsapp || ''}
-            onChange={(e) => handleInputChange('whatsapp', 'phone', e.target.value)}
+            onChange={(e) => handleInputChange('whatsapp', e.target.value)}
             placeholder={t.fields.whatsapp.phonePlaceholder}
             className={`w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 transition-all duration-300 ${
-              errors['whatsapp.phone'] 
+              errors['whatsapp'] 
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
                 : 'border-green-500/30 focus:border-green-500 focus:ring-green-500/20'
             }`}
           />
         </div>
-        {errors['whatsapp.phone'] && (
-          <p className="text-red-400 text-sm mt-1">{errors['whatsapp.phone']}</p>
+        {errors['whatsapp'] && (
+          <p className="text-red-400 text-sm mt-1">{errors['whatsapp']}</p>
         )}
       </div>
     </div>
@@ -293,17 +325,17 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
           <input
             type="url"
             value={configs.slack || ''}
-            onChange={(e) => handleInputChange('slack', 'webhook', e.target.value)}
+            onChange={(e) => handleInputChange('slack', e.target.value)}
             placeholder={t.fields.slack.webhookPlaceholder}
             className={`w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 transition-all duration-300 ${
-              errors['slack.webhook'] 
+              errors['slack'] 
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
                 : 'border-purple-500/30 focus:border-purple-500 focus:ring-purple-500/20'
             }`}
           />
         </div>
-        {errors['slack.webhook'] && (
-          <p className="text-red-400 text-sm mt-1">{errors['slack.webhook']}</p>
+        {errors['slack'] && (
+          <p className="text-red-400 text-sm mt-1">{errors['slack']}</p>
         )}
       </div>
     </div>
@@ -327,17 +359,17 @@ export const ChannelConfigModal: React.FC<ChannelConfigModalProps> = ({
           <input
             type="url"
             value={configs.discord || ''}
-            onChange={(e) => handleInputChange('discord', 'webhook', e.target.value)}
+            onChange={(e) => handleInputChange('discord', e.target.value)}
             placeholder={t.fields.discord.webhookPlaceholder}
             className={`w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 transition-all duration-300 ${
-              errors['discord.webhook'] 
+              errors['discord'] 
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
                 : 'border-indigo-500/30 focus:border-indigo-500 focus:ring-indigo-500/20'
             }`}
           />
         </div>
-        {errors['discord.webhook'] && (
-          <p className="text-red-400 text-sm mt-1">{errors['discord.webhook']}</p>
+        {errors['discord'] && (
+          <p className="text-red-400 text-sm mt-1">{errors['discord']}</p>
         )}
       </div>
     </div>
