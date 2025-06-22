@@ -8,7 +8,8 @@ export const API_CONFIG = {
 export interface ValidatePromptRequest {
   prompt: string;
   email: string;
-  channel?: 'email' | 'whatsapp' | 'slack' | 'discord';
+  channels?: string[];
+  channelConfigs?: Record<string, any>;
 }
 
 export interface ValidatePromptResponse {
@@ -40,6 +41,7 @@ export interface ParsedValidationData {
     text: string;
     language: string;
     category: string;
+    channels?: string[];
   };
   metadata: {
     model_version: string;

@@ -5,9 +5,12 @@ import com.notifyme.dto.ValidatePromptResponse;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ValidationService {
@@ -54,7 +57,14 @@ public class ValidationService {
             summary.put("text", "User wants to receive notifications about: " + request.getPrompt());
             summary.put("language", "en");
             summary.put("category", "general");
-            summary.put("channel", request.getChannel() != null ? request.getChannel() : "email");
+            
+            // Add channels to summary
+            if (request.getChannels() != null && !request.getChannels().isEmpty()) {
+                ArrayNode channelsArray = objectMapper.createArrayNode();
+                request.getChannels().forEach(channelsArray::add);
+                summary.set("channels", channelsArray);
+            }
+            
             responseData.set("summary", summary);
             
             // Metadata section
@@ -62,14 +72,36 @@ public class ValidationService {
             metadata.put("model_version", "1.0.0");
             metadata.put("confidence_score", 0.95);
             metadata.put("policy_enforced", true);
-            metadata.set("tags", objectMapper.createArrayNode().add("notification").add("reminder").add(request.getChannel()));
+            
+            ArrayNode tagsArray = objectMapper.createArrayNode();
+            tagsArray.add("notification");
+            tagsArray.add("reminder");
+            if (request.getChannels() != null) {
+                request.getChannels().forEach(tagsArray::add);
+            }
+            metadata.set("tags", tagsArray);
+            
             responseData.set("metadata", metadata);
+            
+            // Add channel configurations for logging/processing
+            if (request.getChannelConfigs() != null && !request.getChannelConfigs().isEmpty()) {
+                ObjectNode configsNode = objectMapper.createObjectNode();
+                request.getChannelConfigs().forEach((key, value) -> {
+                    if (value != null) {
+                        configsNode.put(key, value.toString());
+                    }
+                });
+                responseData.set("channel_configs", configsNode);
+            }
             
             String jsonData = objectMapper.writeValueAsString(responseData);
             
+            String channelsText = request.getChannels() != null ? 
+                String.join(", ", request.getChannels()) : "email";
+            
             return new ValidatePromptResponse(
                 true,
-                isValid ? "Prompt validated successfully for " + request.getChannel() + " delivery" : "Prompt validation failed",
+                isValid ? "Prompt validated successfully for delivery via: " + channelsText : "Prompt validation failed",
                 jsonData
             );
             

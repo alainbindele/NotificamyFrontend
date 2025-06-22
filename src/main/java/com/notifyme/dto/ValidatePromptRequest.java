@@ -3,6 +3,8 @@ package com.notifyme.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.Map;
 
 public class ValidatePromptRequest {
     
@@ -14,7 +16,8 @@ public class ValidatePromptRequest {
     @Email(message = "Email must be valid")
     private String email;
     
-    private String channel = "email"; // Default to email
+    private List<String> channels;
+    private Map<String, Object> channelConfigs;
     
     // Default constructor
     public ValidatePromptRequest() {}
@@ -25,10 +28,11 @@ public class ValidatePromptRequest {
         this.email = email;
     }
     
-    public ValidatePromptRequest(String prompt, String email, String channel) {
+    public ValidatePromptRequest(String prompt, String email, List<String> channels, Map<String, Object> channelConfigs) {
         this.prompt = prompt;
         this.email = email;
-        this.channel = channel;
+        this.channels = channels;
+        this.channelConfigs = channelConfigs;
     }
     
     // Getters and setters
@@ -48,12 +52,20 @@ public class ValidatePromptRequest {
         this.email = email;
     }
     
-    public String getChannel() {
-        return channel;
+    public List<String> getChannels() {
+        return channels;
     }
     
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setChannels(List<String> channels) {
+        this.channels = channels;
+    }
+    
+    public Map<String, Object> getChannelConfigs() {
+        return channelConfigs;
+    }
+    
+    public void setChannelConfigs(Map<String, Object> channelConfigs) {
+        this.channelConfigs = channelConfigs;
     }
     
     @Override
@@ -61,7 +73,8 @@ public class ValidatePromptRequest {
         return "ValidatePromptRequest{" +
                 "prompt='" + prompt + '\'' +
                 ", email='" + email + '\'' +
-                ", channel='" + channel + '\'' +
+                ", channels=" + channels +
+                ", channelConfigs=" + channelConfigs +
                 '}';
     }
 }

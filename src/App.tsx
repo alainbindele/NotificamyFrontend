@@ -7,6 +7,7 @@ import { NotificationPopup } from './components/NotificationPopup';
 import { AuthButton } from './components/AuthButton';
 import { SocialLoginModal } from './components/SocialLoginModal';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ChannelConfigModal } from './components/ChannelConfigModal';
 
 const translations = {
   en: {
@@ -16,13 +17,13 @@ const translations = {
     description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, Slack, or Discord exactly when you need it.",
     promptPlaceholder: "Tell our AI what you want to be notified about...",
     emailPlaceholder: "Enter your email address",
-    channelLabel: "Choose your notification channel",
+    channelLabel: "Choose your notification channels (select multiple)",
     getStarted: "Notificamy!",
     processing: "Processing...",
     loginToUse: "Sign in to create notifications",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
-    multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, Slack, or Discord",
+    multiPlatformDesc: "Receive notifications on your preferred platforms - Email, WhatsApp, Slack, or Discord",
     smartScheduling: "Smart Scheduling",
     smartSchedulingDesc: "Set periodic notifications or schedule for specific dates and times",
     aiPowered: "AI-Powered Intelligence",
@@ -30,8 +31,8 @@ const translations = {
     howItWorks: "How It Works",
     step1: "Describe Your Need",
     step1Desc: "Tell our AI what you want to be notified about in natural language",
-    step2: "Choose Your Platform",
-    step2Desc: "Select Email, WhatsApp, Slack, or Discord as your notification channel",
+    step2: "Choose Your Platforms",
+    step2Desc: "Select Email, WhatsApp, Slack, or Discord as your notification channels",
     step3: "Set Your Schedule",
     step3Desc: "Choose periodic alerts or set specific dates and times",
     step4: "Stay Informed",
@@ -51,12 +52,14 @@ const translations = {
     errorGeneric: "An error occurred while processing your request. Please try again.",
     errorNetwork: "Unable to connect to the server. Please check your connection and try again.",
     errorAuth: "Authentication required. Please sign in to continue.",
+    errorNoChannels: "Please select at least one notification channel.",
     channels: {
       email: "Email",
       whatsapp: "WhatsApp",
       slack: "Slack",
       discord: "Discord"
-    }
+    },
+    selectedChannels: "Selected channels"
   },
   it: {
     title: "Notificamy",
@@ -65,13 +68,13 @@ const translations = {
     description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp, Slack o Discord esattamente quando ne hai bisogno.",
     promptPlaceholder: "Racconta alla nostra AI di cosa vuoi essere notificato...",
     emailPlaceholder: "Inserisci il tuo indirizzo email",
-    channelLabel: "Scegli il tuo canale di notifica",
+    channelLabel: "Scegli i tuoi canali di notifica (selezione multipla)",
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
     loginToUse: "Accedi per creare notifiche",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
-    multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp, Slack o Discord",
+    multiPlatformDesc: "Ricevi notifiche sulle tue piattaforme preferite - Email, WhatsApp, Slack o Discord",
     smartScheduling: "Programmazione Intelligente",
     smartSchedulingDesc: "Imposta notifiche periodiche o programma per date e orari specifici",
     aiPowered: "Intelligenza Basata su AI",
@@ -79,8 +82,8 @@ const translations = {
     howItWorks: "Come Funziona",
     step1: "Descrivi la Tua Necessità",
     step1Desc: "Racconta alla nostra AI di cosa vuoi essere notificato in linguaggio naturale",
-    step2: "Scegli la Tua Piattaforma",
-    step2Desc: "Seleziona Email, WhatsApp, Slack o Discord come canale di notifica",
+    step2: "Scegli le Tue Piattaforme",
+    step2Desc: "Seleziona Email, WhatsApp, Slack o Discord come canali di notifica",
     step3: "Imposta la Programmazione",
     step3Desc: "Scegli avvisi periodici o imposta date e orari specifici",
     step4: "Rimani Informato",
@@ -100,25 +103,36 @@ const translations = {
     errorGeneric: "Si è verificato un errore durante l'elaborazione della richiesta. Riprova.",
     errorNetwork: "Impossibile connettersi al server. Controlla la connessione e riprova.",
     errorAuth: "Autenticazione richiesta. Effettua l'accesso per continuare.",
+    errorNoChannels: "Seleziona almeno un canale di notifica.",
     channels: {
       email: "Email",
       whatsapp: "WhatsApp",
       slack: "Slack",
       discord: "Discord"
-    }
+    },
+    selectedChannels: "Canali selezionati"
   }
 };
 
-type NotificationChannel = 'email' | 'whatsapp' | 'slack' | 'discord';
+export type NotificationChannel = 'email' | 'whatsapp' | 'slack' | 'discord';
+
+export interface ChannelConfig {
+  email?: string;
+  whatsapp?: string;
+  slack?: string;
+  discord?: string;
+}
 
 function App() {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
   const [language, setLanguage] = useState<'en' | 'it'>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
-  const [selectedChannel, setSelectedChannel] = useState<NotificationChannel>('email');
+  const [selectedChannels, setSelectedChannels] = useState<NotificationChannel[]>(['email']);
+  const [channelConfigs, setChannelConfigs] = useState<ChannelConfig>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showChannelConfigModal, setShowChannelConfigModal] = useState(false);
   const [popup, setPopup] = useState<{
     isOpen: boolean;
     isSuccess: boolean;
@@ -135,6 +149,7 @@ function App() {
   React.useEffect(() => {
     if (isAuthenticated && user?.email && !email) {
       setEmail(user.email);
+      setChannelConfigs(prev => ({ ...prev, email: user.email }));
     }
   }, [isAuthenticated, user, email]);
 
@@ -152,6 +167,23 @@ function App() {
     discord: 'indigo'
   };
 
+  const toggleChannel = (channel: NotificationChannel) => {
+    setSelectedChannels(prev => {
+      if (prev.includes(channel)) {
+        // Remove channel
+        const newChannels = prev.filter(c => c !== channel);
+        // Remove config for this channel
+        const newConfigs = { ...channelConfigs };
+        delete newConfigs[channel];
+        setChannelConfigs(newConfigs);
+        return newChannels;
+      } else {
+        // Add channel
+        return [...prev, channel];
+      }
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -159,8 +191,28 @@ function App() {
       return;
     }
 
+    if (selectedChannels.length === 0) {
+      setPopup({
+        isOpen: true,
+        isSuccess: false,
+        message: t.errorNoChannels
+      });
+      return;
+    }
+
     if (!isAuthenticated) {
       setShowLoginModal(true);
+      return;
+    }
+
+    // Check if we need channel configurations
+    const needsConfig = selectedChannels.some(channel => {
+      if (channel === 'email') return false; // Email is already configured
+      return !channelConfigs[channel];
+    });
+
+    if (needsConfig) {
+      setShowChannelConfigModal(true);
       return;
     }
 
@@ -172,7 +224,8 @@ function App() {
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim(),
-        channel: selectedChannel
+        channels: selectedChannels,
+        channelConfigs: channelConfigs
       }, token);
 
       const isValid = validationData.validity.valid_prompt;
@@ -187,9 +240,11 @@ function App() {
       // Clear form on success
       if (isValid) {
         setPrompt('');
-        // Keep email for authenticated users
+        // Keep email and channels for authenticated users
         if (!isAuthenticated) {
           setEmail('');
+          setSelectedChannels(['email']);
+          setChannelConfigs({});
         }
       }
 
@@ -214,6 +269,14 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleChannelConfigSave = (configs: ChannelConfig) => {
+    setChannelConfigs(prev => ({ ...prev, ...configs }));
+    setShowChannelConfigModal(false);
+    
+    // Now submit the form
+    handleSubmit(new Event('submit') as any);
   };
 
   const closePopup = () => {
@@ -284,21 +347,29 @@ function App() {
             </div>
 
             {/* Channel Selection */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-300 text-left">
-                {t.channelLabel}
-              </label>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-300 text-left">
+                  {t.channelLabel}
+                </label>
+                {selectedChannels.length > 0 && (
+                  <div className="text-xs text-gray-400">
+                    {t.selectedChannels}: {selectedChannels.length}
+                  </div>
+                )}
+              </div>
+              
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {(Object.keys(channelIcons) as NotificationChannel[]).map((channel) => {
                   const Icon = channelIcons[channel];
                   const color = channelColors[channel];
-                  const isSelected = selectedChannel === channel;
+                  const isSelected = selectedChannels.includes(channel);
                   
                   return (
                     <button
                       key={channel}
                       type="button"
-                      onClick={() => setSelectedChannel(channel)}
+                      onClick={() => toggleChannel(channel)}
                       disabled={isLoading}
                       className={`
                         relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105
@@ -318,10 +389,41 @@ function App() {
                       {isSelected && (
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${color}-500/10 to-${color}-500/20 pointer-events-none`}></div>
                       )}
+                      {isSelected && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-white">{selectedChannels.indexOf(channel) + 1}</span>
+                        </div>
+                      )}
                     </button>
                   );
                 })}
               </div>
+
+              {/* Selected Channels Summary */}
+              {selectedChannels.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {selectedChannels.map((channel) => {
+                    const Icon = channelIcons[channel];
+                    const color = channelColors[channel];
+                    const hasConfig = channel === 'email' || channelConfigs[channel];
+                    
+                    return (
+                      <div
+                        key={channel}
+                        className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs border ${
+                          hasConfig 
+                            ? `border-${color}-500/50 bg-${color}-500/20 text-${color}-300`
+                            : `border-yellow-500/50 bg-yellow-500/20 text-yellow-300`
+                        }`}
+                      >
+                        <Icon className="w-3 h-3" />
+                        <span>{t.channels[channel]}</span>
+                        {!hasConfig && <span className="text-yellow-400">⚠</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col md:flex-row gap-4">
@@ -339,7 +441,7 @@ function App() {
               
               <button
                 type="submit"
-                disabled={isLoading || !prompt.trim() || !email.trim()}
+                disabled={isLoading || !prompt.trim() || !email.trim() || selectedChannels.length === 0}
                 className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <span className="flex items-center space-x-2">
@@ -479,6 +581,15 @@ function App() {
       <SocialLoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+        language={language}
+      />
+
+      <ChannelConfigModal
+        isOpen={showChannelConfigModal}
+        onClose={() => setShowChannelConfigModal(false)}
+        onSave={handleChannelConfigSave}
+        selectedChannels={selectedChannels}
+        existingConfigs={channelConfigs}
         language={language}
       />
 
