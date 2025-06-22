@@ -54,6 +54,7 @@ public class ValidationService {
             summary.put("text", "User wants to receive notifications about: " + request.getPrompt());
             summary.put("language", "en");
             summary.put("category", "general");
+            summary.put("channel", request.getChannel() != null ? request.getChannel() : "email");
             responseData.set("summary", summary);
             
             // Metadata section
@@ -61,14 +62,14 @@ public class ValidationService {
             metadata.put("model_version", "1.0.0");
             metadata.put("confidence_score", 0.95);
             metadata.put("policy_enforced", true);
-            metadata.set("tags", objectMapper.createArrayNode().add("notification").add("reminder"));
+            metadata.set("tags", objectMapper.createArrayNode().add("notification").add("reminder").add(request.getChannel()));
             responseData.set("metadata", metadata);
             
             String jsonData = objectMapper.writeValueAsString(responseData);
             
             return new ValidatePromptResponse(
                 true,
-                isValid ? "Prompt validated successfully" : "Prompt validation failed",
+                isValid ? "Prompt validated successfully for " + request.getChannel() + " delivery" : "Prompt validation failed",
                 jsonData
             );
             

@@ -14,6 +14,8 @@ public class ValidatePromptRequest {
     @Email(message = "Email must be valid")
     private String email;
     
+    private String channel = "email"; // Default to email
+    
     // Default constructor
     public ValidatePromptRequest() {}
     
@@ -21,6 +23,12 @@ public class ValidatePromptRequest {
     public ValidatePromptRequest(String prompt, String email) {
         this.prompt = prompt;
         this.email = email;
+    }
+    
+    public ValidatePromptRequest(String prompt, String email, String channel) {
+        this.prompt = prompt;
+        this.email = email;
+        this.channel = channel;
     }
     
     // Getters and setters
@@ -40,11 +48,20 @@ public class ValidatePromptRequest {
         this.email = email;
     }
     
+    public String getChannel() {
+        return channel;
+    }
+    
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+    
     @Override
     public String toString() {
         return "ValidatePromptRequest{" +
                 "prompt='" + prompt + '\'' +
                 ", email='" + email + '\'' +
+                ", channel='" + channel + '\'' +
                 '}';
     }
 }

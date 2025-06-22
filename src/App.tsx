@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2 } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
@@ -13,15 +13,16 @@ const translations = {
     title: "Notificamy",
     subtitle: "Never Miss What Matters",
     hero: "The Ultimate AI-Powered Notification System",
-    description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, or Slack exactly when you need it.",
+    description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, Slack, or Discord exactly when you need it.",
     promptPlaceholder: "Tell our AI what you want to be notified about...",
     emailPlaceholder: "Enter your email address",
+    channelLabel: "Choose your notification channel",
     getStarted: "Notificamy!",
     processing: "Processing...",
     loginToUse: "Sign in to create notifications",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
-    multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, or Slack",
+    multiPlatformDesc: "Receive notifications on your preferred platform - Email, WhatsApp, Slack, or Discord",
     smartScheduling: "Smart Scheduling",
     smartSchedulingDesc: "Set periodic notifications or schedule for specific dates and times",
     aiPowered: "AI-Powered Intelligence",
@@ -30,7 +31,7 @@ const translations = {
     step1: "Describe Your Need",
     step1Desc: "Tell our AI what you want to be notified about in natural language",
     step2: "Choose Your Platform",
-    step2Desc: "Select Email, WhatsApp, or Slack as your notification channel",
+    step2Desc: "Select Email, WhatsApp, Slack, or Discord as your notification channel",
     step3: "Set Your Schedule",
     step3Desc: "Choose periodic alerts or set specific dates and times",
     step4: "Stay Informed",
@@ -50,20 +51,27 @@ const translations = {
     errorGeneric: "An error occurred while processing your request. Please try again.",
     errorNetwork: "Unable to connect to the server. Please check your connection and try again.",
     errorAuth: "Authentication required. Please sign in to continue.",
+    channels: {
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    }
   },
   it: {
     title: "Notificamy",
     subtitle: "Non Perdere Mai Ciò Che Conta",
     hero: "Il Sistema di Notifiche Definitivo Basato su AI",
-    description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp o Slack esattamente quando ne hai bisogno.",
+    description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp, Slack o Discord esattamente quando ne hai bisogno.",
     promptPlaceholder: "Racconta alla nostra AI di cosa vuoi essere notificato...",
     emailPlaceholder: "Inserisci il tuo indirizzo email",
+    channelLabel: "Scegli il tuo canale di notifica",
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
     loginToUse: "Accedi per creare notifiche",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
-    multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp o Slack",
+    multiPlatformDesc: "Ricevi notifiche sulla tua piattaforma preferita - Email, WhatsApp, Slack o Discord",
     smartScheduling: "Programmazione Intelligente",
     smartSchedulingDesc: "Imposta notifiche periodiche o programma per date e orari specifici",
     aiPowered: "Intelligenza Basata su AI",
@@ -72,7 +80,7 @@ const translations = {
     step1: "Descrivi la Tua Necessità",
     step1Desc: "Racconta alla nostra AI di cosa vuoi essere notificato in linguaggio naturale",
     step2: "Scegli la Tua Piattaforma",
-    step2Desc: "Seleziona Email, WhatsApp o Slack come canale di notifica",
+    step2Desc: "Seleziona Email, WhatsApp, Slack o Discord come canale di notifica",
     step3: "Imposta la Programmazione",
     step3Desc: "Scegli avvisi periodici o imposta date e orari specifici",
     step4: "Rimani Informato",
@@ -92,14 +100,23 @@ const translations = {
     errorGeneric: "Si è verificato un errore durante l'elaborazione della richiesta. Riprova.",
     errorNetwork: "Impossibile connettersi al server. Controlla la connessione e riprova.",
     errorAuth: "Autenticazione richiesta. Effettua l'accesso per continuare.",
+    channels: {
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    }
   }
 };
+
+type NotificationChannel = 'email' | 'whatsapp' | 'slack' | 'discord';
 
 function App() {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
   const [language, setLanguage] = useState<'en' | 'it'>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
+  const [selectedChannel, setSelectedChannel] = useState<NotificationChannel>('email');
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [popup, setPopup] = useState<{
@@ -121,6 +138,20 @@ function App() {
     }
   }, [isAuthenticated, user, email]);
 
+  const channelIcons = {
+    email: Mail,
+    whatsapp: MessageSquare,
+    slack: Slack,
+    discord: Hash
+  };
+
+  const channelColors = {
+    email: 'red',
+    whatsapp: 'green',
+    slack: 'purple',
+    discord: 'indigo'
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -140,7 +171,8 @@ function App() {
       
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
-        email: email.trim()
+        email: email.trim(),
+        channel: selectedChannel
       }, token);
 
       const isValid = validationData.validity.valid_prompt;
@@ -250,6 +282,47 @@ function App() {
               />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
+
+            {/* Channel Selection */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-300 text-left">
+                {t.channelLabel}
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(Object.keys(channelIcons) as NotificationChannel[]).map((channel) => {
+                  const Icon = channelIcons[channel];
+                  const color = channelColors[channel];
+                  const isSelected = selectedChannel === channel;
+                  
+                  return (
+                    <button
+                      key={channel}
+                      type="button"
+                      onClick={() => setSelectedChannel(channel)}
+                      disabled={isLoading}
+                      className={`
+                        relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105
+                        ${isSelected 
+                          ? `border-${color}-500 bg-${color}-500/20 shadow-lg shadow-${color}-500/25` 
+                          : `border-white/20 bg-white/5 hover:border-${color}-500/50 hover:bg-${color}-500/10`
+                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                      `}
+                    >
+                      <div className="flex flex-col items-center space-y-2">
+                        <Icon className={`w-6 h-6 ${isSelected ? `text-${color}-400` : 'text-gray-400'}`} />
+                        <span className={`text-sm font-medium ${isSelected ? `text-${color}-400` : 'text-gray-400'}`}>
+                          {t.channels[channel]}
+                        </span>
+                      </div>
+                      {isSelected && (
+                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${color}-500/10 to-${color}-500/20 pointer-events-none`}></div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -290,7 +363,7 @@ function App() {
             {t.platforms}
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-red-500/50 transition-all duration-300 group">
               <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-2xl flex items-center justify-center group-hover:bg-red-500/30 transition-all duration-300">
                 <Mail className="w-8 h-8 text-red-400" />
@@ -313,6 +386,14 @@ function App() {
               </div>
               <h4 className="text-xl font-semibold mb-2">Slack</h4>
               <p className="text-gray-400">Team collaboration alerts</p>
+            </div>
+
+            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-indigo-500/50 transition-all duration-300 group">
+              <div className="w-16 h-16 mx-auto mb-4 bg-indigo-500/20 rounded-2xl flex items-center justify-center group-hover:bg-indigo-500/30 transition-all duration-300">
+                <Hash className="w-8 h-8 text-indigo-400" />
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Discord</h4>
+              <p className="text-gray-400">Gaming and community alerts</p>
             </div>
           </div>
         </div>
