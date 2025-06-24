@@ -22,6 +22,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onLanguageChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = languages.find(lang => lang.code === language);
@@ -31,6 +32,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setHoveredIndex(null);
       }
     };
 
@@ -40,9 +42,35 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     };
   }, []);
 
+  // Close dropdown on escape key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        setHoveredIndex(null);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [isOpen]);
+
   const handleLanguageSelect = (langCode: Language) => {
     onLanguageChange(langCode);
     setIsOpen(false);
+    setHoveredIndex(null);
+  };
+
+  const handleMouseEnter = (index: number) => {
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
   };
 
   return (
@@ -50,43 +78,92 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/20"
+        className={`
+          flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50
+          ${isOpen 
+            ? 'bg-gray-800 border-fuchsia-500/50 shadow-lg' 
+            : 'bg-gray-800/90 border-white/20 hover:bg-gray-700 hover:border-white/30'
+          }
+        `}
       >
-        <Globe className="w-4 h-4" />
-        <span className="text-sm font-medium hidden md:block">
+        <Globe className="w-4 h-4 text-white" />
+        <span className="text-sm font-medium text-white hidden md:block">
           {currentLanguage?.nativeName}
         </span>
-        <span className="text-xs font-medium md:hidden">
+        <span className="text-sm font-medium text-white md:hidden">
           {currentLanguage?.flag}
         </span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown 
+          className={`w-3 h-3 text-white transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`} 
+        />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-white/20 rounded-xl shadow-2xl backdrop-blur-sm z-50 overflow-hidden">
+        <div 
+          className={`
+            absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-white/20 rounded-xl shadow-2xl z-50 overflow-hidden
+            animate-in fade-in slide-in-from-top-2 duration-200
+          `}
+          style={{
+            animation: 'fadeInSlideDown 0.2s ease-out forwards'
+          }}
+        >
           <div className="py-2">
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => handleLanguageSelect(lang.code as Language)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-white/10 transition-all duration-200 ${
-                  language === lang.code ? 'bg-fuchsia-500/20 text-fuchsia-300' : 'text-gray-300'
-                }`}
-              >
-                <span className="text-lg">{lang.flag}</span>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{lang.nativeName}</span>
-                  <span className="text-xs text-gray-400">{lang.name}</span>
-                </div>
-                {language === lang.code && (
-                  <div className="ml-auto w-2 h-2 bg-fuchsia-400 rounded-full"></div>
-                )}
-              </button>
-            ))}
+            {languages.map((lang, index) => {
+              const isSelected = language === lang.code;
+              const isHovered = hoveredIndex === index;
+              
+              return (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageSelect(lang.code as Language)}
+                  onMouseEnter={() => handleMouseEnter(index)}
+                  onMouseLeave={handleMouseLeave}
+                  className={`
+                    w-full flex items-center space-x-3 px-4 py-3 text-left transition-all duration-150 relative
+                    ${isSelected 
+                      ? 'bg-fuchsia-500/20 text-fuchsia-300 border-r-2 border-fuchsia-500' 
+                      : isHovered
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-300 hover:text-white'
+                    }
+                  `}
+                  style={{
+                    backgroundColor: isHovered && !isSelected ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                    transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
+                  }}
+                >
+                  <span className="text-lg flex-shrink-0">{lang.flag}</span>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-sm font-medium truncate">{lang.nativeName}</span>
+                    <span className="text-xs text-gray-400 truncate">{lang.name}</span>
+                  </div>
+                  {isSelected && (
+                    <div className="w-2 h-2 bg-fuchsia-400 rounded-full flex-shrink-0"></div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* CSS Animation Styles */}
+      <style jsx>{`
+        @keyframes fadeInSlideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 };
