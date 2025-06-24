@@ -564,17 +564,17 @@ function App() {
         <div className="max-w-7xl mx-auto">
           {/* Mobile Layout */}
           <div className="md:hidden">
-            {/* Top row with logo centered */}
+            {/* Top row with logo centered - 65% width */}
             <div className="flex justify-center mb-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <Bell className="w-5 h-5 text-white" />
+              <div className="flex items-center space-x-3 w-[65%] justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Bell className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex flex-col">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                <div className="flex flex-col min-w-0">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent leading-tight">
                     {t.title}
                   </h1>
-                  <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                  <span className="text-sm font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
                     {t.alphaStatus}
                   </span>
                 </div>
