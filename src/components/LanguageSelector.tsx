@@ -65,101 +65,97 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     setHoveredIndex(null);
   };
 
-  const getItemStyle = (index: number, isSelected: boolean) => {
-    if (isSelected) {
-      return {
-        backgroundColor: 'rgba(217, 70, 239, 0.2)',
-        borderRight: '2px solid rgb(217, 70, 239)',
-        color: 'rgb(232, 121, 249)',
-        transform: 'translateX(0px)'
-      };
-    }
-    
-    if (hoveredIndex === index) {
-      return {
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-        color: 'rgb(255, 255, 255)',
-        transform: 'translateX(3px)'
-      };
-    }
-    
-    return {
-      backgroundColor: 'transparent',
-      color: 'rgb(209, 213, 219)',
-      transform: 'translateX(0px)'
-    };
-  };
-
   return (
-    <div className="relative z-[9999]" ref={dropdownRef}>
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          relative z-[9999] flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50
-          ${isOpen 
-            ? 'bg-gray-800 border-fuchsia-500/50 shadow-lg' 
-            : 'bg-gray-800 border-white/20 hover:bg-gray-700 hover:border-white/30'
-          }
-        `}
+    <>
+      {/* Container with maximum z-index */}
+      <div 
+        className="relative"
+        ref={dropdownRef}
+        style={{ zIndex: 999999 }}
       >
-        <Globe className="w-4 h-4 text-white" />
-        <span className="text-sm font-medium text-white hidden md:block">
-          {currentLanguage?.nativeName}
-        </span>
-        <span className="text-sm font-medium text-white md:hidden">
-          {currentLanguage?.flag}
-        </span>
-        <ChevronDown 
-          className={`w-3 h-3 text-white transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
-          }`} 
-        />
-      </button>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div 
-          className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden"
-          style={{
-            backgroundColor: 'rgb(31, 41, 55)', // gray-800 solid
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            animation: 'fadeInSlideDown 0.2s ease-out forwards',
-            zIndex: 99999, // Massimo z-index possibile
-            position: 'absolute'
-          }}
+        {/* Trigger Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`
+            flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50
+            ${isOpen 
+              ? 'bg-gray-800 border-fuchsia-500/50 shadow-lg' 
+              : 'bg-gray-800 border-white/20 hover:bg-gray-700 hover:border-white/30'
+            }
+          `}
         >
-          <div className="py-2">
-            {languages.map((lang, index) => {
-              const isSelected = language === lang.code;
-              const itemStyle = getItemStyle(index, isSelected);
-              
-              return (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageSelect(lang.code as Language)}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-left transition-all duration-150 relative"
-                  style={itemStyle}
-                >
-                  <span className="text-lg flex-shrink-0">{lang.flag}</span>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">{lang.nativeName}</span>
-                    <span className="text-xs opacity-70 truncate">{lang.name}</span>
-                  </div>
-                  {isSelected && (
-                    <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: 'rgb(232, 121, 249)' }}
-                    ></div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+          <Globe className="w-4 h-4 text-white" />
+          <span className="text-sm font-medium text-white hidden md:block">
+            {currentLanguage?.nativeName}
+          </span>
+          <span className="text-sm font-medium text-white md:hidden">
+            {currentLanguage?.flag}
+          </span>
+          <ChevronDown 
+            className={`w-3 h-3 text-white transition-transform duration-200 ${
+              isOpen ? 'rotate-180' : ''
+            }`} 
+          />
+        </button>
+
+        {/* Dropdown Menu with Portal-like positioning */}
+        {isOpen && (
+          <>
+            {/* Backdrop to ensure clicks outside close the dropdown */}
+            <div 
+              className="fixed inset-0"
+              style={{ zIndex: 999998 }}
+              onClick={() => setIsOpen(false)}
+            />
+            
+            {/* Dropdown Menu */}
+            <div 
+              className="absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-white/20 rounded-xl shadow-2xl overflow-hidden"
+              style={{ 
+                zIndex: 999999,
+                animation: 'fadeInSlideDown 0.2s ease-out forwards'
+              }}
+            >
+              <div className="py-2">
+                {languages.map((lang, index) => {
+                  const isSelected = language === lang.code;
+                  const isHovered = hoveredIndex === index;
+                  
+                  return (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageSelect(lang.code as Language)}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      className={`
+                        w-full flex items-center space-x-3 px-4 py-3 text-left transition-all duration-150 relative
+                        ${isSelected 
+                          ? 'bg-fuchsia-500/20 text-fuchsia-300 border-r-2 border-fuchsia-500' 
+                          : isHovered
+                            ? 'bg-white/15 text-white'
+                            : 'text-gray-300 hover:text-white'
+                        }
+                      `}
+                      style={{
+                        transform: isHovered ? 'translateX(3px)' : 'translateX(0)',
+                      }}
+                    >
+                      <span className="text-lg flex-shrink-0">{lang.flag}</span>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="text-sm font-medium truncate">{lang.nativeName}</span>
+                        <span className="text-xs opacity-70 truncate">{lang.name}</span>
+                      </div>
+                      {isSelected && (
+                        <div className="w-2 h-2 bg-fuchsia-400 rounded-full flex-shrink-0"></div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* CSS Animation Styles */}
       <style jsx>{`
@@ -174,6 +170,6 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           }
         }
       `}</style>
-    </div>
+    </>
   );
 };

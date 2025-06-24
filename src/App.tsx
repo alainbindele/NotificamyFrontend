@@ -561,28 +561,59 @@ function App() {
       
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Bell className="w-5 h-5 text-white" />
+        <div className="max-w-7xl mx-auto">
+          {/* Mobile Layout */}
+          <div className="md:hidden">
+            {/* Top row with logo centered */}
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                    {t.title}
+                  </h1>
+                  <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                    {t.alphaStatus}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
-                {t.title}
-              </h1>
-              <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
-                {t.alphaStatus}
-              </span>
+            
+            {/* Bottom row with auth button and language selector */}
+            <div className="flex justify-center items-center space-x-3">
+              <AuthButton language={language} />
+              <LanguageSelector 
+                language={language} 
+                onLanguageChange={setLanguage} 
+              />
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <LanguageSelector 
-              language={language} 
-              onLanguageChange={setLanguage} 
-            />
+
+          {/* Desktop Layout */}
+          <div className="hidden md:flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                  {t.title}
+                </h1>
+                <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                  {t.alphaStatus}
+                </span>
+              </div>
+            </div>
             
-            <AuthButton language={language} />
+            <div className="flex items-center space-x-3">
+              <AuthButton language={language} />
+              <LanguageSelector 
+                language={language} 
+                onLanguageChange={setLanguage} 
+              />
+            </div>
           </div>
         </div>
       </header>
