@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Hash, Check, Globe, ArrowLeft, Crown, Zap, Shield, Users, BarChart3, Settings } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Hash, Check, ArrowLeft, Crown, Zap } from 'lucide-react';
 import { AuthButton } from '../components/AuthButton';
-
-type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+import { LanguageSelector, Language } from '../components/LanguageSelector';
 
 // Function to detect browser language
 const detectBrowserLanguage = (): Language => {
@@ -544,25 +543,6 @@ export const PlansPage: React.FC = () => {
     return true;
   };
 
-  const cycleLanguage = () => {
-    const languages: Language[] = ['en', 'it', 'es', 'fr', 'de', 'zh'];
-    const currentIndex = languages.indexOf(language);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    setLanguage(languages[nextIndex]);
-  };
-
-  const getLanguageDisplay = (lang: Language) => {
-    const displays = {
-      en: 'EN',
-      it: 'IT',
-      es: 'ES',
-      fr: 'FR',
-      de: 'DE',
-      zh: '中文'
-    };
-    return displays[lang];
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
       {/* Animated Background */}
@@ -586,13 +566,10 @@ export const PlansPage: React.FC = () => {
               </button>
               
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={cycleLanguage}
-                  className="flex items-center space-x-1 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span className="text-xs font-medium">{getLanguageDisplay(language)}</span>
-                </button>
+                <LanguageSelector 
+                  language={language} 
+                  onLanguageChange={setLanguage} 
+                />
                 
                 <AuthButton language={language} />
               </div>
@@ -643,13 +620,10 @@ export const PlansPage: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <button
-                onClick={cycleLanguage}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
-              >
-                <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium">{getLanguageDisplay(language)}</span>
-              </button>
+              <LanguageSelector 
+                language={language} 
+                onLanguageChange={setLanguage} 
+              />
               
               <AuthButton language={language} />
             </div>

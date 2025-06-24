@@ -1,8 +1,7 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { X, Mail, Facebook, Twitter } from 'lucide-react';
-
-type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+import { Language } from './LanguageSelector';
 
 interface SocialLoginModalProps {
   isOpen: boolean;

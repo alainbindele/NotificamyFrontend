@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, MessageSquare, Slack, Hash, Phone, Link, User, Key } from 'lucide-react';
 import { NotificationChannel, ChannelConfig } from '../App';
-
-type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+import { Language } from './LanguageSelector';
 
 interface ChannelConfigModalProps {
   isOpen: boolean;
@@ -189,7 +188,7 @@ const configTranslations = {
       },
       whatsapp: {
         title: 'WhatsApp-Konfiguration',
-        phone: 'Telefonnummer',
+        phone: '电话号码',
         phonePlaceholder: '+491234567890 (mit Ländercode)'
       },
       slack: {

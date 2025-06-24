@@ -1,7 +1,6 @@
 import React from 'react';
 import { CheckCircle, XCircle, X } from 'lucide-react';
-
-type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+import { Language } from './LanguageSelector';
 
 interface NotificationPopupProps {
   isOpen: boolean;

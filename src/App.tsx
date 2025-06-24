@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Lock, Info } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Smartphone, Monitor, Loader2, Lock, Info } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
@@ -8,6 +8,7 @@ import { AuthButton } from './components/AuthButton';
 import { SocialLoginModal } from './components/SocialLoginModal';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ChannelConfigModal } from './components/ChannelConfigModal';
+import { LanguageSelector, Language } from './components/LanguageSelector';
 
 const translations = {
   en: {
@@ -337,7 +338,6 @@ const translations = {
 };
 
 export type NotificationChannel = 'email' | 'whatsapp' | 'slack' | 'discord';
-export type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
 
 export interface ChannelConfig {
   email?: string;
@@ -552,25 +552,6 @@ function App() {
     setPopup(prev => ({ ...prev, isOpen: false }));
   };
 
-  const cycleLanguage = () => {
-    const languages: Language[] = ['en', 'it', 'es', 'fr', 'de', 'zh'];
-    const currentIndex = languages.indexOf(language);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    setLanguage(languages[nextIndex]);
-  };
-
-  const getLanguageDisplay = (lang: Language) => {
-    const displays = {
-      en: 'EN',
-      it: 'IT',
-      es: 'ES',
-      fr: 'FR',
-      de: 'DE',
-      zh: '中文'
-    };
-    return displays[lang];
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
       {/* Animated Background */}
@@ -596,13 +577,10 @@ function App() {
           </div>
           
           <div className="flex items-center space-x-2 md:space-x-4">
-            <button
-              onClick={cycleLanguage}
-              className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
-            >
-              <Globe className="w-4 h-4" />
-              <span className="text-xs md:text-sm font-medium">{getLanguageDisplay(language)}</span>
-            </button>
+            <LanguageSelector 
+              language={language} 
+              onLanguageChange={setLanguage} 
+            />
             
             <AuthButton language={language} />
           </div>
