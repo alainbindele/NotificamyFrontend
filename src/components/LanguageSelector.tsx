@@ -91,12 +91,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[9999]" ref={dropdownRef}>
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50
+          relative z-[9999] flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50
           ${isOpen 
             ? 'bg-gray-800 border-fuchsia-500/50 shadow-lg' 
             : 'bg-gray-800 border-white/20 hover:bg-gray-700 hover:border-white/30'
@@ -120,11 +120,13 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       {/* Dropdown Menu */}
       {isOpen && (
         <div 
-          className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl z-50 overflow-hidden"
+          className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden"
           style={{
             backgroundColor: 'rgb(31, 41, 55)', // gray-800 solid
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            animation: 'fadeInSlideDown 0.2s ease-out forwards'
+            animation: 'fadeInSlideDown 0.2s ease-out forwards',
+            zIndex: 99999, // Massimo z-index possibile
+            position: 'absolute'
           }}
         >
           <div className="py-2">
