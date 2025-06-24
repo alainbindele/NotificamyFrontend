@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash, Lock } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
@@ -12,6 +12,7 @@ import { ChannelConfigModal } from './components/ChannelConfigModal';
 const translations = {
   en: {
     title: "Notificamy",
+    alphaStatus: "Alpha",
     subtitle: "Never Miss What Matters",
     hero: "The Ultimate AI-Powered Notification System",
     description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, Slack, or Discord exactly when you need it.",
@@ -53,6 +54,7 @@ const translations = {
     errorNetwork: "Unable to connect to the server. Please check your connection and try again.",
     errorAuth: "Authentication required. Please sign in to continue.",
     errorNoChannels: "Please select at least one notification channel.",
+    comingSoon: "Coming Soon",
     channels: {
       email: "Email",
       whatsapp: "WhatsApp",
@@ -63,6 +65,7 @@ const translations = {
   },
   it: {
     title: "Notificamy",
+    alphaStatus: "Alpha",
     subtitle: "Non Perdere Mai Ciò Che Conta",
     hero: "Il Sistema di Notifiche Definitivo Basato su AI",
     description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp, Slack o Discord esattamente quando ne hai bisogno.",
@@ -104,6 +107,7 @@ const translations = {
     errorNetwork: "Impossibile connettersi al server. Controlla la connessione e riprova.",
     errorAuth: "Autenticazione richiesta. Effettua l'accesso per continuare.",
     errorNoChannels: "Seleziona almeno un canale di notifica.",
+    comingSoon: "Prossimamente",
     channels: {
       email: "Email",
       whatsapp: "WhatsApp",
@@ -167,7 +171,15 @@ function App() {
     discord: 'indigo'
   };
 
+  // Disabled channels for alpha
+  const disabledChannels: NotificationChannel[] = ['whatsapp', 'slack', 'discord'];
+
   const toggleChannel = (channel: NotificationChannel) => {
+    // Prevent toggling disabled channels
+    if (disabledChannels.includes(channel)) {
+      return;
+    }
+
     setSelectedChannels(prev => {
       if (prev.includes(channel)) {
         // Remove channel
@@ -306,18 +318,23 @@ function App() {
             <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
               <Bell className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
-              {t.title}
-            </h1>
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                {t.title}
+              </h1>
+              <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                {t.alphaStatus}
+              </span>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <button
               onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
-              className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+              className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
             >
               <Globe className="w-4 h-4" />
-              <span className="text-sm font-medium">{language.toUpperCase()}</span>
+              <span className="text-xs md:text-sm font-medium">{language.toUpperCase()}</span>
             </button>
             
             <AuthButton language={language} />
@@ -373,32 +390,57 @@ function App() {
                   const Icon = channelIcons[channel];
                   const color = channelColors[channel];
                   const isSelected = selectedChannels.includes(channel);
+                  const isDisabled = disabledChannels.includes(channel);
                   
                   return (
                     <button
                       key={channel}
                       type="button"
                       onClick={() => toggleChannel(channel)}
-                      disabled={isLoading}
+                      disabled={isLoading || isDisabled}
                       className={`
-                        relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105
-                        ${isSelected 
-                          ? `border-${color}-500 bg-${color}-500/20 shadow-lg shadow-${color}-500/25` 
-                          : `border-white/20 bg-white/5 hover:border-${color}-500/50 hover:bg-${color}-500/10`
+                        relative p-4 rounded-xl border-2 transition-all duration-300 transform
+                        ${isDisabled 
+                          ? 'border-gray-600 bg-gray-800/50 cursor-not-allowed opacity-60' 
+                          : isSelected 
+                            ? `border-${color}-500 bg-${color}-500/20 shadow-lg shadow-${color}-500/25 hover:scale-105` 
+                            : `border-white/20 bg-white/5 hover:border-${color}-500/50 hover:bg-${color}-500/10 hover:scale-105`
                         }
-                        disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                        disabled:transform-none
                       `}
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <Icon className={`w-6 h-6 ${isSelected ? `text-${color}-400` : 'text-gray-400'}`} />
-                        <span className={`text-sm font-medium ${isSelected ? `text-${color}-400` : 'text-gray-400'}`}>
+                        <div className="relative">
+                          <Icon className={`w-6 h-6 ${
+                            isDisabled 
+                              ? 'text-gray-500' 
+                              : isSelected 
+                                ? `text-${color}-400` 
+                                : 'text-gray-400'
+                          }`} />
+                          {isDisabled && (
+                            <Lock className="absolute -top-1 -right-1 w-3 h-3 text-gray-500" />
+                          )}
+                        </div>
+                        <span className={`text-sm font-medium ${
+                          isDisabled 
+                            ? 'text-gray-500' 
+                            : isSelected 
+                              ? `text-${color}-400` 
+                              : 'text-gray-400'
+                        }`}>
                           {t.channels[channel]}
                         </span>
+                        {isDisabled && (
+                          <span className="text-xs text-gray-500 font-medium">
+                            {t.comingSoon}
+                          </span>
+                        )}
                       </div>
-                      {isSelected && (
+                      {isSelected && !isDisabled && (
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${color}-500/10 to-${color}-500/20 pointer-events-none`}></div>
                       )}
-                      {isSelected && (
+                      {isSelected && !isDisabled && (
                         <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full flex items-center justify-center">
                           <span className="text-xs font-bold text-white">{selectedChannels.indexOf(channel) + 1}</span>
                         </div>
@@ -483,28 +525,40 @@ function App() {
               <p className="text-gray-400">Reliable delivery to your inbox</p>
             </div>
             
-            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-green-500/50 transition-all duration-300 group">
-              <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-all duration-300">
+            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 opacity-60 relative">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-2xl flex items-center justify-center">
                 <MessageSquare className="w-8 h-8 text-green-400" />
+                <Lock className="absolute top-2 right-2 w-4 h-4 text-gray-500" />
               </div>
               <h4 className="text-xl font-semibold mb-2">WhatsApp</h4>
               <p className="text-gray-400">Instant mobile notifications</p>
+              <div className="absolute top-4 right-4 px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300">
+                {t.comingSoon}
+              </div>
             </div>
             
-            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-500/50 transition-all duration-300 group">
-              <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-2xl flex items-center justify-center group-hover:bg-purple-500/30 transition-all duration-300">
+            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 opacity-60 relative">
+              <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-2xl flex items-center justify-center">
                 <Slack className="w-8 h-8 text-purple-400" />
+                <Lock className="absolute top-2 right-2 w-4 h-4 text-gray-500" />
               </div>
               <h4 className="text-xl font-semibold mb-2">Slack</h4>
               <p className="text-gray-400">Team collaboration alerts</p>
+              <div className="absolute top-4 right-4 px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300">
+                {t.comingSoon}
+              </div>
             </div>
 
-            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-indigo-500/50 transition-all duration-300 group">
-              <div className="w-16 h-16 mx-auto mb-4 bg-indigo-500/20 rounded-2xl flex items-center justify-center group-hover:bg-indigo-500/30 transition-all duration-300">
+            <div className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 opacity-60 relative">
+              <div className="w-16 h-16 mx-auto mb-4 bg-indigo-500/20 rounded-2xl flex items-center justify-center">
                 <Hash className="w-8 h-8 text-indigo-400" />
+                <Lock className="absolute top-2 right-2 w-4 h-4 text-gray-500" />
               </div>
               <h4 className="text-xl font-semibold mb-2">Discord</h4>
               <p className="text-gray-400">Gaming and community alerts</p>
+              <div className="absolute top-4 right-4 px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300">
+                {t.comingSoon}
+              </div>
             </div>
           </div>
         </div>
