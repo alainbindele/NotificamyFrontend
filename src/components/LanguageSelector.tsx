@@ -22,40 +22,39 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onLanguageChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = languages.find(lang => lang.code === language);
 
-  // Close dropdown when clicking outside
+  // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
     }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isOpen]);
 
-  // Close dropdown on escape key
+  // Handle escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => {
-        document.removeEventListener('keydown', handleEscape);
-      };
-    }
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, [isOpen]);
 
   const handleLanguageSelect = (langCode: Language) => {
@@ -63,19 +62,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     setIsOpen(false);
   };
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div ref={containerRef} className="relative">
       {/* Trigger Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 relative
-          ${isOpen 
-            ? 'bg-gray-800 border-fuchsia-500/50 shadow-lg' 
-            : 'bg-gray-800 border-white/20 hover:bg-gray-700 hover:border-white/30'
-          }
-        `}
-        style={{ zIndex: 1000 }}
+        onClick={toggleDropdown}
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-800 border border-white/20 hover:bg-gray-700 hover:border-white/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+        style={{ position: 'relative', zIndex: 50 }}
       >
         <Globe className="w-4 h-4 text-white" />
         <span className="text-sm font-medium text-white hidden md:block">
@@ -94,11 +91,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       {/* Dropdown Menu */}
       {isOpen && (
         <div 
-          className="absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-white/20 rounded-xl shadow-2xl overflow-hidden"
+          className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden"
           style={{ 
-            zIndex: 10000,
-            backgroundColor: 'rgb(31, 41, 55)', // Solid background
-            backdropFilter: 'none'
+            position: 'absolute',
+            zIndex: 9999,
+            backgroundColor: '#1f2937',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
           }}
         >
           <div className="py-2">
@@ -109,13 +107,24 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                 <button
                   key={lang.code}
                   onClick={() => handleLanguageSelect(lang.code as Language)}
-                  className={`
-                    w-full flex items-center space-x-3 px-4 py-3 text-left transition-all duration-200 relative
-                    ${isSelected 
-                      ? 'bg-fuchsia-500/20 text-fuchsia-300 border-r-2 border-fuchsia-500' 
-                      : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                  className="w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200"
+                  style={{
+                    backgroundColor: isSelected ? 'rgba(217, 70, 239, 0.2)' : 'transparent',
+                    color: isSelected ? '#f0abfc' : '#d1d5db',
+                    borderRight: isSelected ? '2px solid #d946ef' : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.color = '#ffffff';
                     }
-                  `}
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#d1d5db';
+                    }
+                  }}
                 >
                   <span className="text-lg flex-shrink-0">{lang.flag}</span>
                   <div className="flex flex-col min-w-0 flex-1">
@@ -123,7 +132,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                     <span className="text-xs opacity-70 truncate">{lang.name}</span>
                   </div>
                   {isSelected && (
-                    <div className="w-2 h-2 bg-fuchsia-400 rounded-full flex-shrink-0"></div>
+                    <div 
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: '#c084fc' }}
+                    ></div>
                   )}
                 </button>
               );
