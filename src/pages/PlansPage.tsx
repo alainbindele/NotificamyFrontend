@@ -11,6 +11,7 @@ const translations = {
     hero: "Simple, Transparent Pricing",
     description: "Start free and scale as you grow. All plans include our AI-powered notification system.",
     backToHome: "← Back to Home",
+    back: "Back",
     monthly: "Monthly",
     yearly: "Yearly",
     yearlyDiscount: "Save 20%",
@@ -86,6 +87,7 @@ const translations = {
     hero: "Prezzi Semplici e Trasparenti",
     description: "Inizia gratis e scala man mano che cresci. Tutti i piani includono il nostro sistema di notifiche basato su AI.",
     backToHome: "← Torna alla Home",
+    back: "Indietro",
     monthly: "Mensile",
     yearly: "Annuale",
     yearlyDiscount: "Risparmia 20%",
@@ -226,41 +228,87 @@ export const PlansPage: React.FC = () => {
       
       {/* Header */}
       <header className="relative z-10 px-4 py-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden md:block">{t.backToHome}</span>
-            </button>
-            
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-white" />
+        <div className="max-w-7xl mx-auto">
+          {/* Mobile Layout */}
+          <div className="md:hidden">
+            {/* Top row with back button and auth */}
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>{t.back}</span>
+              </button>
+              
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+                  className="flex items-center space-x-1 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span className="text-xs font-medium">{language.toUpperCase()}</span>
+                </button>
+                
+                <AuthButton language={language} />
               </div>
-              <div className="flex flex-col">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
-                  {t.title}
-                </h1>
-                <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
-                  {t.alphaStatus}
-                </span>
+            </div>
+            
+            {/* Bottom row with logo */}
+            <div className="flex justify-center">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                    {t.title}
+                  </h1>
+                  <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                    {t.alphaStatus}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <button
-              onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
-              className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
-            >
-              <Globe className="w-4 h-4" />
-              <span className="text-xs md:text-sm font-medium">{language.toUpperCase()}</span>
-            </button>
+
+          {/* Desktop Layout */}
+          <div className="hidden md:flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>{t.backToHome}</span>
+              </button>
+              
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+                    {t.title}
+                  </h1>
+                  <span className="text-xs font-medium text-fuchsia-400 uppercase tracking-wider -mt-1">
+                    {t.alphaStatus}
+                  </span>
+                </div>
+              </div>
+            </div>
             
-            <AuthButton language={language} />
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="text-sm font-medium">{language.toUpperCase()}</span>
+              </button>
+              
+              <AuthButton language={language} />
+            </div>
           </div>
         </div>
       </header>
@@ -271,10 +319,10 @@ export const PlansPage: React.FC = () => {
           <h2 className="text-sm font-semibold text-fuchsia-400 mb-2 tracking-wide uppercase">
             {t.subtitle}
           </h2>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-fuchsia-200 to-cyan-200 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-fuchsia-200 to-cyan-200 bg-clip-text text-transparent leading-tight">
             {t.hero}
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t.description}
           </p>
 
@@ -377,33 +425,33 @@ export const PlansPage: React.FC = () => {
       {/* Channel Comparison */}
       <section className="relative z-10 px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+          <h3 className="text-2xl md:text-3xl font-bold text-center mb-12 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
             {t.channels.title}
           </h3>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
-            <div className="grid grid-cols-4 gap-4 p-6 border-b border-white/10">
-              <div className="font-semibold text-gray-300">Channel</div>
-              <div className="text-center font-semibold text-gray-300">Free</div>
-              <div className="text-center font-semibold text-fuchsia-400">Advanced</div>
-              <div className="text-center font-semibold text-cyan-400">Full</div>
+            <div className="grid grid-cols-4 gap-2 md:gap-4 p-4 md:p-6 border-b border-white/10">
+              <div className="font-semibold text-gray-300 text-sm md:text-base">Channel</div>
+              <div className="text-center font-semibold text-gray-300 text-sm md:text-base">Free</div>
+              <div className="text-center font-semibold text-fuchsia-400 text-sm md:text-base">Advanced</div>
+              <div className="text-center font-semibold text-cyan-400 text-sm md:text-base">Full</div>
             </div>
             
             {channels.map((channel) => {
               const Icon = channel.icon;
               return (
-                <div key={channel.key} className="grid grid-cols-4 gap-4 p-6 border-b border-white/5 last:border-b-0">
-                  <div className="flex items-center space-x-3">
-                    <Icon className={`w-5 h-5 text-${channel.color}-400`} />
-                    <span className="text-gray-300">{t.channels[channel.key as keyof typeof t.channels]}</span>
+                <div key={channel.key} className="grid grid-cols-4 gap-2 md:gap-4 p-4 md:p-6 border-b border-white/5 last:border-b-0">
+                  <div className="flex items-center space-x-2 md:space-x-3">
+                    <Icon className={`w-4 h-4 md:w-5 md:h-5 text-${channel.color}-400`} />
+                    <span className="text-gray-300 text-sm md:text-base">{t.channels[channel.key as keyof typeof t.channels]}</span>
                   </div>
                   
                   {plans.map((plan) => (
                     <div key={plan.key} className="text-center">
                       {getChannelAvailability(plan.key, channel.key) ? (
-                        <Check className="w-5 h-5 text-green-400 mx-auto" />
+                        <Check className="w-4 h-4 md:w-5 md:h-5 text-green-400 mx-auto" />
                       ) : (
-                        <div className="w-5 h-5 mx-auto rounded-full bg-gray-600"></div>
+                        <div className="w-4 h-4 md:w-5 md:h-5 mx-auto rounded-full bg-gray-600"></div>
                       )}
                     </div>
                   ))}
@@ -417,7 +465,7 @@ export const PlansPage: React.FC = () => {
       {/* FAQ Section */}
       <section className="relative z-10 px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+          <h3 className="text-2xl md:text-3xl font-bold text-center mb-12 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
             {t.faq.title}
           </h3>
           
