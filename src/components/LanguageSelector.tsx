@@ -67,12 +67,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" style={{ zIndex: 99999 }}>
       {/* Trigger Button */}
       <button
         onClick={toggleDropdown}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-800 border border-white/20 hover:bg-gray-700 hover:border-white/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
-        style={{ position: 'relative', zIndex: 50 }}
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-800 border border-white/20 hover:bg-gray-700 hover:border-white/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 relative"
+        style={{ zIndex: 99999 }}
       >
         <Globe className="w-4 h-4 text-white" />
         <span className="text-sm font-medium text-white hidden md:block">
@@ -90,58 +90,50 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div 
-          className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden"
-          style={{ 
-            position: 'absolute',
-            zIndex: 9999,
-            backgroundColor: '#1f2937',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}
-        >
-          <div className="py-2">
-            {languages.map((lang) => {
-              const isSelected = language === lang.code;
-              
-              return (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageSelect(lang.code as Language)}
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200"
-                  style={{
-                    backgroundColor: isSelected ? 'rgba(217, 70, 239, 0.2)' : 'transparent',
-                    color: isSelected ? '#f0abfc' : '#d1d5db',
-                    borderRight: isSelected ? '2px solid #d946ef' : 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                      e.currentTarget.style.color = '#ffffff';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#d1d5db';
-                    }
-                  }}
-                >
-                  <span className="text-lg flex-shrink-0">{lang.flag}</span>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">{lang.nativeName}</span>
-                    <span className="text-xs opacity-70 truncate">{lang.name}</span>
-                  </div>
-                  {isSelected && (
-                    <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: '#c084fc' }}
-                    ></div>
-                  )}
-                </button>
-              );
-            })}
+        <>
+          {/* Backdrop to ensure clicks are captured */}
+          <div 
+            className="fixed inset-0"
+            style={{ zIndex: 99998 }}
+            onClick={() => setIsOpen(false)}
+          />
+          
+          <div 
+            className="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden bg-gray-800 border border-white/20"
+            style={{ 
+              zIndex: 99999,
+              position: 'absolute'
+            }}
+          >
+            <div className="py-2">
+              {languages.map((lang) => {
+                const isSelected = language === lang.code;
+                
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleLanguageSelect(lang.code as Language)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
+                      isSelected 
+                        ? 'bg-fuchsia-500/20 text-fuchsia-300 border-r-2 border-fuchsia-500' 
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                    style={{ zIndex: 99999 }}
+                  >
+                    <span className="text-lg flex-shrink-0">{lang.flag}</span>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="text-sm font-medium truncate">{lang.nativeName}</span>
+                      <span className="text-xs opacity-70 truncate">{lang.name}</span>
+                    </div>
+                    {isSelected && (
+                      <div className="w-2 h-2 rounded-full bg-fuchsia-400 flex-shrink-0"></div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
