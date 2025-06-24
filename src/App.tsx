@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash, Lock, Shield, UserCheck } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash, Lock } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
@@ -22,16 +22,6 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Processing...",
     loginToUse: "Sign in to create notifications",
-    signInRequired: "Sign In Required",
-    signInMessage: "Create your free account to start receiving AI-powered notifications",
-    signInNow: "Sign In Now",
-    whySignIn: "Why sign in?",
-    signInBenefits: [
-      "Save your notification preferences",
-      "Track your notification history", 
-      "Access all notification channels",
-      "Get personalized AI recommendations"
-    ],
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
     multiPlatformDesc: "Receive notifications on your preferred platforms - Email, WhatsApp, Slack, or Discord",
@@ -85,16 +75,6 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
     loginToUse: "Accedi per creare notifiche",
-    signInRequired: "Accesso Richiesto",
-    signInMessage: "Crea il tuo account gratuito per iniziare a ricevere notifiche basate su AI",
-    signInNow: "Accedi Ora",
-    whySignIn: "Perché accedere?",
-    signInBenefits: [
-      "Salva le tue preferenze di notifica",
-      "Traccia la cronologia delle notifiche",
-      "Accedi a tutti i canali di notifica",
-      "Ottieni raccomandazioni AI personalizzate"
-    ],
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
     multiPlatformDesc: "Ricevi notifiche sulle tue piattaforme preferite - Email, WhatsApp, Slack o Discord",
@@ -377,198 +357,155 @@ function App() {
             </p>
           </div>
 
-          {/* Sign-in Required Section - Only show when not authenticated */}
-          {!isAuthenticated && (
-            <div className="max-w-2xl mx-auto mb-12 p-8 rounded-2xl bg-gradient-to-br from-fuchsia-500/10 to-cyan-500/10 border border-fuchsia-500/30 backdrop-blur-sm">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center border border-fuchsia-500/30">
-                  <Shield className="w-8 h-8 text-fuchsia-400" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                {t.signInRequired}
-              </h3>
-              
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                {t.signInMessage}
-              </p>
-
-              <div className="mb-6">
-                <h4 className="text-lg font-semibold mb-4 text-fuchsia-400">{t.whySignIn}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {t.signInBenefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <UserCheck className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                      <span className="text-gray-300 text-sm">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25"
-              >
-                <span className="flex items-center space-x-2">
-                  <Shield className="w-5 h-5" />
-                  <span>{t.signInNow}</span>
-                </span>
-              </button>
+          {/* Main Form */}
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+            <div className="relative">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder={t.promptPlaceholder}
+                className="w-full h-32 px-6 py-4 bg-white/10 backdrop-blur-sm border border-fuchsia-500/30 rounded-2xl placeholder-gray-400 text-white resize-none focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 transition-all duration-300"
+                rows={4}
+                required
+                disabled={isLoading}
+              />
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
-          )}
 
-          {/* Main Form - Only show when authenticated */}
-          {isAuthenticated && (
-            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-              <div className="relative">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={t.promptPlaceholder}
-                  className="w-full h-32 px-6 py-4 bg-white/10 backdrop-blur-sm border border-fuchsia-500/30 rounded-2xl placeholder-gray-400 text-white resize-none focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 transition-all duration-300"
-                  rows={4}
-                  required
-                  disabled={isLoading}
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            {/* Channel Selection */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-300 text-left">
+                  {t.channelLabel}
+                </label>
+                {selectedChannels.length > 0 && (
+                  <div className="text-xs text-gray-400">
+                    {t.selectedChannels}: {selectedChannels.length}
+                  </div>
+                )}
               </div>
-
-              {/* Channel Selection */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-gray-300 text-left">
-                    {t.channelLabel}
-                  </label>
-                  {selectedChannels.length > 0 && (
-                    <div className="text-xs text-gray-400">
-                      {t.selectedChannels}: {selectedChannels.length}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {(Object.keys(channelIcons) as NotificationChannel[]).map((channel) => {
-                    const Icon = channelIcons[channel];
-                    const color = channelColors[channel];
-                    const isSelected = selectedChannels.includes(channel);
-                    const isDisabled = disabledChannels.includes(channel);
-                    
-                    return (
-                      <button
-                        key={channel}
-                        type="button"
-                        onClick={() => toggleChannel(channel)}
-                        disabled={isLoading || isDisabled}
-                        className={`
-                          relative p-4 rounded-xl border-2 transition-all duration-300 transform
-                          ${isDisabled 
-                            ? 'border-gray-600 bg-gray-800/50 cursor-not-allowed opacity-60' 
-                            : isSelected 
-                              ? `border-${color}-500 bg-${color}-500/20 shadow-lg shadow-${color}-500/25 hover:scale-105` 
-                              : `border-white/20 bg-white/5 hover:border-${color}-500/50 hover:bg-${color}-500/10 hover:scale-105`
-                          }
-                          disabled:transform-none
-                        `}
-                      >
-                        <div className="flex flex-col items-center space-y-2">
-                          <div className="relative">
-                            <Icon className={`w-6 h-6 ${
-                              isDisabled 
-                                ? 'text-gray-500' 
-                                : isSelected 
-                                  ? `text-${color}-400` 
-                                  : 'text-gray-400'
-                            }`} />
-                            {isDisabled && (
-                              <Lock className="absolute -top-1 -right-1 w-3 h-3 text-gray-500" />
-                            )}
-                          </div>
-                          <span className={`text-sm font-medium ${
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(Object.keys(channelIcons) as NotificationChannel[]).map((channel) => {
+                  const Icon = channelIcons[channel];
+                  const color = channelColors[channel];
+                  const isSelected = selectedChannels.includes(channel);
+                  const isDisabled = disabledChannels.includes(channel);
+                  
+                  return (
+                    <button
+                      key={channel}
+                      type="button"
+                      onClick={() => toggleChannel(channel)}
+                      disabled={isLoading || isDisabled}
+                      className={`
+                        relative p-4 rounded-xl border-2 transition-all duration-300 transform
+                        ${isDisabled 
+                          ? 'border-gray-600 bg-gray-800/50 cursor-not-allowed opacity-60' 
+                          : isSelected 
+                            ? `border-${color}-500 bg-${color}-500/20 shadow-lg shadow-${color}-500/25 hover:scale-105` 
+                            : `border-white/20 bg-white/5 hover:border-${color}-500/50 hover:bg-${color}-500/10 hover:scale-105`
+                        }
+                        disabled:transform-none
+                      `}
+                    >
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="relative">
+                          <Icon className={`w-6 h-6 ${
                             isDisabled 
                               ? 'text-gray-500' 
                               : isSelected 
                                 ? `text-${color}-400` 
                                 : 'text-gray-400'
-                          }`}>
-                            {t.channels[channel]}
-                          </span>
+                          }`} />
                           {isDisabled && (
-                            <span className="text-xs text-gray-500 font-medium">
-                              {t.comingSoon}
-                            </span>
+                            <Lock className="absolute -top-1 -right-1 w-3 h-3 text-gray-500" />
                           )}
                         </div>
-                        {isSelected && !isDisabled && (
-                          <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${color}-500/10 to-${color}-500/20 pointer-events-none`}></div>
+                        <span className={`text-sm font-medium ${
+                          isDisabled 
+                            ? 'text-gray-500' 
+                            : isSelected 
+                              ? `text-${color}-400` 
+                              : 'text-gray-400'
+                        }`}>
+                          {t.channels[channel]}
+                        </span>
+                        {isDisabled && (
+                          <span className="text-xs text-gray-500 font-medium">
+                            {t.comingSoon}
+                          </span>
                         )}
-                        {isSelected && !isDisabled && (
-                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">{selectedChannels.indexOf(channel) + 1}</span>
-                          </div>
-                        )}
-                      </button>
+                      </div>
+                      {isSelected && !isDisabled && (
+                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${color}-500/10 to-${color}-500/20 pointer-events-none`}></div>
+                      )}
+                      {isSelected && !isDisabled && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-white">{selectedChannels.indexOf(channel) + 1}</span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected Channels Summary */}
+              {selectedChannels.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {selectedChannels.map((channel) => {
+                    const Icon = channelIcons[channel];
+                    const color = channelColors[channel];
+                    const hasConfig = channel === 'email' || (channelConfigs[channel] && typeof channelConfigs[channel] === 'string');
+                    
+                    return (
+                      <div
+                        key={channel}
+                        className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs border ${
+                          hasConfig 
+                            ? `border-${color}-500/50 bg-${color}-500/20 text-${color}-300`
+                            : `border-yellow-500/50 bg-yellow-500/20 text-yellow-300`
+                        }`}
+                      >
+                        <Icon className="w-3 h-3" />
+                        <span>{t.channels[channel]}</span>
+                        {!hasConfig && <span className="text-yellow-400">⚠</span>}
+                      </div>
                     );
                   })}
                 </div>
-
-                {/* Selected Channels Summary */}
-                {selectedChannels.length > 0 && (
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {selectedChannels.map((channel) => {
-                      const Icon = channelIcons[channel];
-                      const color = channelColors[channel];
-                      const hasConfig = channel === 'email' || (channelConfigs[channel] && typeof channelConfigs[channel] === 'string');
-                      
-                      return (
-                        <div
-                          key={channel}
-                          className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs border ${
-                            hasConfig 
-                              ? `border-${color}-500/50 bg-${color}-500/20 text-${color}-300`
-                              : `border-yellow-500/50 bg-yellow-500/20 text-yellow-300`
-                          }`}
-                        >
-                          <Icon className="w-3 h-3" />
-                          <span>{t.channels[channel]}</span>
-                          {!hasConfig && <span className="text-yellow-400">⚠</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+              )}
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.emailPlaceholder}
+                  className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
+                  required
+                  disabled={isLoading || (isAuthenticated && user?.email)}
+                />
               </div>
               
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t.emailPlaceholder}
-                    className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
-                    required
-                    disabled={isLoading || (isAuthenticated && user?.email)}
-                  />
-                </div>
-                
-                <button
-                  type="submit"
-                  disabled={isLoading || !prompt.trim() || !email.trim() || selectedChannels.length === 0}
-                  className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  <span className="flex items-center space-x-2">
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <Zap className="w-5 h-5" />
-                    )}
-                    <span>{isLoading ? t.processing : t.getStarted}</span>
-                  </span>
-                </button>
-              </div>
-            </form>
-          )}
+              <button
+                type="submit"
+                disabled={isLoading || !prompt.trim() || !email.trim() || selectedChannels.length === 0}
+                className="px-8 py-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-2xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                <span className="flex items-center space-x-2">
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Zap className="w-5 h-5" />
+                  )}
+                  <span>{isLoading ? t.processing : (isAuthenticated ? t.getStarted : t.loginToUse)}</span>
+                </span>
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
