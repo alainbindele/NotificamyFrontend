@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, MessageSquare, Slack, Hash, Phone, Link, User, Key } from 'lucide-react';
 import { NotificationChannel, ChannelConfig } from '../App';
 
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
 interface ChannelConfigModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (configs: ChannelConfig) => void;
   selectedChannels: NotificationChannel[];
   existingConfigs: ChannelConfig;
-  language: 'en' | 'it';
+  language: Language;
 }
 
 const configTranslations = {
@@ -90,6 +92,166 @@ const configTranslations = {
       phoneInvalid: 'Inserisci un numero di telefono valido con prefisso internazionale',
       webhookInvalid: 'Inserisci un URL webhook valido',
       required: 'Questo campo è obbligatorio'
+    }
+  },
+  es: {
+    title: 'Configurar Canales de Notificación',
+    subtitle: 'Ingresa la información requerida para cada canal seleccionado',
+    save: 'Guardar y Continuar',
+    cancel: 'Cancelar',
+    required: 'Requerido',
+    optional: 'Opcional',
+    fields: {
+      email: {
+        title: 'Configuración de Email',
+        email: 'Dirección de Email',
+        emailPlaceholder: 'tu-email@ejemplo.com'
+      },
+      whatsapp: {
+        title: 'Configuración de WhatsApp',
+        phone: 'Número de Teléfono',
+        phonePlaceholder: '+1234567890 (con código de país)'
+      },
+      slack: {
+        title: 'Configuración de Slack',
+        webhook: 'URL de Webhook',
+        webhookPlaceholder: 'https://hooks.slack.com/services/...',
+        channel: 'Nombre del Canal',
+        channelPlaceholder: '#general o @usuario'
+      },
+      discord: {
+        title: 'Configuración de Discord',
+        webhook: 'URL de Webhook',
+        webhookPlaceholder: 'https://discord.com/api/webhooks/...',
+        username: 'Nombre del Bot',
+        usernamePlaceholder: 'NotifyMe Bot'
+      }
+    },
+    validation: {
+      emailInvalid: 'Ingresa una dirección de email válida',
+      phoneInvalid: 'Ingresa un número de teléfono válido con código de país',
+      webhookInvalid: 'Ingresa una URL de webhook válida',
+      required: 'Este campo es requerido'
+    }
+  },
+  fr: {
+    title: 'Configurer les Canaux de Notification',
+    subtitle: 'Entrez les informations requises pour chaque canal sélectionné',
+    save: 'Sauvegarder et Continuer',
+    cancel: 'Annuler',
+    required: 'Requis',
+    optional: 'Optionnel',
+    fields: {
+      email: {
+        title: 'Configuration Email',
+        email: 'Adresse Email',
+        emailPlaceholder: 'votre-email@exemple.com'
+      },
+      whatsapp: {
+        title: 'Configuration WhatsApp',
+        phone: 'Numéro de Téléphone',
+        phonePlaceholder: '+33123456789 (avec indicatif pays)'
+      },
+      slack: {
+        title: 'Configuration Slack',
+        webhook: 'URL Webhook',
+        webhookPlaceholder: 'https://hooks.slack.com/services/...',
+        channel: 'Nom du Canal',
+        channelPlaceholder: '#general ou @utilisateur'
+      },
+      discord: {
+        title: 'Configuration Discord',
+        webhook: 'URL Webhook',
+        webhookPlaceholder: 'https://discord.com/api/webhooks/...',
+        username: 'Nom du Bot',
+        usernamePlaceholder: 'NotifyMe Bot'
+      }
+    },
+    validation: {
+      emailInvalid: 'Veuillez entrer une adresse email valide',
+      phoneInvalid: 'Veuillez entrer un numéro de téléphone valide avec indicatif pays',
+      webhookInvalid: 'Veuillez entrer une URL webhook valide',
+      required: 'Ce champ est requis'
+    }
+  },
+  de: {
+    title: 'Benachrichtigungskanäle Konfigurieren',
+    subtitle: 'Geben Sie die erforderlichen Informationen für jeden ausgewählten Kanal ein',
+    save: 'Speichern und Fortfahren',
+    cancel: 'Abbrechen',
+    required: 'Erforderlich',
+    optional: 'Optional',
+    fields: {
+      email: {
+        title: 'E-Mail-Konfiguration',
+        email: 'E-Mail-Adresse',
+        emailPlaceholder: 'ihre-email@beispiel.com'
+      },
+      whatsapp: {
+        title: 'WhatsApp-Konfiguration',
+        phone: 'Telefonnummer',
+        phonePlaceholder: '+491234567890 (mit Ländercode)'
+      },
+      slack: {
+        title: 'Slack-Konfiguration',
+        webhook: 'Webhook-URL',
+        webhookPlaceholder: 'https://hooks.slack.com/services/...',
+        channel: 'Kanalname',
+        channelPlaceholder: '#allgemein oder @benutzername'
+      },
+      discord: {
+        title: 'Discord-Konfiguration',
+        webhook: 'Webhook-URL',
+        webhookPlaceholder: 'https://discord.com/api/webhooks/...',
+        username: 'Bot-Benutzername',
+        usernamePlaceholder: 'NotifyMe Bot'
+      }
+    },
+    validation: {
+      emailInvalid: 'Bitte geben Sie eine gültige E-Mail-Adresse ein',
+      phoneInvalid: 'Bitte geben Sie eine gültige Telefonnummer mit Ländercode ein',
+      webhookInvalid: 'Bitte geben Sie eine gültige Webhook-URL ein',
+      required: 'Dieses Feld ist erforderlich'
+    }
+  },
+  zh: {
+    title: '配置通知渠道',
+    subtitle: '为每个选定的渠道输入所需信息',
+    save: '保存并继续',
+    cancel: '取消',
+    required: '必填',
+    optional: '可选',
+    fields: {
+      email: {
+        title: '电子邮件配置',
+        email: '电子邮件地址',
+        emailPlaceholder: 'your-email@example.com'
+      },
+      whatsapp: {
+        title: 'WhatsApp 配置',
+        phone: '电话号码',
+        phonePlaceholder: '+8612345678901 (包含国家代码)'
+      },
+      slack: {
+        title: 'Slack 配置',
+        webhook: 'Webhook URL',
+        webhookPlaceholder: 'https://hooks.slack.com/services/...',
+        channel: '频道名称',
+        channelPlaceholder: '#general 或 @用户名'
+      },
+      discord: {
+        title: 'Discord 配置',
+        webhook: 'Webhook URL',
+        webhookPlaceholder: 'https://discord.com/api/webhooks/...',
+        username: '机器人用户名',
+        usernamePlaceholder: 'NotifyMe Bot'
+      }
+    },
+    validation: {
+      emailInvalid: '请输入有效的电子邮件地址',
+      phoneInvalid: '请输入包含国家代码的有效电话号码',
+      webhookInvalid: '请输入有效的 webhook URL',
+      required: '此字段为必填项'
     }
   }
 };

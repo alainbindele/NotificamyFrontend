@@ -1,12 +1,14 @@
 import React from 'react';
 import { CheckCircle, XCircle, X } from 'lucide-react';
 
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
 interface NotificationPopupProps {
   isOpen: boolean;
   onClose: () => void;
   isSuccess: boolean;
   message: string;
-  language: 'en' | 'it';
+  language: Language;
 }
 
 const popupTranslations = {
@@ -21,6 +23,30 @@ const popupTranslations = {
     error: 'Validazione Fallita',
     successMessage: 'Riceverai le notifiche come richiesto!',
     close: 'Chiudi'
+  },
+  es: {
+    success: '¡Éxito!',
+    error: 'Validación Fallida',
+    successMessage: '¡Recibirás notificaciones como solicitaste!',
+    close: 'Cerrar'
+  },
+  fr: {
+    success: 'Succès!',
+    error: 'Validation Échouée',
+    successMessage: 'Vous recevrez des notifications comme demandé!',
+    close: 'Fermer'
+  },
+  de: {
+    success: 'Erfolg!',
+    error: 'Validierung Fehlgeschlagen',
+    successMessage: 'Sie erhalten Benachrichtigungen wie angefordert!',
+    close: 'Schließen'
+  },
+  zh: {
+    success: '成功！',
+    error: '验证失败',
+    successMessage: '您将按要求收到通知！',
+    close: '关闭'
   }
 };
 

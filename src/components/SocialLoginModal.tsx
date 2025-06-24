@@ -2,10 +2,12 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { X, Mail, Facebook, Twitter } from 'lucide-react';
 
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
 interface SocialLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  language: 'en' | 'it';
+  language: Language;
 }
 
 const socialTranslations = {
@@ -26,6 +28,42 @@ const socialTranslations = {
     twitter: 'Continua con X (Twitter)',
     email: 'Continua con Email',
     close: 'Chiudi'
+  },
+  es: {
+    title: 'Iniciar sesión en NotifyMe',
+    subtitle: 'Elige tu método de inicio de sesión preferido',
+    google: 'Continuar con Google',
+    facebook: 'Continuar con Facebook',
+    twitter: 'Continuar con X (Twitter)',
+    email: 'Continuar con Email',
+    close: 'Cerrar'
+  },
+  fr: {
+    title: 'Se connecter à NotifyMe',
+    subtitle: 'Choisissez votre méthode de connexion préférée',
+    google: 'Continuer avec Google',
+    facebook: 'Continuer avec Facebook',
+    twitter: 'Continuer avec X (Twitter)',
+    email: 'Continuer avec Email',
+    close: 'Fermer'
+  },
+  de: {
+    title: 'Bei NotifyMe anmelden',
+    subtitle: 'Wählen Sie Ihre bevorzugte Anmeldemethode',
+    google: 'Mit Google fortfahren',
+    facebook: 'Mit Facebook fortfahren',
+    twitter: 'Mit X (Twitter) fortfahren',
+    email: 'Mit Email fortfahren',
+    close: 'Schließen'
+  },
+  zh: {
+    title: '登录 NotifyMe',
+    subtitle: '选择您偏好的登录方式',
+    google: '使用 Google 继续',
+    facebook: '使用 Facebook 继续',
+    twitter: '使用 X (Twitter) 继续',
+    email: '使用邮箱继续',
+    close: '关闭'
   }
 };
 

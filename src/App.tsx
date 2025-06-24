@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Hash, Lock } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Globe, Smartphone, Monitor, Loader2, Lock, Info } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
@@ -18,6 +18,7 @@ const translations = {
     description: "Transform any idea into smart notifications. Get alerted via Email, WhatsApp, Slack, or Discord exactly when you need it.",
     promptPlaceholder: "Tell our AI what you want to be notified about...",
     emailPlaceholder: "Enter your email address",
+    emailDisabledTooltip: "Sign in to enable email field",
     channelLabel: "Choose your notification channels (select multiple)",
     getStarted: "Notificamy!",
     processing: "Processing...",
@@ -71,6 +72,7 @@ const translations = {
     description: "Trasforma qualsiasi idea in notifiche intelligenti. Ricevi avvisi via Email, WhatsApp, Slack o Discord esattamente quando ne hai bisogno.",
     promptPlaceholder: "Racconta alla nostra AI di cosa vuoi essere notificato...",
     emailPlaceholder: "Inserisci il tuo indirizzo email",
+    emailDisabledTooltip: "Accedi per abilitare il campo email",
     channelLabel: "Scegli i tuoi canali di notifica (selezione multipla)",
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
@@ -115,10 +117,227 @@ const translations = {
       discord: "Discord"
     },
     selectedChannels: "Canali selezionati"
+  },
+  es: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Nunca Te Pierdas Lo Que Importa",
+    hero: "El Sistema de Notificaciones Definitivo con IA",
+    description: "Transforma cualquier idea en notificaciones inteligentes. Recibe alertas por Email, WhatsApp, Slack o Discord exactamente cuando las necesites.",
+    promptPlaceholder: "Dile a nuestra IA sobre qué quieres ser notificado...",
+    emailPlaceholder: "Ingresa tu dirección de email",
+    emailDisabledTooltip: "Inicia sesión para habilitar el campo de email",
+    channelLabel: "Elige tus canales de notificación (selección múltiple)",
+    getStarted: "¡Notificamy!",
+    processing: "Procesando...",
+    loginToUse: "Inicia sesión para crear notificaciones",
+    features: "Características",
+    multiPlatform: "Entrega Multi-Plataforma",
+    multiPlatformDesc: "Recibe notificaciones en tus plataformas preferidas - Email, WhatsApp, Slack o Discord",
+    smartScheduling: "Programación Inteligente",
+    smartSchedulingDesc: "Configura notificaciones periódicas o programa para fechas y horas específicas",
+    aiPowered: "Inteligencia Basada en IA",
+    aiPoweredDesc: "Nuestra IA entiende el contexto y entrega notificaciones relevantes en el momento perfecto",
+    howItWorks: "Cómo Funciona",
+    step1: "Describe Tu Necesidad",
+    step1Desc: "Dile a nuestra IA sobre qué quieres ser notificado en lenguaje natural",
+    step2: "Elige Tus Plataformas",
+    step2Desc: "Selecciona Email, WhatsApp, Slack o Discord como canales de notificación",
+    step3: "Configura Tu Horario",
+    step3Desc: "Elige alertas periódicas o configura fechas y horas específicas",
+    step4: "Mantente Informado",
+    step4Desc: "Recibe notificaciones inteligentes exactamente cuando las necesites",
+    platforms: "Plataformas Soportadas",
+    pricing: "Precios Simples",
+    free: "Gratis",
+    freeDesc: "Perfecto para empezar",
+    freeFeatures: ["5 notificaciones/mes", "Entrega por email", "Programación básica"],
+    pro: "Pro",
+    proDesc: "Para usuarios avanzados",
+    proFeatures: ["Notificaciones ilimitadas", "Todas las plataformas", "IA avanzada", "Programación personalizada"],
+    enterprise: "Enterprise",
+    enterpriseDesc: "Para equipos y organizaciones",
+    enterpriseFeatures: ["Gestión de equipos", "Acceso API", "Soporte prioritario", "Integraciones personalizadas"],
+    footer: "© 2025 Notificamy. Revolucionando las notificaciones con IA.",
+    errorGeneric: "Ocurrió un error al procesar tu solicitud. Inténtalo de nuevo.",
+    errorNetwork: "No se puede conectar al servidor. Verifica tu conexión e inténtalo de nuevo.",
+    errorAuth: "Autenticación requerida. Inicia sesión para continuar.",
+    errorNoChannels: "Selecciona al menos un canal de notificación.",
+    comingSoon: "Próximamente",
+    channels: {
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    selectedChannels: "Canales seleccionados"
+  },
+  fr: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Ne Ratez Jamais Ce Qui Compte",
+    hero: "Le Système de Notifications Ultime Alimenté par l'IA",
+    description: "Transformez n'importe quelle idée en notifications intelligentes. Recevez des alertes par Email, WhatsApp, Slack ou Discord exactement quand vous en avez besoin.",
+    promptPlaceholder: "Dites à notre IA ce dont vous voulez être notifié...",
+    emailPlaceholder: "Entrez votre adresse email",
+    emailDisabledTooltip: "Connectez-vous pour activer le champ email",
+    channelLabel: "Choisissez vos canaux de notification (sélection multiple)",
+    getStarted: "Notificamy!",
+    processing: "Traitement...",
+    loginToUse: "Connectez-vous pour créer des notifications",
+    features: "Fonctionnalités",
+    multiPlatform: "Livraison Multi-Plateforme",
+    multiPlatformDesc: "Recevez des notifications sur vos plateformes préférées - Email, WhatsApp, Slack ou Discord",
+    smartScheduling: "Planification Intelligente",
+    smartSchedulingDesc: "Configurez des notifications périodiques ou planifiez pour des dates et heures spécifiques",
+    aiPowered: "Intelligence Alimentée par l'IA",
+    aiPoweredDesc: "Notre IA comprend le contexte et livre des notifications pertinentes au moment parfait",
+    howItWorks: "Comment Ça Marche",
+    step1: "Décrivez Votre Besoin",
+    step1Desc: "Dites à notre IA ce dont vous voulez être notifié en langage naturel",
+    step2: "Choisissez Vos Plateformes",
+    step2Desc: "Sélectionnez Email, WhatsApp, Slack ou Discord comme canaux de notification",
+    step3: "Configurez Votre Horaire",
+    step3Desc: "Choisissez des alertes périodiques ou configurez des dates et heures spécifiques",
+    step4: "Restez Informé",
+    step4Desc: "Recevez des notifications intelligentes exactement quand vous en avez besoin",
+    platforms: "Plateformes Supportées",
+    pricing: "Prix Simples",
+    free: "Gratuit",
+    freeDesc: "Parfait pour commencer",
+    freeFeatures: ["5 notifications/mois", "Livraison par email", "Planification de base"],
+    pro: "Pro",
+    proDesc: "Pour les utilisateurs avancés",
+    proFeatures: ["Notifications illimitées", "Toutes les plateformes", "IA avancée", "Planification personnalisée"],
+    enterprise: "Enterprise",
+    enterpriseDesc: "Pour les équipes et organisations",
+    enterpriseFeatures: ["Gestion d'équipe", "Accès API", "Support prioritaire", "Intégrations personnalisées"],
+    footer: "© 2025 Notificamy. Révolutionner les notifications avec l'IA.",
+    errorGeneric: "Une erreur s'est produite lors du traitement de votre demande. Veuillez réessayer.",
+    errorNetwork: "Impossible de se connecter au serveur. Vérifiez votre connexion et réessayez.",
+    errorAuth: "Authentification requise. Veuillez vous connecter pour continuer.",
+    errorNoChannels: "Veuillez sélectionner au moins un canal de notification.",
+    comingSoon: "Bientôt Disponible",
+    channels: {
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    selectedChannels: "Canaux sélectionnés"
+  },
+  de: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Verpassen Sie Nie Was Wichtig Ist",
+    hero: "Das Ultimative KI-Gestützte Benachrichtigungssystem",
+    description: "Verwandeln Sie jede Idee in intelligente Benachrichtigungen. Erhalten Sie Benachrichtigungen per E-Mail, WhatsApp, Slack oder Discord genau dann, wenn Sie sie brauchen.",
+    promptPlaceholder: "Sagen Sie unserer KI, worüber Sie benachrichtigt werden möchten...",
+    emailPlaceholder: "Geben Sie Ihre E-Mail-Adresse ein",
+    emailDisabledTooltip: "Melden Sie sich an, um das E-Mail-Feld zu aktivieren",
+    channelLabel: "Wählen Sie Ihre Benachrichtigungskanäle (Mehrfachauswahl)",
+    getStarted: "Notificamy!",
+    processing: "Verarbeitung...",
+    loginToUse: "Anmelden, um Benachrichtigungen zu erstellen",
+    features: "Funktionen",
+    multiPlatform: "Multi-Plattform-Zustellung",
+    multiPlatformDesc: "Erhalten Sie Benachrichtigungen auf Ihren bevorzugten Plattformen - E-Mail, WhatsApp, Slack oder Discord",
+    smartScheduling: "Intelligente Planung",
+    smartSchedulingDesc: "Stellen Sie periodische Benachrichtigungen ein oder planen Sie für bestimmte Daten und Zeiten",
+    aiPowered: "KI-Gestützte Intelligenz",
+    aiPoweredDesc: "Unsere KI versteht den Kontext und liefert relevante Benachrichtigungen zum perfekten Zeitpunkt",
+    howItWorks: "Wie Es Funktioniert",
+    step1: "Beschreiben Sie Ihren Bedarf",
+    step1Desc: "Sagen Sie unserer KI in natürlicher Sprache, worüber Sie benachrichtigt werden möchten",
+    step2: "Wählen Sie Ihre Plattformen",
+    step2Desc: "Wählen Sie E-Mail, WhatsApp, Slack oder Discord als Benachrichtigungskanäle",
+    step3: "Stellen Sie Ihren Zeitplan Ein",
+    step3Desc: "Wählen Sie periodische Benachrichtigungen oder stellen Sie bestimmte Daten und Zeiten ein",
+    step4: "Bleiben Sie Informiert",
+    step4Desc: "Erhalten Sie intelligente Benachrichtigungen genau dann, wenn Sie sie brauchen",
+    platforms: "Unterstützte Plattformen",
+    pricing: "Einfache Preise",
+    free: "Kostenlos",
+    freeDesc: "Perfekt für den Einstieg",
+    freeFeatures: ["5 Benachrichtigungen/Monat", "E-Mail-Zustellung", "Grundlegende Planung"],
+    pro: "Pro",
+    proDesc: "Für Power-User",
+    proFeatures: ["Unbegrenzte Benachrichtigungen", "Alle Plattformen", "Erweiterte KI", "Benutzerdefinierte Planung"],
+    enterprise: "Enterprise",
+    enterpriseDesc: "Für Teams und Organisationen",
+    enterpriseFeatures: ["Team-Management", "API-Zugang", "Prioritäts-Support", "Benutzerdefinierte Integrationen"],
+    footer: "© 2025 Notificamy. Revolutionierung von Benachrichtigungen mit KI.",
+    errorGeneric: "Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    errorNetwork: "Verbindung zum Server nicht möglich. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    errorAuth: "Authentifizierung erforderlich. Bitte melden Sie sich an, um fortzufahren.",
+    errorNoChannels: "Bitte wählen Sie mindestens einen Benachrichtigungskanal aus.",
+    comingSoon: "Demnächst Verfügbar",
+    channels: {
+      email: "E-Mail",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    selectedChannels: "Ausgewählte Kanäle"
+  },
+  zh: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "永不错过重要事项",
+    hero: "终极AI驱动通知系统",
+    description: "将任何想法转化为智能通知。通过电子邮件、WhatsApp、Slack或Discord在您需要的确切时间收到提醒。",
+    promptPlaceholder: "告诉我们的AI您想要收到什么通知...",
+    emailPlaceholder: "输入您的电子邮件地址",
+    emailDisabledTooltip: "登录以启用电子邮件字段",
+    channelLabel: "选择您的通知渠道（多选）",
+    getStarted: "开始使用Notificamy！",
+    processing: "处理中...",
+    loginToUse: "登录以创建通知",
+    features: "功能特色",
+    multiPlatform: "多平台投递",
+    multiPlatformDesc: "在您喜欢的平台上接收通知 - 电子邮件、WhatsApp、Slack或Discord",
+    smartScheduling: "智能调度",
+    smartSchedulingDesc: "设置定期通知或安排特定日期和时间",
+    aiPowered: "AI驱动智能",
+    aiPoweredDesc: "我们的AI理解上下文，在完美时刻提供相关通知",
+    howItWorks: "工作原理",
+    step1: "描述您的需求",
+    step1Desc: "用自然语言告诉我们的AI您想要收到什么通知",
+    step2: "选择您的平台",
+    step2Desc: "选择电子邮件、WhatsApp、Slack或Discord作为通知渠道",
+    step3: "设置您的时间表",
+    step3Desc: "选择定期提醒或设置特定日期和时间",
+    step4: "保持知情",
+    step4Desc: "在您需要的确切时间收到智能通知",
+    platforms: "支持的平台",
+    pricing: "简单定价",
+    free: "免费",
+    freeDesc: "完美的入门选择",
+    freeFeatures: ["每月5条通知", "电子邮件投递", "基础调度"],
+    pro: "专业版",
+    proDesc: "适合高级用户",
+    proFeatures: ["无限通知", "所有平台", "高级AI", "自定义调度"],
+    enterprise: "企业版",
+    enterpriseDesc: "适合团队和组织",
+    enterpriseFeatures: ["团队管理", "API访问", "优先支持", "自定义集成"],
+    footer: "© 2025 Notificamy. 用AI革新通知。",
+    errorGeneric: "处理您的请求时发生错误。请重试。",
+    errorNetwork: "无法连接到服务器。请检查您的连接并重试。",
+    errorAuth: "需要身份验证。请登录以继续。",
+    errorNoChannels: "请至少选择一个通知渠道。",
+    comingSoon: "即将推出",
+    channels: {
+      email: "电子邮件",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    selectedChannels: "已选择的渠道"
   }
 };
 
 export type NotificationChannel = 'email' | 'whatsapp' | 'slack' | 'discord';
+export type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
 
 export interface ChannelConfig {
   email?: string;
@@ -127,9 +346,22 @@ export interface ChannelConfig {
   discord?: string;
 }
 
+// Function to detect browser language
+const detectBrowserLanguage = (): Language => {
+  const browserLang = navigator.language.toLowerCase();
+  
+  if (browserLang.startsWith('it')) return 'it';
+  if (browserLang.startsWith('es')) return 'es';
+  if (browserLang.startsWith('fr')) return 'fr';
+  if (browserLang.startsWith('de')) return 'de';
+  if (browserLang.startsWith('zh')) return 'zh';
+  
+  return 'en'; // Default to English
+};
+
 function App() {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
-  const [language, setLanguage] = useState<'en' | 'it'>('en');
+  const [language, setLanguage] = useState<Language>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
   const [selectedChannels, setSelectedChannels] = useState<NotificationChannel[]>(['email']);
@@ -137,6 +369,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showChannelConfigModal, setShowChannelConfigModal] = useState(false);
+  const [showEmailTooltip, setShowEmailTooltip] = useState(false);
   const [popup, setPopup] = useState<{
     isOpen: boolean;
     isSuccess: boolean;
@@ -147,10 +380,16 @@ function App() {
     message: ''
   });
 
+  // Initialize language from browser on component mount
+  useEffect(() => {
+    const detectedLang = detectBrowserLanguage();
+    setLanguage(detectedLang);
+  }, []);
+
   const t = translations[language];
 
   // Auto-fill email from authenticated user
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated && user?.email && !email) {
       setEmail(user.email);
       setChannelConfigs(prev => ({ ...prev, email: user.email }));
@@ -194,6 +433,15 @@ function App() {
         return [...prev, channel];
       }
     });
+  };
+
+  const handleEmailClick = () => {
+    if (!isAuthenticated) {
+      setShowEmailTooltip(true);
+      setTimeout(() => {
+        setShowEmailTooltip(false);
+      }, 2500);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -304,6 +552,25 @@ function App() {
     setPopup(prev => ({ ...prev, isOpen: false }));
   };
 
+  const cycleLanguage = () => {
+    const languages: Language[] = ['en', 'it', 'es', 'fr', 'de', 'zh'];
+    const currentIndex = languages.indexOf(language);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    setLanguage(languages[nextIndex]);
+  };
+
+  const getLanguageDisplay = (lang: Language) => {
+    const displays = {
+      en: 'EN',
+      it: 'IT',
+      es: 'ES',
+      fr: 'FR',
+      de: 'DE',
+      zh: '中文'
+    };
+    return displays[lang];
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
       {/* Animated Background */}
@@ -330,11 +597,11 @@ function App() {
           
           <div className="flex items-center space-x-2 md:space-x-4">
             <button
-              onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+              onClick={cycleLanguage}
               className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
             >
               <Globe className="w-4 h-4" />
-              <span className="text-xs md:text-sm font-medium">{language.toUpperCase()}</span>
+              <span className="text-xs md:text-sm font-medium">{getLanguageDisplay(language)}</span>
             </button>
             
             <AuthButton language={language} />
@@ -483,11 +750,32 @@ function App() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onClick={handleEmailClick}
                   placeholder={t.emailPlaceholder}
-                  className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
+                  className={`w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 ${
+                    !isAuthenticated ? 'cursor-pointer' : ''
+                  }`}
                   required
-                  disabled={isLoading || (isAuthenticated && user?.email)}
+                  disabled={isLoading || (!isAuthenticated)}
+                  readOnly={!isAuthenticated}
                 />
+                
+                {/* Email Tooltip */}
+                {showEmailTooltip && !isAuthenticated && (
+                  <div className="absolute top-full left-0 mt-2 z-50">
+                    <div className="bg-gray-800 border border-fuchsia-500/30 rounded-lg p-3 shadow-lg backdrop-blur-sm">
+                      <div className="flex items-center space-x-2 text-sm">
+                        <Info className="w-4 h-4 text-fuchsia-400 flex-shrink-0" />
+                        <span className="text-gray-300">{t.emailDisabledTooltip}</span>
+                        <div className="flex items-center space-x-1 ml-2 px-2 py-1 bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 rounded-md border border-fuchsia-500/30">
+                          <span className="text-xs font-medium text-fuchsia-400">Sign In</span>
+                          <div className="w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse"></div>
+                        </div>
+                      </div>
+                      <div className="absolute -top-2 left-6 w-4 h-4 bg-gray-800 border-l border-t border-fuchsia-500/30 transform rotate-45"></div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <button

@@ -2,9 +2,11 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Loader2, Lock } from 'lucide-react';
 
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  language: 'en' | 'it';
+  language: Language;
 }
 
 const protectedTranslations = {
@@ -19,6 +21,30 @@ const protectedTranslations = {
     loginRequired: 'Autenticazione Richiesta',
     loginMessage: 'Effettua l\'accesso per utilizzare questa funzione',
     signIn: 'Accedi'
+  },
+  es: {
+    loading: 'Cargando...',
+    loginRequired: 'Autenticación Requerida',
+    loginMessage: 'Inicia sesión para acceder a esta función',
+    signIn: 'Iniciar Sesión'
+  },
+  fr: {
+    loading: 'Chargement...',
+    loginRequired: 'Authentification Requise',
+    loginMessage: 'Veuillez vous connecter pour accéder à cette fonctionnalité',
+    signIn: 'Se Connecter'
+  },
+  de: {
+    loading: 'Laden...',
+    loginRequired: 'Authentifizierung Erforderlich',
+    loginMessage: 'Bitte melden Sie sich an, um auf diese Funktion zuzugreifen',
+    signIn: 'Anmelden'
+  },
+  zh: {
+    loading: '加载中...',
+    loginRequired: '需要身份验证',
+    loginMessage: '请登录以访问此功能',
+    signIn: '登录'
   }
 };
 

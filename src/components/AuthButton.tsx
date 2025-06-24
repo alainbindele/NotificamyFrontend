@@ -2,8 +2,10 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { LogIn, LogOut, User, Loader2 } from 'lucide-react';
 
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
 interface AuthButtonProps {
-  language: 'en' | 'it';
+  language: Language;
 }
 
 const authTranslations = {
@@ -18,6 +20,30 @@ const authTranslations = {
     logout: 'Esci',
     loading: 'Caricamento...',
     welcome: 'Benvenuto'
+  },
+  es: {
+    login: 'Iniciar Sesión',
+    logout: 'Cerrar Sesión',
+    loading: 'Cargando...',
+    welcome: 'Bienvenido'
+  },
+  fr: {
+    login: 'Se Connecter',
+    logout: 'Se Déconnecter',
+    loading: 'Chargement...',
+    welcome: 'Bienvenue'
+  },
+  de: {
+    login: 'Anmelden',
+    logout: 'Abmelden',
+    loading: 'Laden...',
+    welcome: 'Willkommen'
+  },
+  zh: {
+    login: '登录',
+    logout: '登出',
+    loading: '加载中...',
+    welcome: '欢迎'
   }
 };
 

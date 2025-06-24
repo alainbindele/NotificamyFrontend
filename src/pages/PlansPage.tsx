@@ -1,7 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Bell, Mail, MessageSquare, Slack, Hash, Check, Globe, ArrowLeft, Crown, Zap, Shield, Users, BarChart3, Settings } from 'lucide-react';
 import { AuthButton } from '../components/AuthButton';
+
+type Language = 'en' | 'it' | 'es' | 'fr' | 'de' | 'zh';
+
+// Function to detect browser language
+const detectBrowserLanguage = (): Language => {
+  const browserLang = navigator.language.toLowerCase();
+  
+  if (browserLang.startsWith('it')) return 'it';
+  if (browserLang.startsWith('es')) return 'es';
+  if (browserLang.startsWith('fr')) return 'fr';
+  if (browserLang.startsWith('de')) return 'de';
+  if (browserLang.startsWith('zh')) return 'zh';
+  
+  return 'en'; // Default to English
+};
 
 const translations = {
   en: {
@@ -155,13 +170,323 @@ const translations = {
       a4: "No, non ci sono tasse di attivazione o costi nascosti. Paghi solo per il piano selezionato."
     },
     footer: "© 2025 Notificamy. Rivoluzione delle notifiche con AI."
+  },
+  es: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Elige Tu Plan",
+    hero: "Precios Simples y Transparentes",
+    description: "Comienza gratis y escala a medida que creces. Todos los planes incluyen nuestro sistema de notificaciones con IA.",
+    backToHome: "← Volver al Inicio",
+    back: "Atrás",
+    monthly: "Mensual",
+    yearly: "Anual",
+    yearlyDiscount: "Ahorra 20%",
+    mostPopular: "Más Popular",
+    getStarted: "Comenzar",
+    currentPlan: "Plan Actual",
+    upgrade: "Actualizar Ahora",
+    perMonth: "/mes",
+    perYear: "/año",
+    billed: "facturado",
+    plans: {
+      free: {
+        name: "Gratis",
+        price: "0",
+        description: "Perfecto para comenzar",
+        features: [
+          "1 notificación por email al día",
+          "Solo entrega por email",
+          "Programación básica",
+          "Soporte de la comunidad"
+        ]
+      },
+      advanced: {
+        name: "Avanzado",
+        price: "5",
+        description: "Para usuarios regulares",
+        features: [
+          "48 notificaciones por email al día",
+          "Todos los canales de notificación",
+          "Programación avanzada",
+          "Soporte prioritario",
+          "Plantillas personalizadas"
+        ]
+      },
+      full: {
+        name: "Completo",
+        price: "10",
+        description: "Para usuarios avanzados",
+        features: [
+          "300 notificaciones por email al día",
+          "Todos los canales de notificación",
+          "Funciones de IA avanzadas",
+          "Soporte premium",
+          "Integraciones personalizadas",
+          "Panel de análisis"
+        ]
+      }
+    },
+    channels: {
+      title: "Canales Disponibles por Plan",
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    faq: {
+      title: "Preguntas Frecuentes",
+      q1: "¿Puedo cambiar mi plan en cualquier momento?",
+      a1: "Sí, puedes actualizar o reducir tu plan en cualquier momento. Los cambios toman efecto inmediatamente.",
+      q2: "¿Qué pasa si excedo mi límite diario?",
+      a2: "Las notificaciones se pondrán en cola y se enviarán al día siguiente. Puedes actualizar en cualquier momento para aumentar tus límites.",
+      q3: "¿Ofrecen reembolsos?",
+      a3: "Sí, ofrecemos una garantía de devolución de dinero de 30 días para todos los planes pagos.",
+      q4: "¿Hay una tarifa de configuración?",
+      a4: "No, no hay tarifas de configuración o costos ocultos. Solo pagas por tu plan seleccionado."
+    },
+    footer: "© 2025 Notificamy. Revolucionando las notificaciones con IA."
+  },
+  fr: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Choisissez Votre Plan",
+    hero: "Prix Simples et Transparents",
+    description: "Commencez gratuitement et évoluez à mesure que vous grandissez. Tous les plans incluent notre système de notifications alimenté par l'IA.",
+    backToHome: "← Retour à l'Accueil",
+    back: "Retour",
+    monthly: "Mensuel",
+    yearly: "Annuel",
+    yearlyDiscount: "Économisez 20%",
+    mostPopular: "Le Plus Populaire",
+    getStarted: "Commencer",
+    currentPlan: "Plan Actuel",
+    upgrade: "Mettre à Niveau",
+    perMonth: "/mois",
+    perYear: "/an",
+    billed: "facturé",
+    plans: {
+      free: {
+        name: "Gratuit",
+        price: "0",
+        description: "Parfait pour commencer",
+        features: [
+          "1 notification email par jour",
+          "Livraison par email uniquement",
+          "Planification de base",
+          "Support communautaire"
+        ]
+      },
+      advanced: {
+        name: "Avancé",
+        price: "5",
+        description: "Pour les utilisateurs réguliers",
+        features: [
+          "48 notifications email par jour",
+          "Tous les canaux de notification",
+          "Planification avancée",
+          "Support prioritaire",
+          "Modèles personnalisés"
+        ]
+      },
+      full: {
+        name: "Complet",
+        price: "10",
+        description: "Pour les utilisateurs avancés",
+        features: [
+          "300 notifications email par jour",
+          "Tous les canaux de notification",
+          "Fonctionnalités IA avancées",
+          "Support premium",
+          "Intégrations personnalisées",
+          "Tableau de bord analytique"
+        ]
+      }
+    },
+    channels: {
+      title: "Canaux Disponibles par Plan",
+      email: "Email",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    faq: {
+      title: "Questions Fréquemment Posées",
+      q1: "Puis-je changer mon plan à tout moment?",
+      a1: "Oui, vous pouvez mettre à niveau ou rétrograder votre plan à tout moment. Les changements prennent effet immédiatement.",
+      q2: "Que se passe-t-il si je dépasse ma limite quotidienne?",
+      a2: "Les notifications seront mises en file d'attente et envoyées le jour suivant. Vous pouvez mettre à niveau à tout moment pour augmenter vos limites.",
+      q3: "Offrez-vous des remboursements?",
+      a3: "Oui, nous offrons une garantie de remboursement de 30 jours pour tous les plans payants.",
+      q4: "Y a-t-il des frais de configuration?",
+      a4: "Non, il n'y a pas de frais de configuration ou de coûts cachés. Vous ne payez que pour votre plan sélectionné."
+    },
+    footer: "© 2025 Notificamy. Révolutionner les notifications avec l'IA."
+  },
+  de: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "Wählen Sie Ihren Plan",
+    hero: "Einfache, Transparente Preise",
+    description: "Starten Sie kostenlos und skalieren Sie, während Sie wachsen. Alle Pläne beinhalten unser KI-gestütztes Benachrichtigungssystem.",
+    backToHome: "← Zurück zur Startseite",
+    back: "Zurück",
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+    yearlyDiscount: "20% Sparen",
+    mostPopular: "Am Beliebtesten",
+    getStarted: "Loslegen",
+    currentPlan: "Aktueller Plan",
+    upgrade: "Jetzt Upgraden",
+    perMonth: "/Monat",
+    perYear: "/Jahr",
+    billed: "abgerechnet",
+    plans: {
+      free: {
+        name: "Kostenlos",
+        price: "0",
+        description: "Perfekt für den Einstieg",
+        features: [
+          "1 E-Mail-Benachrichtigung pro Tag",
+          "Nur E-Mail-Zustellung",
+          "Grundlegende Planung",
+          "Community-Support"
+        ]
+      },
+      advanced: {
+        name: "Erweitert",
+        price: "5",
+        description: "Für regelmäßige Nutzer",
+        features: [
+          "48 E-Mail-Benachrichtigungen pro Tag",
+          "Alle Benachrichtigungskanäle",
+          "Erweiterte Planung",
+          "Prioritäts-Support",
+          "Benutzerdefinierte Vorlagen"
+        ]
+      },
+      full: {
+        name: "Vollständig",
+        price: "10",
+        description: "Für Power-User",
+        features: [
+          "300 E-Mail-Benachrichtigungen pro Tag",
+          "Alle Benachrichtigungskanäle",
+          "Erweiterte KI-Funktionen",
+          "Premium-Support",
+          "Benutzerdefinierte Integrationen",
+          "Analytics-Dashboard"
+        ]
+      }
+    },
+    channels: {
+      title: "Verfügbare Kanäle nach Plan",
+      email: "E-Mail",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    faq: {
+      title: "Häufig Gestellte Fragen",
+      q1: "Kann ich meinen Plan jederzeit ändern?",
+      a1: "Ja, Sie können Ihren Plan jederzeit upgraden oder downgraden. Änderungen werden sofort wirksam.",
+      q2: "Was passiert, wenn ich mein Tageslimit überschreite?",
+      a2: "Benachrichtigungen werden in die Warteschlange eingereiht und am nächsten Tag gesendet. Sie können jederzeit upgraden, um Ihre Limits zu erhöhen.",
+      q3: "Bieten Sie Rückerstattungen an?",
+      a3: "Ja, wir bieten eine 30-tägige Geld-zurück-Garantie für alle bezahlten Pläne.",
+      q4: "Gibt es eine Einrichtungsgebühr?",
+      a4: "Nein, es gibt keine Einrichtungsgebühren oder versteckten Kosten. Sie zahlen nur für Ihren gewählten Plan."
+    },
+    footer: "© 2025 Notificamy. Revolutionierung von Benachrichtigungen mit KI."
+  },
+  zh: {
+    title: "Notificamy",
+    alphaStatus: "Alpha",
+    subtitle: "选择您的计划",
+    hero: "简单透明的定价",
+    description: "免费开始，随着成长而扩展。所有计划都包含我们的AI驱动通知系统。",
+    backToHome: "← 返回首页",
+    back: "返回",
+    monthly: "月付",
+    yearly: "年付",
+    yearlyDiscount: "节省20%",
+    mostPopular: "最受欢迎",
+    getStarted: "开始使用",
+    currentPlan: "当前计划",
+    upgrade: "立即升级",
+    perMonth: "/月",
+    perYear: "/年",
+    billed: "计费",
+    plans: {
+      free: {
+        name: "免费",
+        price: "0",
+        description: "完美的入门选择",
+        features: [
+          "每天1条邮件通知",
+          "仅邮件投递",
+          "基础调度",
+          "社区支持"
+        ]
+      },
+      advanced: {
+        name: "高级",
+        price: "5",
+        description: "适合常规用户",
+        features: [
+          "每天48条邮件通知",
+          "所有通知渠道",
+          "高级调度",
+          "优先支持",
+          "自定义模板"
+        ]
+      },
+      full: {
+        name: "完整",
+        price: "10",
+        description: "适合高级用户",
+        features: [
+          "每天300条邮件通知",
+          "所有通知渠道",
+          "高级AI功能",
+          "高级支持",
+          "自定义集成",
+          "分析仪表板"
+        ]
+      }
+    },
+    channels: {
+      title: "按计划提供的渠道",
+      email: "电子邮件",
+      whatsapp: "WhatsApp",
+      slack: "Slack",
+      discord: "Discord"
+    },
+    faq: {
+      title: "常见问题",
+      q1: "我可以随时更改计划吗？",
+      a1: "是的，您可以随时升级或降级您的计划。更改立即生效。",
+      q2: "如果我超过每日限制会怎样？",
+      a2: "通知将排队并在第二天发送。您可以随时升级以增加限制。",
+      q3: "您提供退款吗？",
+      a3: "是的，我们为所有付费计划提供30天退款保证。",
+      q4: "有设置费吗？",
+      a4: "没有，没有设置费或隐藏费用。您只需为选择的计划付费。"
+    },
+    footer: "© 2025 Notificamy. 用AI革新通知。"
   }
 };
 
 export const PlansPage: React.FC = () => {
   const { isAuthenticated } = useAuth0();
-  const [language, setLanguage] = useState<'en' | 'it'>('en');
+  const [language, setLanguage] = useState<Language>('en');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+
+  // Initialize language from browser on component mount
+  useEffect(() => {
+    const detectedLang = detectBrowserLanguage();
+    setLanguage(detectedLang);
+  }, []);
 
   const t = translations[language];
 
@@ -219,6 +544,25 @@ export const PlansPage: React.FC = () => {
     return true;
   };
 
+  const cycleLanguage = () => {
+    const languages: Language[] = ['en', 'it', 'es', 'fr', 'de', 'zh'];
+    const currentIndex = languages.indexOf(language);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    setLanguage(languages[nextIndex]);
+  };
+
+  const getLanguageDisplay = (lang: Language) => {
+    const displays = {
+      en: 'EN',
+      it: 'IT',
+      es: 'ES',
+      fr: 'FR',
+      de: 'DE',
+      zh: '中文'
+    };
+    return displays[lang];
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
       {/* Animated Background */}
@@ -243,11 +587,11 @@ export const PlansPage: React.FC = () => {
               
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+                  onClick={cycleLanguage}
                   className="flex items-center space-x-1 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
                 >
                   <Globe className="w-4 h-4" />
-                  <span className="text-xs font-medium">{language.toUpperCase()}</span>
+                  <span className="text-xs font-medium">{getLanguageDisplay(language)}</span>
                 </button>
                 
                 <AuthButton language={language} />
@@ -300,11 +644,11 @@ export const PlansPage: React.FC = () => {
             
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+                onClick={cycleLanguage}
                 className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
               >
                 <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium">{language.toUpperCase()}</span>
+                <span className="text-sm font-medium">{getLanguageDisplay(language)}</span>
               </button>
               
               <AuthButton language={language} />
