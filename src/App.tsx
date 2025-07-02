@@ -360,7 +360,7 @@ const detectBrowserLanguage = (): Language => {
 };
 
 function App() {
-  const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently, user, isLoading: authLoading } = useAuth0();
   const [language, setLanguage] = useState<Language>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
@@ -479,7 +479,14 @@ function App() {
     setIsLoading(true);
 
     try {
-      const token = await getAccessTokenSilently();
+      // Get token with proper error handling
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
+          scope: 'openid profile email'
+        },
+        cacheMode: 'off' // Force fresh token
+      });
       
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
@@ -515,7 +522,9 @@ function App() {
       if (error instanceof Error) {
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
           errorMessage = t.errorNetwork;
-        } else if (error.message.includes('Authentication required')) {
+        } else if (error.message.includes('Authentication required') || 
+                   error.message.includes('Missing Refresh Token') ||
+                   error.message.includes('Unauthorized')) {
           errorMessage = t.errorAuth;
           setShowLoginModal(true);
         }
@@ -551,6 +560,18 @@ function App() {
   const closePopup = () => {
     setPopup(prev => ({ ...prev, isOpen: false }));
   };
+
+  // Show loading state while Auth0 is initializing
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-fuchsia-400" />
+          <p className="text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
