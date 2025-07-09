@@ -545,22 +545,28 @@ function App() {
       console.error('Validation failed:', error);
       console.error('Error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
         isAuthenticated,
-        userEmail: user?.email
+        userEmail: user?.email,
+        apiBaseUrl: import.meta.env.VITE_API_BASE_URL
       });
       
       let errorMessage = t.errorGeneric;
       if (error instanceof Error) {
-        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        if (error.message.includes('Failed to fetch') || 
+            error.message.includes('NetworkError') || 
+            error.message.includes('Network error')) {
           errorMessage = t.errorNetwork;
         } else if (error.message.includes('Authentication required') || 
                    error.message.includes('Missing Refresh Token') ||
                    error.message.includes('Unauthorized') ||
-                   error.message.includes('Login required')) {
+                   error.message.includes('Login required') ||
+                   error.message.includes('Invalid or expired token')) {
           errorMessage = t.errorAuth;
           console.log('Auth error detected, showing login modal');
           setShowLoginModal(true);
+        } else {
+          // Show the actual error message for debugging
+          errorMessage = error.message;
         }
       }
 

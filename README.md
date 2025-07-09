@@ -4,10 +4,10 @@ A modern web application that transforms natural language requests into smart no
 
 ## Architecture
 
-- **Frontend**: React 18 + TypeScript + Tailwind CSS
-- **Backend**: Spring Boot 3 + Java 17
+- **Frontend**: React 18 + TypeScript + Tailwind CSS (questo progetto)
+- **Backend**: Gestito separatamente
 - **Authentication**: Auth0 OAuth2/JWT
-- **Build Tool**: Vite (Frontend) + Maven (Backend)
+- **Build Tool**: Vite
 
 ## Features
 
@@ -20,9 +20,8 @@ A modern web application that transforms natural language requests into smart no
 ## Prerequisites
 
 - Node.js 18+ and npm
-- Java 17+
-- Maven 3.6+
 - Auth0 account
+- Backend API separato già configurato
 
 ## Setup Instructions
 
@@ -44,25 +43,12 @@ VITE_AUTH0_CLIENT_ID=your-spa-client-id
 VITE_AUTH0_AUDIENCE=https://notificamy.com/api
 
 # API Configuration
-VITE_API_BASE_URL=http://localhost:8080
-```
-
-### 3. Backend Configuration
-
-Update `src/main/resources/application.yml`:
-
-```yaml
-auth0:
-  audience: https://notificamy.com/api
-  domain: https://your-domain.auth0.com/
-
-cors:
-  allowed-origins: http://localhost:5173,https://notificamy.com
+VITE_API_BASE_URL=https://your-backend-domain.com
 ```
 
 ## Development
 
-### Frontend Development
+### Frontend
 
 ```bash
 # Install dependencies
@@ -74,32 +60,15 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173`
 
-### Backend Development
-
-```bash
-# Run Spring Boot application
-./mvnw spring-boot:run
-```
-
-The backend API will be available at `http://localhost:8080`
-
 ## Production Deployment
 
-### Frontend Build
+### Build
 
 ```bash
 npm run build
 ```
 
 Built files will be in the `dist/` directory.
-
-### Backend Build
-
-```bash
-./mvnw clean package
-```
-
-JAR file will be in `target/` directory.
 
 ### Apache Configuration
 
@@ -109,8 +78,8 @@ JAR file will be in `target/` directory.
     DocumentRoot /var/www/notificamy/dist
     
     # API Proxy
-    ProxyPass /api/ http://localhost:8080/api/
-    ProxyPassReverse /api/ http://localhost:8080/api/
+    ProxyPass /api/ https://your-backend-domain.com/api/
+    ProxyPassReverse /api/ https://your-backend-domain.com/api/
     
     # SPA Routing
     RewriteEngine On
@@ -128,8 +97,23 @@ JAR file will be in `target/` directory.
 
 ## API Endpoints
 
-- `GET /api/v1/health` - Health check (public)
+Il frontend si aspetta che il backend esponga:
+
 - `POST /api/v1/validate-prompt` - Validate notification prompt (authenticated)
+
+### Esempio di richiesta al backend:
+
+```json
+{
+  "prompt": "Remind me to water the plants every morning",
+  "email": "user@example.com",
+  "timezone": "Europe/Rome",
+  "channels": ["email"],
+  "channelConfigs": {
+    "email": "user@example.com"
+  }
+}
+```
 
 ## Authentication Flow
 
@@ -147,13 +131,6 @@ JAR file will be in `target/` directory.
 - Auth0 React SDK
 - Lucide React Icons
 - Vite 5.4.2
-
-### Backend
-- Spring Boot 3.2.0
-- Spring Security 6
-- OAuth2 Resource Server
-- Jackson JSON Processing
-- Maven
 
 ## Contributing
 

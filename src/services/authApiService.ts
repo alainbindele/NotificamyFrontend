@@ -8,7 +8,7 @@ export class AuthApiService {
   ): Promise<T> {
     console.log('Making authenticated request to:', endpoint);
     console.log('Token present:', !!token);
-    console.log('Token starts with:', token?.substring(0, 20) + '...');
+    console.log('API Base URL:', API_CONFIG.BASE_URL);
     
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
@@ -22,11 +22,8 @@ export class AuthApiService {
     };
 
     try {
-      console.log('Sending request with options:', {
-        url,
-        method: defaultOptions.method,
-        headers: defaultOptions.headers
-      });
+      console.log('Sending request to:', url);
+      console.log('Request body:', options.body);
       
       const response = await fetch(url, defaultOptions);
       
@@ -42,7 +39,10 @@ export class AuthApiService {
         });
         
         if (response.status === 401) {
-          throw new Error('Authentication required');
+          throw new Error('Authentication required - Invalid or expired token');
+        }
+        if (response.status === 403) {
+          throw new Error('Access forbidden - Insufficient permissions');
         }
         throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
@@ -52,6 +52,12 @@ export class AuthApiService {
       return responseData;
     } catch (error) {
       console.error('Authenticated API request failed:', error);
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        throw new Error('Network error - Unable to connect to API server');
+      }
+      
       throw error;
     }
   }

@@ -23,10 +23,12 @@ export interface ParsedValidationData {
   response_type: string;
   timestamp: string;
   generated_by: string;
+  user_timezone?: string;
   when_notify: {
     detected: string;
     cron_expression: string | null;
     date_time: string;
+    timezone?: string;
   };
   validity: {
     out_of_bounds_prompt_length: boolean;
