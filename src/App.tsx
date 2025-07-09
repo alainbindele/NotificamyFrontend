@@ -463,6 +463,9 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Submit started - isAuthenticated:', isAuthenticated);
+    console.log('User:', user);
+    
     if (!prompt.trim() || !email.trim()) {
       return;
     }
@@ -495,14 +498,18 @@ function App() {
     setIsLoading(true);
 
     try {
+      console.log('Getting access token...');
       // Get token with proper error handling
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
           scope: 'openid profile email'
         },
-        cacheMode: 'off' // Force fresh token
+        cacheMode: 'cache-only' // Try cache first, then refresh if needed
       });
+      
+      console.log('Token obtained successfully, length:', token?.length);
+      console.log('Making API call...');
       
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
@@ -511,6 +518,8 @@ function App() {
         channels: selectedChannels,
         channelConfigs: channelConfigs
       }, token);
+      
+      console.log('API call successful:', validationData);
 
       const isValid = validationData.validity.valid_prompt;
       const invalidReason = validationData.validity.invalid_reason;
@@ -534,6 +543,12 @@ function App() {
 
     } catch (error) {
       console.error('Validation failed:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        isAuthenticated,
+        userEmail: user?.email
+      });
       
       let errorMessage = t.errorGeneric;
       if (error instanceof Error) {
@@ -541,8 +556,10 @@ function App() {
           errorMessage = t.errorNetwork;
         } else if (error.message.includes('Authentication required') || 
                    error.message.includes('Missing Refresh Token') ||
-                   error.message.includes('Unauthorized')) {
+                   error.message.includes('Unauthorized') ||
+                   error.message.includes('Login required')) {
           errorMessage = t.errorAuth;
+          console.log('Auth error detected, showing login modal');
           setShowLoginModal(true);
         }
       }

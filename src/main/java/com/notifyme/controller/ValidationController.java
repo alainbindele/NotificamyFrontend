@@ -24,6 +24,14 @@ public class ValidationController {
             @Valid @RequestBody ValidatePromptRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         
+        System.out.println("=== VALIDATION REQUEST RECEIVED ===");
+        System.out.println("JWT present: " + (jwt != null));
+        
+        if (jwt != null) {
+            System.out.println("JWT subject: " + jwt.getSubject());
+            System.out.println("JWT claims: " + jwt.getClaims());
+        }
+        
         // Ottieni informazioni dall'utente autenticato
         String userEmail = jwt.getClaimAsString("email");
         String userId = jwt.getSubject();
@@ -33,6 +41,7 @@ public class ValidationController {
         System.out.println("Request: " + request.getPrompt());
         System.out.println("Timezone: " + request.getTimezone());
         System.out.println("Channels: " + request.getChannels());
+        System.out.println("=== END REQUEST INFO ===");
         
         try {
             ValidatePromptResponse response = validationService.validatePrompt(request, userEmail, userId);

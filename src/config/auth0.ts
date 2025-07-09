@@ -4,9 +4,8 @@ export const auth0Config = {
   authorizationParams: {
     redirect_uri: window.location.origin,
     audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-    scope: 'openid profile email offline_access'
+    scope: 'openid profile email'
   },
-  cacheLocation: 'localstorage' as const,
-  useRefreshTokens: true,
-  useRefreshTokensFallback: true
+  cacheLocation: 'memory' as const,
+  useRefreshTokens: false
 };

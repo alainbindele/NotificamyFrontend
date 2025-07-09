@@ -6,6 +6,10 @@ export class AuthApiService {
     token: string,
     options: RequestInit = {}
   ): Promise<T> {
+    console.log('Making authenticated request to:', endpoint);
+    console.log('Token present:', !!token);
+    console.log('Token starts with:', token?.substring(0, 20) + '...');
+    
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
     const defaultOptions: RequestInit = {
@@ -18,16 +22,34 @@ export class AuthApiService {
     };
 
     try {
+      console.log('Sending request with options:', {
+        url,
+        method: defaultOptions.method,
+        headers: defaultOptions.headers
+      });
+      
       const response = await fetch(url, defaultOptions);
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        
         if (response.status === 401) {
           throw new Error('Authentication required');
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
       
-      return await response.json();
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+      return responseData;
     } catch (error) {
       console.error('Authenticated API request failed:', error);
       throw error;
