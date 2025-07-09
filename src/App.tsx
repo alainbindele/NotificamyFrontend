@@ -368,6 +368,7 @@ function App() {
   const [channelConfigs, setChannelConfigs] = useState<ChannelConfig>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [userTimezone, setUserTimezone] = useState<string>('UTC');
   const [showChannelConfigModal, setShowChannelConfigModal] = useState(false);
   const [showEmailTooltip, setShowEmailTooltip] = useState(false);
   const [popup, setPopup] = useState<{
@@ -384,6 +385,15 @@ function App() {
   useEffect(() => {
     const detectedLang = detectBrowserLanguage();
     setLanguage(detectedLang);
+    
+    // Detect user's timezone
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      setUserTimezone(timezone);
+    } catch (error) {
+      console.warn('Could not detect timezone, using UTC:', error);
+      setUserTimezone('UTC');
+    }
   }, []);
 
   const t = translations[language];
@@ -491,6 +501,7 @@ function App() {
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim(),
+        timezone: userTimezone,
         channels: selectedChannels,
         channelConfigs: channelConfigs
       }, token);

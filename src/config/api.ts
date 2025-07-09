@@ -8,6 +8,7 @@ export const API_CONFIG = {
 export interface ValidatePromptRequest {
   prompt: string;
   email: string;
+  timezone?: string;
   channels?: string[];
   channelConfigs?: Record<string, any>;
 }

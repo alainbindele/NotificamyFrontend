@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -19,18 +21,32 @@ public class ValidationService {
     
     public ValidatePromptResponse validatePrompt(ValidatePromptRequest request, String userEmail, String userId) {
         try {
+            // Parse and validate timezone
+            ZoneId userTimezone;
+            try {
+                userTimezone = ZoneId.of(request.getTimezone());
+            } catch (Exception e) {
+                userTimezone = ZoneId.of("UTC"); // Fallback to UTC
+            }
+            
+            // Create timestamps in user's timezone
+            ZonedDateTime now = ZonedDateTime.now(userTimezone);
+            ZonedDateTime scheduledTime = now.plusDays(1).withHour(9).withMinute(0).withSecond(0).withNano(0);
+            
             // Create mock validation response
             ObjectNode responseData = objectMapper.createObjectNode();
             
             responseData.put("response_type", "validation_result");
-            responseData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            responseData.put("timestamp", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             responseData.put("generated_by", "NotifyMe AI Validator v1.0");
+            responseData.put("user_timezone", request.getTimezone());
             
             // When to notify section
             ObjectNode whenNotify = objectMapper.createObjectNode();
             whenNotify.put("detected", "daily");
             whenNotify.put("cron_expression", "0 9 * * *");
-            whenNotify.put("date_time", "2025-01-20T09:00:00");
+            whenNotify.put("date_time", scheduledTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+            whenNotify.put("timezone", request.getTimezone());
             responseData.set("when_notify", whenNotify);
             
             // Validity section
