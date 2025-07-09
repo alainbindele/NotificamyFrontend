@@ -3,7 +3,6 @@ package com.notifyme.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ public class ValidatePromptRequest {
     @Email(message = "Email must be valid")
     private String email;
     
-    @Pattern(regexp = "^[A-Za-z]+/[A-Za-z_]+$|^UTC$", message = "Invalid timezone format. Use IANA timezone identifiers like 'Europe/Rome' or 'UTC'")
     private String timezone = "UTC"; // Default to UTC
     
     private List<String> channels;

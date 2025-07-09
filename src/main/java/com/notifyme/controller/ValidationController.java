@@ -31,6 +31,8 @@ public class ValidationController {
         // Log per debug
         System.out.println("Authenticated user: " + userEmail + " (ID: " + userId + ")");
         System.out.println("Request: " + request.getPrompt());
+        System.out.println("Timezone: " + request.getTimezone());
+        System.out.println("Channels: " + request.getChannels());
         
         try {
             ValidatePromptResponse response = validationService.validatePrompt(request, userEmail, userId);

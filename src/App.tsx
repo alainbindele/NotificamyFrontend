@@ -389,7 +389,13 @@ function App() {
     // Detect user's timezone
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      setUserTimezone(timezone);
+      if (timezone && timezone.trim() !== '') {
+        setUserTimezone(timezone);
+        console.log('Detected timezone:', timezone);
+      } else {
+        setUserTimezone('UTC');
+        console.log('Could not detect timezone, using UTC');
+      }
     } catch (error) {
       console.warn('Could not detect timezone, using UTC:', error);
       setUserTimezone('UTC');
@@ -501,7 +507,7 @@ function App() {
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim(),
-        timezone: userTimezone,
+        timezone: userTimezone || 'UTC',
         channels: selectedChannels,
         channelConfigs: channelConfigs
       }, token);

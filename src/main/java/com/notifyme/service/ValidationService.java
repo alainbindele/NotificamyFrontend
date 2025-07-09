@@ -23,10 +23,19 @@ public class ValidationService {
         try {
             // Parse and validate timezone
             ZoneId userTimezone;
+            String validatedTimezone;
             try {
-                userTimezone = ZoneId.of(request.getTimezone());
+                String requestedTimezone = request.getTimezone();
+                if (requestedTimezone == null || requestedTimezone.trim().isEmpty()) {
+                    requestedTimezone = "UTC";
+                }
+                userTimezone = ZoneId.of(requestedTimezone);
+                validatedTimezone = requestedTimezone;
+                System.out.println("Using timezone: " + validatedTimezone);
             } catch (Exception e) {
+                System.out.println("Invalid timezone '" + request.getTimezone() + "', falling back to UTC: " + e.getMessage());
                 userTimezone = ZoneId.of("UTC"); // Fallback to UTC
+                validatedTimezone = "UTC";
             }
             
             // Create timestamps in user's timezone
@@ -39,14 +48,14 @@ public class ValidationService {
             responseData.put("response_type", "validation_result");
             responseData.put("timestamp", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             responseData.put("generated_by", "NotifyMe AI Validator v1.0");
-            responseData.put("user_timezone", request.getTimezone());
+            responseData.put("user_timezone", validatedTimezone);
             
             // When to notify section
             ObjectNode whenNotify = objectMapper.createObjectNode();
             whenNotify.put("detected", "daily");
             whenNotify.put("cron_expression", "0 9 * * *");
             whenNotify.put("date_time", scheduledTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            whenNotify.put("timezone", request.getTimezone());
+            whenNotify.put("timezone", validatedTimezone);
             responseData.set("when_notify", whenNotify);
             
             // Validity section
