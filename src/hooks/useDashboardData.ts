@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { DashboardApiService } from '../services/dashboardApiService';
+import { useNotifyMeAPI } from './useNotifyMeAPI';
 import { UserProfile, UserStatistics, NotificationQuery, QueryStatistics } from '../types/api';
 
 export const useDashboardData = () => {
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
+  const api = useNotifyMeAPI();
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [userStats, setUserStats] = useState<UserStatistics | null>(null);
@@ -25,27 +26,19 @@ export const useDashboardData = () => {
       
       console.log('Fetching dashboard data...');
 
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-          scope: 'openid profile email offline_access'
-        },
-        cacheMode: 'cache-only' // Try cache first, then refresh if needed
-      });
-      
-      console.log('Token obtained for dashboard');
-
       const [profile, stats, allQueries, qStats] = await Promise.all([
-        DashboardApiService.getUserProfile(token),
-        DashboardApiService.getUserStatistics(token),
-        DashboardApiService.getAllQueries(token),
-        DashboardApiService.getQueryStatistics(token)
+        api.getUserProfile(),
+        api.getUserStatistics(),
+        api.getAllQueries(),
+        api.getQueryStatistics()
       ]);
 
       setUserProfile(profile);
       setUserStats(stats);
       setQueries(allQueries);
       setQueryStats(qStats);
+      
+      console.log('Dashboard data loaded successfully');
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load dashboard data');

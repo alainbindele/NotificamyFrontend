@@ -170,13 +170,13 @@ export const DashboardPage: React.FC = () => {
               <Bell className="w-8 h-8 text-yellow-400" />
             </div>
             <h2 className="text-2xl font-bold text-yellow-400 mb-2">Backend Temporarily Unavailable</h2>
-            <p className="text-gray-400 mb-4">The server is currently under maintenance.</p>
-            <p className="text-sm text-gray-500 mb-6">You're seeing demo data while we restore service.</p>
+            <p className="text-gray-400 mb-4">Il server è attualmente in manutenzione.</p>
+            <p className="text-sm text-gray-500 mb-6">Stai visualizzando dati demo mentre ripristiniamo il servizio.</p>
             <button
               onClick={refreshData}
-              className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transition-all duration-300"
+              className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-semibold text-white hover:from-yellow-600 hover:to-orange-600 transition-all duration-300"
             >
-              {t.retry}
+              Riprova Connessione
             </button>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, Mail, Calendar, Settings, Trash2, Save, Eye, EyeOff, MessageSquare, Hash, Phone } from 'lucide-react';
 import { UserProfile, UserStatistics, UpdateProfileRequest, UpdateChannelsRequest } from '../../types/api';
-import { DashboardApiService } from '../../services/dashboardApiService';
+import { useNotifyMeAPI } from '../../hooks/useNotifyMeAPI';
 import { useToast } from '../../hooks/useToast';
 
 interface ProfileSectionProps {
@@ -16,7 +16,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   userStats,
   onProfileUpdate
 }) => {
-  const { getAccessTokenSilently, logout } = useAuth0();
+  const { logout } = useAuth0();
+  const api = useNotifyMeAPI();
   const { success, error } = useToast();
   
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -26,14 +27,14 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   const [loading, setLoading] = useState(false);
   
   const [profileForm, setProfileForm] = useState({
-    display_name: userProfile.display_name || '',
+    displayName: userProfile.displayName || '',
     email: userProfile.email || ''
   });
   
   const [channelsForm, setChannelsForm] = useState({
-    discord_webhook: userProfile.notification_channels.discord_webhook || '',
-    slack_webhook: userProfile.notification_channels.slack_webhook || '',
-    whatsapp_phone: userProfile.notification_channels.whatsapp_phone || ''
+    discord: userProfile.discordWebhook || '',
+    slack: userProfile.slackWebhook || '',
+    whatsapp: userProfile.phone || ''
   });
 
   const maskSensitiveData = (data: string, type: 'webhook' | 'phone') => {
@@ -62,8 +63,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     setLoading(true);
 
     try {
-      const token = await getAccessTokenSilently();
-      const updatedProfile = await DashboardApiService.updateUserProfile(token, profileForm);
+      const updatedProfile = await api.updateUserProfile(profileForm);
       
       onProfileUpdate(updatedProfile);
       setIsEditingProfile(false);
@@ -80,20 +80,19 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     setLoading(true);
 
     try {
-      const token = await getAccessTokenSilently();
       const cleanData: UpdateChannelsRequest = {};
       
-      if (channelsForm.discord_webhook.trim()) {
-        cleanData.discord_webhook = channelsForm.discord_webhook.trim();
+      if (channelsForm.discord.trim()) {
+        cleanData.discord = channelsForm.discord.trim();
       }
-      if (channelsForm.slack_webhook.trim()) {
-        cleanData.slack_webhook = channelsForm.slack_webhook.trim();
+      if (channelsForm.slack.trim()) {
+        cleanData.slack = channelsForm.slack.trim();
       }
-      if (channelsForm.whatsapp_phone.trim()) {
-        cleanData.whatsapp_phone = channelsForm.whatsapp_phone.trim();
+      if (channelsForm.whatsapp.trim()) {
+        cleanData.whatsapp = channelsForm.whatsapp.trim();
       }
 
-      const updatedProfile = await DashboardApiService.updateNotificationChannels(token, cleanData);
+      const updatedProfile = await api.updateNotificationChannels(cleanData);
       
       onProfileUpdate(updatedProfile);
       setIsEditingChannels(false);
@@ -109,8 +108,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     setLoading(true);
 
     try {
-      const token = await getAccessTokenSilently();
-      await DashboardApiService.deleteUserAccount(token);
+      await api.deleteUserAccount();
       
       success('Account Deleted', 'Your account has been successfully deleted.');
       
@@ -162,8 +160,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               </label>
               <input
                 type="text"
-                value={profileForm.display_name}
-                onChange={(e) => setProfileForm(prev => ({ ...prev, display_name: e.target.value }))}
+                value={profileForm.displayName}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, displayName: e.target.value }))}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
                 placeholder="Enter your display name"
               />
@@ -199,7 +197,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="text-sm text-gray-400">Display Name</label>
-                <p className="text-white font-medium">{userProfile.display_name || 'Not set'}</p>
+                <p className="text-white font-medium">{userProfile.displayName || 'Not set'}</p>
               </div>
               <div>
                 <label className="text-sm text-gray-400">Email</label>
@@ -209,7 +207,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="text-sm text-gray-400">Member Since</label>
-                <p className="text-white font-medium">{formatDate(userProfile.created_at)}</p>
+                <p className="text-white font-medium">{formatDate(userProfile.createdAt)}</p>
               </div>
               <div>
                 <label className="text-sm text-gray-400">User ID</label>
@@ -226,25 +224,25 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
             <Calendar className="w-6 h-6 text-cyan-400" />
           </div>
-          <span>Account Statistics</span>
+          <span>Statistiche Account</span>
         </h3>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center p-4 bg-white/5 rounded-xl">
-            <div className="text-2xl font-bold text-fuchsia-400 mb-1">{userStats.days_registered}</div>
-            <div className="text-sm text-gray-400">Days Registered</div>
+            <div className="text-2xl font-bold text-fuchsia-400 mb-1">{userStats.daysSinceRegistration}</div>
+            <div className="text-sm text-gray-400">Giorni Registrato</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
-            <div className="text-2xl font-bold text-cyan-400 mb-1">{userStats.channels_configured}</div>
-            <div className="text-sm text-gray-400">Channels Configured</div>
+            <div className="text-2xl font-bold text-cyan-400 mb-1">{userStats.configuredChannels}</div>
+            <div className="text-sm text-gray-400">Canali Configurati</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
-            <div className="text-2xl font-bold text-green-400 mb-1">{userStats.total_queries}</div>
-            <div className="text-sm text-gray-400">Total Notifications</div>
+            <div className="text-2xl font-bold text-green-400 mb-1">{userStats.totalQueries}</div>
+            <div className="text-sm text-gray-400">Notifiche Totali</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">{userStats.active_queries}</div>
-            <div className="text-sm text-gray-400">Active Notifications</div>
+            <div className="text-2xl font-bold text-yellow-400 mb-1">{userStats.activeQueries}</div>
+            <div className="text-sm text-gray-400">Notifiche Attive</div>
           </div>
         </div>
       </div>
@@ -256,7 +254,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
               <MessageSquare className="w-6 h-6 text-purple-400" />
             </div>
-            <h3 className="text-xl font-semibold">Notification Channels</h3>
+            <h3 className="text-xl font-semibold">Canali di Notifica</h3>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -264,14 +262,14 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               className="flex items-center space-x-2 px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 rounded-lg transition-all duration-300"
             >
               {showWebhooks ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              <span className="text-sm">{showWebhooks ? 'Hide' : 'Show'}</span>
+              <span className="text-sm">{showWebhooks ? 'Nascondi' : 'Mostra'}</span>
             </button>
             <button
               onClick={() => setIsEditingChannels(!isEditingChannels)}
               className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition-all duration-300"
             >
               <Settings className="w-4 h-4" />
-              <span className="text-sm">{isEditingChannels ? 'Cancel' : 'Edit'}</span>
+              <span className="text-sm">{isEditingChannels ? 'Annulla' : 'Modifica'}</span>
             </button>
           </div>
         </div>
@@ -282,13 +280,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 <div className="flex items-center space-x-2">
                   <Hash className="w-4 h-4 text-indigo-400" />
-                  <span>Discord Webhook URL</span>
+                  <span>URL Webhook Discord</span>
                 </div>
               </label>
               <input
                 type="url"
-                value={channelsForm.discord_webhook}
-                onChange={(e) => setChannelsForm(prev => ({ ...prev, discord_webhook: e.target.value }))}
+                value={channelsForm.discord}
+                onChange={(e) => setChannelsForm(prev => ({ ...prev, discord: e.target.value }))}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                 placeholder="https://discord.com/api/webhooks/..."
               />
@@ -298,13 +296,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 <div className="flex items-center space-x-2">
                   <MessageSquare className="w-4 h-4 text-purple-400" />
-                  <span>Slack Webhook URL</span>
+                  <span>URL Webhook Slack</span>
                 </div>
               </label>
               <input
                 type="url"
-                value={channelsForm.slack_webhook}
-                onChange={(e) => setChannelsForm(prev => ({ ...prev, slack_webhook: e.target.value }))}
+                value={channelsForm.slack}
+                onChange={(e) => setChannelsForm(prev => ({ ...prev, slack: e.target.value }))}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                 placeholder="https://hooks.slack.com/services/..."
               />
@@ -314,13 +312,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 <div className="flex items-center space-x-2">
                   <Phone className="w-4 h-4 text-green-400" />
-                  <span>WhatsApp Phone Number</span>
+                  <span>Numero WhatsApp</span>
                 </div>
               </label>
               <input
                 type="tel"
-                value={channelsForm.whatsapp_phone}
-                onChange={(e) => setChannelsForm(prev => ({ ...prev, whatsapp_phone: e.target.value }))}
+                value={channelsForm.whatsapp}
+                onChange={(e) => setChannelsForm(prev => ({ ...prev, whatsapp: e.target.value }))}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                 placeholder="+1234567890"
               />
@@ -333,7 +331,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl font-semibold text-white hover:from-purple-600 hover:to-indigo-600 transition-all duration-300 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                <span>{loading ? 'Saving...' : 'Save Channels'}</span>
+                <span>{loading ? 'Salvataggio...' : 'Salva Canali'}</span>
               </button>
             </div>
           </form>
@@ -345,11 +343,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 <span className="font-medium">Discord</span>
               </div>
               <span className="text-sm text-gray-400">
-                {userProfile.notification_channels.discord_webhook 
+                {userProfile.discordWebhook 
                   ? (showWebhooks 
-                      ? userProfile.notification_channels.discord_webhook 
-                      : maskSensitiveData(userProfile.notification_channels.discord_webhook, 'webhook'))
-                  : 'Not configured'
+                      ? userProfile.discordWebhook 
+                      : maskSensitiveData(userProfile.discordWebhook, 'webhook'))
+                  : 'Non configurato'
                 }
               </span>
             </div>
@@ -360,11 +358,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 <span className="font-medium">Slack</span>
               </div>
               <span className="text-sm text-gray-400">
-                {userProfile.notification_channels.slack_webhook 
+                {userProfile.slackWebhook 
                   ? (showWebhooks 
-                      ? userProfile.notification_channels.slack_webhook 
-                      : maskSensitiveData(userProfile.notification_channels.slack_webhook, 'webhook'))
-                  : 'Not configured'
+                      ? userProfile.slackWebhook 
+                      : maskSensitiveData(userProfile.slackWebhook, 'webhook'))
+                  : 'Non configurato'
                 }
               </span>
             </div>
@@ -375,11 +373,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 <span className="font-medium">WhatsApp</span>
               </div>
               <span className="text-sm text-gray-400">
-                {userProfile.notification_channels.whatsapp_phone 
+                {userProfile.phone 
                   ? (showWebhooks 
-                      ? userProfile.notification_channels.whatsapp_phone 
-                      : maskSensitiveData(userProfile.notification_channels.whatsapp_phone, 'phone'))
-                  : 'Not configured'
+                      ? userProfile.phone 
+                      : maskSensitiveData(userProfile.phone, 'phone'))
+                  : 'Non configurato'
                 }
               </span>
             </div>
@@ -394,8 +392,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <Trash2 className="w-6 h-6 text-red-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-red-400">Danger Zone</h3>
-            <p className="text-sm text-gray-400">Irreversible actions</p>
+            <h3 className="text-xl font-semibold text-red-400">Zona Pericolosa</h3>
+            <p className="text-sm text-gray-400">Azioni irreversibili</p>
           </div>
         </div>
 
@@ -404,14 +402,14 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             onClick={() => setShowDeleteConfirm(true)}
             className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 rounded-xl font-semibold text-red-400 transition-all duration-300"
           >
-            Delete Account
+            Elimina Account
           </button>
         ) : (
           <div className="space-y-4">
             <div className="p-4 bg-red-500/20 rounded-xl border border-red-500/30">
-              <h4 className="font-semibold text-red-400 mb-2">Are you absolutely sure?</h4>
+              <h4 className="font-semibold text-red-400 mb-2">Sei assolutamente sicuro?</h4>
               <p className="text-sm text-gray-300 mb-4">
-                This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                Questa azione non può essere annullata. Eliminerà permanentemente il tuo account e rimuoverà tutti i tuoi dati dai nostri server.
               </p>
               <div className="flex space-x-3">
                 <button
@@ -419,13 +417,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                   disabled={loading}
                   className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold text-white transition-all duration-300 disabled:opacity-50"
                 >
-                  {loading ? 'Deleting...' : 'Yes, delete my account'}
+                  {loading ? 'Eliminazione...' : 'Sì, elimina il mio account'}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   className="px-4 py-2 bg-gray-500/20 hover:bg-gray-500/30 rounded-lg font-semibold text-gray-300 transition-all duration-300"
                 >
-                  Cancel
+                  Annulla
                 </button>
               </div>
             </div>
