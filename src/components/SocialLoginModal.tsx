@@ -79,7 +79,8 @@ export const SocialLoginModal: React.FC<SocialLoginModalProps> = ({
   const handleSocialLogin = (connection: string) => {
     loginWithRedirect({
       authorizationParams: {
-        connection: connection
+        connection: connection,
+        scope: 'openid profile email offline_access'
       }
     });
   };

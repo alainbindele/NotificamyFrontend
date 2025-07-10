@@ -102,7 +102,11 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
     <button
       onClick={() => {
         console.log('Logging in...');
-        loginWithRedirect();
+        loginWithRedirect({
+          authorizationParams: {
+            scope: 'openid profile email offline_access'
+          }
+        });
       }}
       className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 backdrop-blur-sm border border-fuchsia-500/30 hover:border-fuchsia-500/50 hover:from-fuchsia-500/30 hover:to-cyan-500/30 transition-all duration-300"
     >

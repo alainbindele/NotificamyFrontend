@@ -28,9 +28,9 @@ export const useDashboardData = () => {
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-          scope: 'openid profile email'
+          scope: 'openid profile email offline_access'
         },
-        cacheMode: 'off' // Force fresh token
+        cacheMode: 'cache-only' // Try cache first, then refresh if needed
       });
       
       console.log('Token obtained for dashboard');

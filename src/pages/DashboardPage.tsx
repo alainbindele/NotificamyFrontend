@@ -117,7 +117,12 @@ export const DashboardPage: React.FC = () => {
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       console.log('Redirecting to home - not authenticated');
-      window.location.href = '/';
+      // Use a timeout to avoid immediate redirect during Auth0 initialization
+      const timer = setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+      
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, authLoading]);
 
