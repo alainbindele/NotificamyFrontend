@@ -21,12 +21,11 @@ fi
 
 echo ""
 echo "4. Testing current API endpoint:"
-curl -v https://notificamy.com:8080/api/health 2>&1 | head -10
+curl -v https://notificamy.com/api/health 2>&1 | head -10
 
 echo ""
-echo "5. Checking what's running on port 8080:"
-sudo netstat -tlnp | grep :8080
+echo "5. Checking what's running on port 80:"
+sudo netstat -tlnp | grep :80
 
 echo ""
 echo "6. Checking if backend is accessible:"
-curl -v http://localhost:8080/api/health 2>&1 | head -5

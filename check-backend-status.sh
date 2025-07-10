@@ -3,20 +3,20 @@
 echo "🔍 Checking backend status..."
 
 echo ""
-echo "1. Checking what's running on port 8080:"
-sudo netstat -tlnp | grep :8080 || echo "❌ Nothing running on port 8080"
+echo "1. Checking what's running on port 80:"
+sudo netstat -tlnp | grep :80 || echo "❌ Nothing running on port 80"
 
 echo ""
 echo "2. Checking all listening ports:"
-sudo netstat -tlnp | grep LISTEN | grep -E "(8080|3000|3001|5000|8000)"
+sudo netstat -tlnp | grep LISTEN | grep -E "(80|443|3000|3001|5000|8000)"
 
 echo ""
-echo "3. Testing localhost backend:"
-curl -v http://localhost:8080/api/health 2>&1 | head -10
+echo "3. Testing API through Apache:"
+curl -v https://notificamy.com/api/health 2>&1 | head -10
 
 echo ""
-echo "4. Testing HTTPS on 8080:"
-curl -v https://localhost:8080/api/health 2>&1 | head -10
+echo "4. Testing backend directly:"
+curl -v http://localhost:80/api/health 2>&1 | head -10
 
 echo ""
 echo "5. Checking for backend processes:"

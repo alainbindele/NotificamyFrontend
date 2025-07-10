@@ -53,4 +53,3 @@ sudo chmod -R 755 /var/www/notificamy/dist
 
 echo "✅ Force rebuild completed!"
 echo "🌐 Site available at: https://notificamy.com"
-echo "🔧 API calls should now go to: https://notificamy.com:8080"
