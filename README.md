@@ -64,7 +64,7 @@ VITE_AUTH0_CLIENT_ID=your-actual-client-id-here
 VITE_AUTH0_AUDIENCE=https://notificamy.com/api
 
 # API Configuration
-VITE_API_BASE_URL=https://notificamy.com
+VITE_API_BASE_URL=https://notificamy.com:8080
 
 # Environment
 VITE_ENVIRONMENT=production
@@ -137,25 +137,29 @@ Built files will be in the `dist/` directory. Use the provided `updateFrontend.s
 
 ### Backend Setup
 
-Il backend deve essere configurato per:
-1. **Porta**: Girare sulla porta 8080
-2. **CORS**: Accettare richieste da `https://notificamy.com`
+**IMPORTANTE**: Il backend deve essere configurato per:
+1. **Porta**: Girare sulla porta 8080 con HTTPS
+2. **CORS**: Accettare richieste da `https://notificamy.com` e `https://notificamy.com:8080`
 3. **Endpoints**: Esporre tutti gli endpoint API sotto `/api/v1/`
+4. **SSL**: Configurato per HTTPS sulla porta 8080
 
 ### Troubleshooting
 
-Se le API vanno in errore 503:
+Se le API vanno in errore 503, verifica:
 
 ```bash
-# 1. Verifica che il backend sia attivo sulla porta 8080
-curl http://localhost:8080/api/health
+# 1. Testa la connettività API
+chmod +x test-api-connection.sh
+./test-api-connection.sh
 
-# 2. Verifica che Apache abbia i moduli proxy abilitati
-sudo a2enmod proxy proxy_http rewrite headers
-sudo systemctl reload apache2
+# 2. Verifica che il backend sia attivo sulla porta 8080 con HTTPS
+curl https://notificamy.com:8080/api/health
 
-# 3. Testa il proxy Apache
-curl https://notificamy.com/api/health
+# 3. Verifica che il backend accetti CORS
+curl -H "Origin: https://notificamy.com" https://notificamy.com:8080/api/health
+
+# 4. Controlla i log del backend
+sudo journalctl -u notificamy-backend -f
 ```
 
 ## API Endpoints

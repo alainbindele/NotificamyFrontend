@@ -24,6 +24,7 @@ export class AuthApiService {
 
     try {
       console.log('Sending request to:', url);
+      console.log('API Base URL configured as:', API_CONFIG.BASE_URL);
       console.log('Request body:', options.body);
       
       const response = await fetch(url, defaultOptions);
