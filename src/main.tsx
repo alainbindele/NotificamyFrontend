@@ -13,7 +13,11 @@ console.log('Environment check:', {
   AUTH0_DOMAIN: import.meta.env.VITE_AUTH0_DOMAIN,
   AUTH0_CLIENT_ID: import.meta.env.VITE_AUTH0_CLIENT_ID ? 'SET' : 'NOT SET',
   AUTH0_AUDIENCE: import.meta.env.VITE_AUTH0_AUDIENCE,
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
+  MODE: import.meta.env.MODE,
+  DEV: import.meta.env.DEV,
+  PROD: import.meta.env.PROD
 });
 
 createRoot(document.getElementById('root')!).render(

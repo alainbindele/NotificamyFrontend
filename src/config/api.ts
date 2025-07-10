@@ -13,6 +13,13 @@ export const API_CONFIG = {
   }
 };
 
+// Debug: Log the actual API base URL being used
+console.log('🔧 API Configuration:', {
+  BASE_URL: API_CONFIG.BASE_URL,
+  ENV_VAR: import.meta.env.VITE_API_BASE_URL,
+  ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT
+});
+
 export interface ValidatePromptRequest {
   prompt: string;
   email: string;
