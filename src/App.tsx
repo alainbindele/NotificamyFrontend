@@ -516,6 +516,20 @@ function App() {
       
       console.log('Token obtained successfully, length:', token?.length);
       console.log('User email for API:', user?.email);
+      
+      // Debug: Verifica il contenuto del token
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('🔍 Token payload:', payload);
+          console.log('📧 Email in token:', payload['https://notificamy.com/email']);
+          console.log('👤 User ID in token:', payload['https://notificamy.com/user_id']);
+          console.log('🏷️ All custom claims:', Object.keys(payload).filter(key => key.includes('notificamy.com')));
+        } catch (e) {
+          console.log('❌ Could not decode token:', e);
+        }
+      }
+      
       console.log('Making API call...');
       
       const validationData = await AuthApiService.validatePromptAuthenticated({

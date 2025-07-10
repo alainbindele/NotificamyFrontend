@@ -13,6 +13,17 @@ export class AuthApiService {
     console.log('User email:', userEmail);
     console.log('API Base URL:', API_CONFIG.BASE_URL);
     
+    // Debug: Decodifica il token per vedere i claims
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload:', payload);
+        console.log('Email in token:', payload['https://notificamy.com/email']);
+      } catch (e) {
+        console.log('Could not decode token:', e);
+      }
+    }
+    
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
     const headers: Record<string, string> = {

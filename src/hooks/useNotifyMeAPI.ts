@@ -1,5 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { NotifyMeApiService } from '../services/notifyMeApiService';
+import { debugToken, hasRequiredClaims } from '../utils/tokenUtils';
 import { 
   UserProfile, 
   UserStatistics, 
@@ -14,13 +15,23 @@ export const useNotifyMeAPI = () => {
   const { getAccessTokenSilently, user } = useAuth0();
 
   const getToken = async (): Promise<string> => {
-    return await getAccessTokenSilently({
+    const token = await getAccessTokenSilently({
       authorizationParams: {
         audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
         scope: 'openid profile email offline_access'
       },
       cacheMode: 'cache-only'
     });
+    
+    // Debug del token
+    console.log('🎫 Token obtained for API call');
+    debugToken(token);
+    
+    if (!hasRequiredClaims(token)) {
+      console.warn('⚠️ Token missing required custom claims. Check Auth0 Action configuration.');
+    }
+    
+    return token;
   };
 
   // User Profile API
