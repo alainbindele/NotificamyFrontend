@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: 'https://notificamy.com:8080',
+  BASE_URL: 'https://notificamy.com',
   ENDPOINTS: {
     VALIDATE_PROMPT: '/api/v1/validate-prompt',
     USER_PROFILE: '/api/v1/user/profile',
@@ -16,7 +16,7 @@ export const API_CONFIG = {
 // Debug: Log the actual API base URL being used
 console.log('🔧 API Configuration:', {
   BASE_URL: API_CONFIG.BASE_URL,
-  ENV_VAR: import.meta.env.VITE_API_BASE_URL,
+  ENV_VAR: import.meta.env.VITE_API_BASE_URL || 'https://notificamy.com',
   ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT
 });
 
