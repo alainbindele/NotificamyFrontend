@@ -9,6 +9,7 @@ import { SocialLoginModal } from './components/SocialLoginModal';
 import { ChannelConfigModal } from './components/ChannelConfigModal';
 import { LanguageSelector, Language } from './components/LanguageSelector';
 import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 const translations = {
   en: {
@@ -24,6 +25,7 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Processing...",
     loginToUse: "Sign in to create notifications",
+    goToDashboard: "Go to Dashboard",
     features: "Features",
     multiPlatform: "Multi-Platform Delivery",
     multiPlatformDesc: "Receive notifications on your preferred platforms - Email, WhatsApp, Slack, or Discord",
@@ -78,6 +80,7 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Elaborazione...",
     loginToUse: "Accedi per creare notifiche",
+    goToDashboard: "Vai alla Dashboard",
     features: "Caratteristiche",
     multiPlatform: "Consegna Multi-Piattaforma",
     multiPlatformDesc: "Ricevi notifiche sulle tue piattaforme preferite - Email, WhatsApp, Slack o Discord",
@@ -132,6 +135,7 @@ const translations = {
     getStarted: "¡Notificamy!",
     processing: "Procesando...",
     loginToUse: "Inicia sesión para crear notificaciones",
+    goToDashboard: "Ir al Panel",
     features: "Características",
     multiPlatform: "Entrega Multi-Plataforma",
     multiPlatformDesc: "Recibe notificaciones en tus plataformas preferidas - Email, WhatsApp, Slack o Discord",
@@ -186,6 +190,7 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Traitement...",
     loginToUse: "Connectez-vous pour créer des notifications",
+    goToDashboard: "Aller au Tableau de Bord",
     features: "Fonctionnalités",
     multiPlatform: "Livraison Multi-Plateforme",
     multiPlatformDesc: "Recevez des notifications sur vos plateformes préférées - Email, WhatsApp, Slack ou Discord",
@@ -240,6 +245,7 @@ const translations = {
     getStarted: "Notificamy!",
     processing: "Verarbeitung...",
     loginToUse: "Anmelden, um Benachrichtigungen zu erstellen",
+    goToDashboard: "Zum Dashboard",
     features: "Funktionen",
     multiPlatform: "Multi-Plattform-Zustellung",
     multiPlatformDesc: "Erhalten Sie Benachrichtigungen auf Ihren bevorzugten Plattformen - E-Mail, WhatsApp, Slack oder Discord",
@@ -294,6 +300,7 @@ const translations = {
     getStarted: "开始使用Notificamy！",
     processing: "处理中...",
     loginToUse: "登录以创建通知",
+    goToDashboard: "前往仪表板",
     features: "功能特色",
     multiPlatform: "多平台投递",
     multiPlatformDesc: "在您喜欢的平台上接收通知 - 电子邮件、WhatsApp、Slack或Discord",
@@ -608,21 +615,6 @@ function App() {
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-fuchsia-400" />
           <p className="text-gray-300">Loading...</p>
-          
-          {/* Dashboard Link for authenticated users */}
-          {isAuthenticated && (
-            <div className="mt-6 text-center">
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center space-x-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl font-medium text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300"
-              >
-                <span>Go to Dashboard</span>
-                <ArrowLeft className="w-4 h-4 rotate-180" />
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
     );
   }
 
@@ -709,6 +701,19 @@ function App() {
 
           {/* Main Form */}
           <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+            {/* Dashboard Link for authenticated users */}
+            {isAuthenticated && (
+              <div className="text-center mb-8">
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl font-medium text-white hover:from-purple-500/30 hover:to-indigo-500/30 hover:border-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <span>{t.goToDashboard}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
             <div className="relative">
               <textarea
                 value={prompt}
