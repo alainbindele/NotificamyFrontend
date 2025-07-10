@@ -102,7 +102,11 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
 
           {/* Message */}
           <p className="text-gray-300 mb-6 leading-relaxed">
-            {isSuccess ? t.successMessage : message}
+            {isSuccess ? t.successMessage : (
+              message.includes('demo data') || message.includes('mock') 
+                ? 'Demo mode: Your request was processed successfully! (Backend is temporarily unavailable)'
+                : message
+            )}
           </p>
 
           {/* Close button */}

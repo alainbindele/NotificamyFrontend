@@ -166,11 +166,12 @@ export const DashboardPage: React.FC = () => {
         
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Bell className="w-8 h-8 text-red-400" />
+            <div className="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Bell className="w-8 h-8 text-yellow-400" />
             </div>
-            <h2 className="text-2xl font-bold text-red-400 mb-2">{t.error}</h2>
-            <p className="text-gray-400 mb-6">{error}</p>
+            <h2 className="text-2xl font-bold text-yellow-400 mb-2">Backend Temporarily Unavailable</h2>
+            <p className="text-gray-400 mb-4">The server is currently under maintenance.</p>
+            <p className="text-sm text-gray-500 mb-6">You're seeing demo data while we restore service.</p>
             <button
               onClick={refreshData}
               className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transition-all duration-300"

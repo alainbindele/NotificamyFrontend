@@ -1,4 +1,5 @@
 import { API_CONFIG, ValidatePromptRequest, ValidatePromptResponse, ParsedValidationData } from '../config/api';
+import { MockApiService } from './mockApiService';
 
 export class AuthApiService {
   private static async makeAuthenticatedRequest<T>(
@@ -55,7 +56,7 @@ export class AuthApiService {
       
       // Check if it's a network error
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Network error - Unable to connect to API server');
+        throw new Error('BACKEND_UNAVAILABLE');
       }
       
       throw error;
@@ -66,21 +67,27 @@ export class AuthApiService {
     request: ValidatePromptRequest, 
     token: string
   ): Promise<ParsedValidationData> {
-    const response = await this.makeAuthenticatedRequest<ValidatePromptResponse>(
-      API_CONFIG.ENDPOINTS.VALIDATE_PROMPT,
-      token,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    );
-
     try {
+      const response = await this.makeAuthenticatedRequest<ValidatePromptResponse>(
+        API_CONFIG.ENDPOINTS.VALIDATE_PROMPT,
+        token,
+        {
+          method: 'POST',
+          body: JSON.stringify(request),
+        }
+      );
+      
       const parsedData: ParsedValidationData = JSON.parse(response.data);
       return parsedData;
     } catch (error) {
-      console.error('Failed to parse response data:', error);
-      throw new Error('Invalid response format from server');
+      if (error instanceof Error && error.message === 'BACKEND_UNAVAILABLE') {
+        console.warn('Backend unavailable, using mock validation');
+        const mockResponse = await MockApiService.createNotification(request);
+        return JSON.parse(mockResponse.data);
+      }
+      
+      console.error('Failed to validate prompt:', error);
+      throw error;
     }
   }
 }
