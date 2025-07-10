@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Smartphone, Monitor, Loader2, Lock, Info, ArrowRight } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Smartphone, Monitor, Loader2, Lock, Info, ArrowRight, Settings } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
