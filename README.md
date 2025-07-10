@@ -110,14 +110,16 @@ Built files will be in the `dist/` directory. Use the provided `updateFrontend.s
 
 ### Apache Configuration
 
+**IMPORTANTE**: Il backend deve essere configurato per girare sulla porta 8080.
+
 ```apache
 <VirtualHost *:443>
     ServerName notificamy.com
     DocumentRoot /var/www/notificamy/dist
     
-    # API Proxy
-    ProxyPass /api/ https://your-backend-domain.com/api/
-    ProxyPassReverse /api/ https://your-backend-domain.com/api/
+    # API Proxy to backend on port 8080
+    ProxyPass /api/ http://localhost:8080/api/
+    ProxyPassReverse /api/ http://localhost:8080/api/
     
     # SPA Routing
     RewriteEngine On
@@ -131,6 +133,29 @@ Built files will be in the `dist/` directory. Use the provided `updateFrontend.s
     SSLCertificateFile /path/to/cert.pem
     SSLCertificateKeyFile /path/to/private.key
 </VirtualHost>
+```
+
+### Backend Setup
+
+Il backend deve essere configurato per:
+1. **Porta**: Girare sulla porta 8080
+2. **CORS**: Accettare richieste da `https://notificamy.com`
+3. **Endpoints**: Esporre tutti gli endpoint API sotto `/api/v1/`
+
+### Troubleshooting
+
+Se le API vanno in errore 503:
+
+```bash
+# 1. Verifica che il backend sia attivo sulla porta 8080
+curl http://localhost:8080/api/health
+
+# 2. Verifica che Apache abbia i moduli proxy abilitati
+sudo a2enmod proxy proxy_http rewrite headers
+sudo systemctl reload apache2
+
+# 3. Testa il proxy Apache
+curl https://notificamy.com/api/health
 ```
 
 ## API Endpoints

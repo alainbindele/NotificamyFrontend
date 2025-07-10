@@ -1,7 +1,15 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://notificamy.com',
   ENDPOINTS: {
-    VALIDATE_PROMPT: '/api/v1/validate-prompt'
+    VALIDATE_PROMPT: '/api/v1/validate-prompt',
+    USER_PROFILE: '/api/v1/user/profile',
+    USER_STATISTICS: '/api/v1/user/statistics',
+    USER_CHANNELS: '/api/v1/user/notification-channels',
+    USER_ACCOUNT: '/api/v1/user/account',
+    QUERIES: '/api/v1/queries',
+    QUERIES_ACTIVE: '/api/v1/queries/active',
+    QUERIES_STATISTICS: '/api/v1/queries/statistics',
+    HEALTH: '/api/health'
   }
 };
 

@@ -10,19 +10,6 @@ import {
   CreateNotificationRequest
 } from '../types/api';
 
-// Check if backend is available
-const isBackendAvailable = async (): Promise<boolean> => {
-  try {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/health`, {
-      method: 'GET',
-      timeout: 5000
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
-
 export class DashboardApiService {
   private static async makeAuthenticatedRequest<T>(
     endpoint: string,
@@ -43,8 +30,11 @@ export class DashboardApiService {
     try {
       const response = await fetch(url, defaultOptions);
       
+      console.log(`API Request: ${endpoint} - Status: ${response.status}`);
+      
       if (!response.ok) {
         const errorText = await response.text();
+        console.error(`API Error Response:`, errorText);
         
         // If it's a 503 or 502, the backend is unavailable
         if (response.status === 503 || response.status === 502) {
@@ -62,6 +52,7 @@ export class DashboardApiService {
       
       return await response.json();
     } catch (error) {
+      console.error(`API Request failed for ${endpoint}:`, error);
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         throw new Error('BACKEND_UNAVAILABLE');
       }
