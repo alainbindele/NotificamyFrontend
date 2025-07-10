@@ -6,9 +6,9 @@ import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
 import { AuthButton } from './components/AuthButton';
 import { SocialLoginModal } from './components/SocialLoginModal';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { ChannelConfigModal } from './components/ChannelConfigModal';
 import { LanguageSelector, Language } from './components/LanguageSelector';
+import { Link } from 'react-router-dom';
 
 const translations = {
   en: {
@@ -608,6 +608,19 @@ function App() {
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-fuchsia-400" />
           <p className="text-gray-300">Loading...</p>
+          
+          {/* Dashboard Link for authenticated users */}
+          {isAuthenticated && (
+            <div className="mt-6 text-center">
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl font-medium text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300"
+              >
+                <span>Go to Dashboard</span>
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     );

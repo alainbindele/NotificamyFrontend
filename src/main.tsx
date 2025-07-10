@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Auth0Provider } from '@auth0/auth0-react';
 import App from './App.tsx';
 import { PlansPage } from './pages/PlansPage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
 import { auth0Config } from './config/auth0';
 import './index.css';
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/plans" element={<PlansPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </BrowserRouter>
     </Auth0Provider>
