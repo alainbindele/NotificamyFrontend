@@ -509,12 +509,13 @@ function App() {
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-          scope: 'openid profile email'
+          scope: 'openid profile email offline_access'
         },
         cacheMode: 'cache-only' // Try cache first, then refresh if needed
       });
       
       console.log('Token obtained successfully, length:', token?.length);
+      console.log('User email for API:', user?.email);
       console.log('Making API call...');
       
       const validationData = await AuthApiService.validatePromptAuthenticated({
@@ -523,7 +524,7 @@ function App() {
         timezone: userTimezone || 'UTC',
         channels: selectedChannels,
         channelConfigs: channelConfigs
-      }, token);
+      }, token, user?.email);
       
       console.log('API call successful:', validationData);
 

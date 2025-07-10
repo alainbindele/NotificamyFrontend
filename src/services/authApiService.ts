@@ -5,26 +5,36 @@ export class AuthApiService {
   private static async makeAuthenticatedRequest<T>(
     endpoint: string,
     token: string,
+    userEmail?: string,
     options: RequestInit = {}
   ): Promise<T> {
     console.log('Making authenticated request to:', endpoint);
     console.log('Token present:', !!token);
+    console.log('User email:', userEmail);
     console.log('API Base URL:', API_CONFIG.BASE_URL);
     
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    // Add email in header if available
+    if (userEmail) {
+      headers['X-User-Email'] = userEmail;
+    }
+
     const defaultOptions: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
+      headers,
       ...options,
     };
 
     try {
       console.log('Sending request to:', url);
       console.log('API Base URL configured as:', API_CONFIG.BASE_URL);
+      console.log('Request headers:', headers);
       console.log('Request body:', options.body);
       
       const response = await fetch(url, defaultOptions);
@@ -66,12 +76,14 @@ export class AuthApiService {
 
   static async validatePromptAuthenticated(
     request: ValidatePromptRequest, 
-    token: string
+    token: string,
+    userEmail?: string
   ): Promise<ParsedValidationData> {
     try {
       const response = await this.makeAuthenticatedRequest<ValidatePromptResponse>(
         API_CONFIG.ENDPOINTS.VALIDATE_PROMPT,
         token,
+        userEmail,
         {
           method: 'POST',
           body: JSON.stringify(request),

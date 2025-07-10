@@ -15,21 +15,29 @@ export class NotifyMeApiService {
   private static async makeAuthenticatedRequest<T>(
     endpoint: string,
     token: string,
+    userEmail?: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    // Add email in header if available
+    if (userEmail) {
+      headers['X-User-Email'] = userEmail;
+    }
+
     const defaultOptions: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
+      headers,
       ...options,
     };
 
     try {
-      console.log(`Making API request to: ${endpoint}`);
+      console.log(`Making API request to: ${endpoint} with email: ${userEmail}`);
       const response = await fetch(url, defaultOptions);
       
       if (!response.ok) {
@@ -71,11 +79,12 @@ export class NotifyMeApiService {
   private static async makeRequestWithFallback<T>(
     endpoint: string,
     token: string,
+    userEmail: string | undefined,
     mockMethod: () => Promise<T>,
     options: RequestInit = {}
   ): Promise<T> {
     try {
-      const response = await this.makeAuthenticatedRequest<T>(endpoint, token, options);
+      const response = await this.makeAuthenticatedRequest<T>(endpoint, token, userEmail, options);
       return response.data;
     } catch (error) {
       if (error instanceof Error && error.message === 'BACKEND_UNAVAILABLE') {
@@ -87,18 +96,20 @@ export class NotifyMeApiService {
   }
 
   // User Profile Management
-  static async getUserProfile(token: string): Promise<UserProfile> {
+  static async getUserProfile(token: string, userEmail?: string): Promise<UserProfile> {
     return this.makeRequestWithFallback(
       '/api/v1/user/profile',
       token,
+      userEmail,
       () => MockApiService.getUserProfile()
     );
   }
 
-  static async updateUserProfile(token: string, data: UpdateProfileRequest): Promise<UserProfile> {
+  static async updateUserProfile(token: string, userEmail: string | undefined, data: UpdateProfileRequest): Promise<UserProfile> {
     return this.makeRequestWithFallback(
       '/api/v1/user/profile',
       token,
+      userEmail,
       () => MockApiService.updateUserProfile(data),
       {
         method: 'PUT',
@@ -107,10 +118,11 @@ export class NotifyMeApiService {
     );
   }
 
-  static async updateNotificationChannels(token: string, data: UpdateChannelsRequest): Promise<UserProfile> {
+  static async updateNotificationChannels(token: string, userEmail: string | undefined, data: UpdateChannelsRequest): Promise<UserProfile> {
     return this.makeRequestWithFallback(
       '/api/v1/user/notification-channels',
       token,
+      userEmail,
       () => MockApiService.updateNotificationChannels(data),
       {
         method: 'PUT',
@@ -119,18 +131,20 @@ export class NotifyMeApiService {
     );
   }
 
-  static async getUserStatistics(token: string): Promise<UserStatistics> {
+  static async getUserStatistics(token: string, userEmail?: string): Promise<UserStatistics> {
     return this.makeRequestWithFallback(
       '/api/v1/user/statistics',
       token,
+      userEmail,
       () => MockApiService.getUserStatistics()
     );
   }
 
-  static async deleteUserAccount(token: string): Promise<void> {
+  static async deleteUserAccount(token: string, userEmail?: string): Promise<void> {
     return this.makeRequestWithFallback(
       '/api/v1/user/account',
       token,
+      userEmail,
       () => MockApiService.deleteUserAccount(),
       {
         method: 'DELETE',
@@ -139,50 +153,56 @@ export class NotifyMeApiService {
   }
 
   // Notification Queries Management
-  static async getAllQueries(token: string): Promise<NotificationQuery[]> {
+  static async getAllQueries(token: string, userEmail?: string): Promise<NotificationQuery[]> {
     return this.makeRequestWithFallback(
       '/api/v1/queries',
       token,
+      userEmail,
       () => MockApiService.getAllQueries()
     );
   }
 
-  static async getActiveQueries(token: string): Promise<NotificationQuery[]> {
+  static async getActiveQueries(token: string, userEmail?: string): Promise<NotificationQuery[]> {
     return this.makeRequestWithFallback(
       '/api/v1/queries/active',
       token,
+      userEmail,
       () => MockApiService.getActiveQueries()
     );
   }
 
-  static async getQueriesByType(token: string, type: 'cron' | 'specific' | 'check'): Promise<NotificationQuery[]> {
+  static async getQueriesByType(token: string, userEmail: string | undefined, type: 'cron' | 'specific' | 'check'): Promise<NotificationQuery[]> {
     return this.makeRequestWithFallback(
       `/api/v1/queries/type/${type}`,
       token,
+      userEmail,
       () => MockApiService.getQueriesByType(type)
     );
   }
 
-  static async getQueryById(token: string, queryId: number): Promise<NotificationQuery> {
+  static async getQueryById(token: string, userEmail: string | undefined, queryId: number): Promise<NotificationQuery> {
     return this.makeRequestWithFallback(
       `/api/v1/queries/${queryId}`,
       token,
+      userEmail,
       () => MockApiService.getQueryById(queryId)
     );
   }
 
-  static async getQueryStatistics(token: string): Promise<QueryStatistics> {
+  static async getQueryStatistics(token: string, userEmail?: string): Promise<QueryStatistics> {
     return this.makeRequestWithFallback(
       '/api/v1/queries/statistics',
       token,
+      userEmail,
       () => MockApiService.getQueryStatistics()
     );
   }
 
-  static async closeQuery(token: string, queryId: number): Promise<void> {
+  static async closeQuery(token: string, userEmail: string | undefined, queryId: number): Promise<void> {
     return this.makeRequestWithFallback(
       `/api/v1/queries/${queryId}/close`,
       token,
+      userEmail,
       () => MockApiService.closeQuery(queryId),
       {
         method: 'PUT',
@@ -190,11 +210,12 @@ export class NotifyMeApiService {
     );
   }
 
-  static async createNotification(token: string, data: CreateNotificationRequest): Promise<any> {
+  static async createNotification(token: string, userEmail: string | undefined, data: CreateNotificationRequest): Promise<any> {
     try {
       const response = await this.makeRequestWithFallback(
         '/api/v1/validate-prompt',
         token,
+        userEmail,
         () => MockApiService.createNotification(data),
         {
           method: 'POST',
