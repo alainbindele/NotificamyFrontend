@@ -25,6 +25,27 @@ A modern web application that transforms natural language requests into smart no
 
 ## Setup Instructions
 
+### Production Deployment
+
+The frontend is deployed using the `updateFrontend.sh` script:
+
+```bash
+# On the server
+./updateFrontend.sh
+```
+
+This script:
+1. Backs up the current deployment
+2. Pulls latest changes from git
+3. Installs dependencies
+4. Builds the project
+5. Deploys to Apache web directory
+6. Sets proper permissions
+
+### Backend Fallback System
+
+The application includes a robust fallback system that automatically switches to demo data when the backend is unavailable (503/502 errors). This ensures users can still explore the application even during maintenance.
+
 ### 1. Auth0 Configuration
 
 1. Create an Auth0 application (Single Page Application type)
@@ -34,17 +55,22 @@ A modern web application that transforms natural language requests into smart no
 
 ### 2. Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory for production:
 
 ```bash
 # Auth0 Configuration
-VITE_AUTH0_DOMAIN=your-domain.auth0.com
-VITE_AUTH0_CLIENT_ID=your-spa-client-id
+VITE_AUTH0_DOMAIN=dev-ksochydsohqywqbm.us.auth0.com
+VITE_AUTH0_CLIENT_ID=your-actual-client-id-here
 VITE_AUTH0_AUDIENCE=https://notificamy.com/api
 
 # API Configuration
-VITE_API_BASE_URL=https://your-backend-domain.com
+VITE_API_BASE_URL=https://notificamy.com
+
+# Environment
+VITE_ENVIRONMENT=production
 ```
+
+**Important**: Make sure to replace `your-actual-client-id-here` with the real Auth0 client ID.
 
 ## Development
 
@@ -60,6 +86,18 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173`
 
+### Local Development with Backend Fallback
+
+For local development, create a `.env.local` file:
+
+```bash
+VITE_AUTH0_DOMAIN=dev-ksochydsohqywqbm.us.auth0.com
+VITE_AUTH0_CLIENT_ID=your-client-id
+VITE_AUTH0_AUDIENCE=https://notificamy.com/api
+VITE_API_BASE_URL=http://localhost:3001
+VITE_ENVIRONMENT=development
+```
+
 ## Production Deployment
 
 ### Build
@@ -68,7 +106,7 @@ The frontend will be available at `http://localhost:5173`
 npm run build
 ```
 
-Built files will be in the `dist/` directory.
+Built files will be in the `dist/` directory. Use the provided `updateFrontend.sh` script for deployment.
 
 ### Apache Configuration
 
@@ -125,12 +163,23 @@ Il frontend si aspetta che il backend esponga:
 ## Technology Stack
 
 ### Frontend
-- React 18.3.1
-- TypeScript 5.5.3
-- Tailwind CSS 3.4.1
-- Auth0 React SDK
-- Lucide React Icons
-- Vite 5.4.2
+- **React 18.3.1** - UI Framework
+- **TypeScript 5.5.3** - Type Safety
+- **Tailwind CSS 3.4.1** - Styling
+- **Auth0 React SDK** - Authentication
+- **Lucide React Icons** - Icons
+- **Vite 5.4.2** - Build Tool
+- **React Router DOM** - Routing
+- **React Hook Form** - Form Management
+
+### Key Features
+- 🌐 Multi-language support (EN, IT, ES, FR, DE, ZH)
+- 🔐 Secure Auth0 authentication with refresh tokens
+- 📱 Fully responsive design
+- 🎨 Modern cyberpunk-inspired UI
+- 🔄 Automatic backend fallback system
+- 📊 Real-time dashboard with statistics
+- 🚀 Production-ready deployment pipeline
 
 ## Contributing
 
