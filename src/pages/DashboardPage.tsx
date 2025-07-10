@@ -116,6 +116,7 @@ export const DashboardPage: React.FC = () => {
   // Redirect to home if not authenticated
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
+      console.log('Redirecting to home - not authenticated');
       window.location.href = '/';
     }
   }, [isAuthenticated, authLoading]);

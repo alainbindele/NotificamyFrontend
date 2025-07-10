@@ -704,7 +704,10 @@ function App() {
           {isAuthenticated && (
             <div className="mb-8">
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => {
+                  console.log('Navigating to dashboard...');
+                  window.location.href = '/dashboard';
+                }}
                 className="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl font-semibold text-white hover:from-purple-600 hover:to-indigo-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
               >
                 <Settings className="w-5 h-5" />

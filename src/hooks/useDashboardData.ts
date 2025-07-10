@@ -14,18 +14,26 @@ export const useDashboardData = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      console.log('User not authenticated, skipping data fetch');
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
+      
+      console.log('Fetching dashboard data...');
 
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
           scope: 'openid profile email'
-        }
+        },
+        cacheMode: 'off' // Force fresh token
       });
+      
+      console.log('Token obtained for dashboard');
 
       const [profile, stats, allQueries, qStats] = await Promise.all([
         DashboardApiService.getUserProfile(token),

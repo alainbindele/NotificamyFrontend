@@ -6,6 +6,6 @@ export const auth0Config = {
     audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
     scope: 'openid profile email'
   },
-  cacheLocation: 'memory' as const,
-  useRefreshTokens: false
+  cacheLocation: 'localstorage' as const,
+  useRefreshTokens: true
 };

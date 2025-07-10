@@ -81,7 +81,14 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
         </div>
         
         <button
-          onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+          onClick={() => {
+            console.log('Logging out...');
+            logout({ 
+              logoutParams: { 
+                returnTo: window.location.origin 
+              } 
+            });
+          }}
           className="flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-2 rounded-lg bg-red-500/20 backdrop-blur-sm border border-red-500/30 hover:bg-red-500/30 transition-all duration-300 text-red-400 hover:text-red-300"
         >
           <LogOut className="w-4 h-4" />
@@ -93,7 +100,10 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
 
   return (
     <button
-      onClick={() => loginWithRedirect()}
+      onClick={() => {
+        console.log('Logging in...');
+        loginWithRedirect();
+      }}
       className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 backdrop-blur-sm border border-fuchsia-500/30 hover:border-fuchsia-500/50 hover:from-fuchsia-500/30 hover:to-cyan-500/30 transition-all duration-300"
     >
       <LogIn className="w-4 h-4" />
