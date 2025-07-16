@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '@clerk/clerk-react';
 import { 
   Bell, 
   Plus, 
@@ -37,7 +37,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   queryStats,
   onQueriesUpdate
 }) => {
-  const { user } = useAuth0();
+  const { user } = useUser();
   const api = useNotifyMeAPI();
   const { success, error } = useToast();
   
@@ -49,7 +49,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   
   const [createForm, setCreateForm] = useState({
     prompt: '',
-    email: user?.email || '',
+    email: user?.emailAddresses?.[0]?.emailAddress || '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
     channels: ['email'] as string[],
     channelConfigs: {} as Record<string, string>
@@ -293,7 +293,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                value={searchTerm}
+                value={createForm.email || user?.emailAddresses?.[0]?.emailAddress || ''}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Cerca notifiche..."
                 className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
