@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '@clerk/clerk-react';
 import { Bell, Mail, MessageSquare, Slack, Hash, Check, ArrowLeft, Crown, Zap } from 'lucide-react';
 import { AuthButton } from '../components/AuthButton';
 import { LanguageSelector, Language } from '../components/LanguageSelector';
@@ -477,7 +477,7 @@ const translations = {
 };
 
 export const PlansPage: React.FC = () => {
-  const { isAuthenticated } = useAuth0();
+  const { isSignedIn } = useUser();
   const [language, setLanguage] = useState<Language>('en');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
