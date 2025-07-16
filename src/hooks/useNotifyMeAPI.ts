@@ -1,6 +1,5 @@
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { NotifyMeApiService } from '../services/notifyMeApiService';
-import { debugToken, hasRequiredClaims } from '../utils/tokenUtils';
 import { 
   UserProfile, 
   UserStatistics, 
@@ -12,23 +11,14 @@ import {
 } from '../types/api';
 
 export const useNotifyMeAPI = () => {
-  const { getAccessTokenSilently, user } = useAuth0();
+  const { user } = useUser();
+  const { getToken } = useAuth();
 
   const getToken = async (): Promise<string> => {
-    const token = await getAccessTokenSilently({
-      authorizationParams: {
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-        scope: 'openid profile email offline_access'
-      },
-      cacheMode: 'cache-only'
-    });
+    const token = await getToken();
     
-    // Debug del token
-    console.log('🎫 Token obtained for API call');
-    debugToken(token);
-    
-    if (!hasRequiredClaims(token)) {
-      console.warn('⚠️ Token missing required custom claims. Check Auth0 Action configuration.');
+    if (!token) {
+      throw new Error('No token available');
     }
     
     return token;
@@ -37,63 +27,63 @@ export const useNotifyMeAPI = () => {
   // User Profile API
   const getUserProfile = async (): Promise<UserProfile> => {
     const token = await getToken();
-    return NotifyMeApiService.getUserProfile(token, user?.email);
+    return NotifyMeApiService.getUserProfile(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   const updateUserProfile = async (data: UpdateProfileRequest): Promise<UserProfile> => {
     const token = await getToken();
-    return NotifyMeApiService.updateUserProfile(token, user?.email, data);
+    return NotifyMeApiService.updateUserProfile(token, user?.emailAddresses?.[0]?.emailAddress, data);
   };
 
   const updateNotificationChannels = async (data: UpdateChannelsRequest): Promise<UserProfile> => {
     const token = await getToken();
-    return NotifyMeApiService.updateNotificationChannels(token, user?.email, data);
+    return NotifyMeApiService.updateNotificationChannels(token, user?.emailAddresses?.[0]?.emailAddress, data);
   };
 
   const getUserStatistics = async (): Promise<UserStatistics> => {
     const token = await getToken();
-    return NotifyMeApiService.getUserStatistics(token, user?.email);
+    return NotifyMeApiService.getUserStatistics(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   const deleteUserAccount = async (): Promise<void> => {
     const token = await getToken();
-    return NotifyMeApiService.deleteUserAccount(token, user?.email);
+    return NotifyMeApiService.deleteUserAccount(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   // Notification Queries API
   const getAllQueries = async (): Promise<NotificationQuery[]> => {
     const token = await getToken();
-    return NotifyMeApiService.getAllQueries(token, user?.email);
+    return NotifyMeApiService.getAllQueries(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   const getActiveQueries = async (): Promise<NotificationQuery[]> => {
     const token = await getToken();
-    return NotifyMeApiService.getActiveQueries(token, user?.email);
+    return NotifyMeApiService.getActiveQueries(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   const getQueriesByType = async (type: 'cron' | 'specific' | 'check'): Promise<NotificationQuery[]> => {
     const token = await getToken();
-    return NotifyMeApiService.getQueriesByType(token, user?.email, type);
+    return NotifyMeApiService.getQueriesByType(token, user?.emailAddresses?.[0]?.emailAddress, type);
   };
 
   const getQueryById = async (queryId: number): Promise<NotificationQuery> => {
     const token = await getToken();
-    return NotifyMeApiService.getQueryById(token, user?.email, queryId);
+    return NotifyMeApiService.getQueryById(token, user?.emailAddresses?.[0]?.emailAddress, queryId);
   };
 
   const getQueryStatistics = async (): Promise<QueryStatistics> => {
     const token = await getToken();
-    return NotifyMeApiService.getQueryStatistics(token, user?.email);
+    return NotifyMeApiService.getQueryStatistics(token, user?.emailAddresses?.[0]?.emailAddress);
   };
 
   const closeQuery = async (queryId: number): Promise<void> => {
     const token = await getToken();
-    return NotifyMeApiService.closeQuery(token, user?.email, queryId);
+    return NotifyMeApiService.closeQuery(token, user?.emailAddresses?.[0]?.emailAddress, queryId);
   };
 
   const createNotification = async (data: CreateNotificationRequest): Promise<any> => {
     const token = await getToken();
-    return NotifyMeApiService.createNotification(token, user?.email, data);
+    return NotifyMeApiService.createNotification(token, user?.emailAddresses?.[0]?.emailAddress, data);
   };
 
   return {

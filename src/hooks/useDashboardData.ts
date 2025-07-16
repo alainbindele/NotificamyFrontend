@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '@clerk/clerk-react';
 import { useNotifyMeAPI } from './useNotifyMeAPI';
 import { UserProfile, UserStatistics, NotificationQuery, QueryStatistics } from '../types/api';
 
 export const useDashboardData = () => {
-  const { isAuthenticated } = useAuth0();
+  const { isSignedIn } = useUser();
   const api = useNotifyMeAPI();
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -15,7 +15,7 @@ export const useDashboardData = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
-    if (!isAuthenticated) {
+    if (!isSignedIn) {
       console.log('User not authenticated, skipping data fetch');
       return;
     }
@@ -49,7 +49,7 @@ export const useDashboardData = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isAuthenticated]);
+  }, [isSignedIn]);
 
   const refreshData = () => {
     fetchData();

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser, useClerk } from '@clerk/clerk-react';
 import { User, Mail, Calendar, Settings, Trash2, Save, Eye, EyeOff, MessageSquare, Hash, Phone } from 'lucide-react';
 import { UserProfile, UserStatistics, UpdateProfileRequest, UpdateChannelsRequest } from '../../types/api';
 import { useNotifyMeAPI } from '../../hooks/useNotifyMeAPI';
@@ -16,7 +16,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   userStats,
   onProfileUpdate
 }) => {
-  const { logout } = useAuth0();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const api = useNotifyMeAPI();
   const { success, error } = useToast();
   
@@ -114,7 +115,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       
       // Logout after successful deletion
       setTimeout(() => {
-        logout({ logoutParams: { returnTo: window.location.origin } });
+        signOut();
       }, 2000);
     } catch (err) {
       error('Deletion Failed', err instanceof Error ? err.message : 'Failed to delete account');

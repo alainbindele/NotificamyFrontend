@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Smartphone, Monitor, Loader2, Lock, Info, ArrowRight, Settings } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
 import { NotificationPopup } from './components/NotificationPopup';
 import { AuthButton } from './components/AuthButton';
-import { SocialLoginModal } from './components/SocialLoginModal';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ChannelConfigModal } from './components/ChannelConfigModal';
 import { LanguageSelector, Language } from './components/LanguageSelector';
@@ -366,14 +365,14 @@ const detectBrowserLanguage = (): Language => {
 };
 
 function App() {
-  const { isAuthenticated, getAccessTokenSilently, user, isLoading: authLoading } = useAuth0();
+  const { isSignedIn, user, isLoaded } = useUser();
+  const { getToken } = useAuth();
   const [language, setLanguage] = useState<Language>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
   const [selectedChannels, setSelectedChannels] = useState<NotificationChannel[]>(['email']);
   const [channelConfigs, setChannelConfigs] = useState<ChannelConfig>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [userTimezone, setUserTimezone] = useState<string>('UTC');
   const [showChannelConfigModal, setShowChannelConfigModal] = useState(false);
   const [showEmailTooltip, setShowEmailTooltip] = useState(false);
@@ -412,11 +411,12 @@ function App() {
 
   // Auto-fill email from authenticated user
   useEffect(() => {
-    if (isAuthenticated && user?.email && !email) {
-      setEmail(user.email);
-      setChannelConfigs(prev => ({ ...prev, email: user.email }));
+    if (isSignedIn && user?.emailAddresses?.[0]?.emailAddress && !email) {
+      const userEmail = user.emailAddresses[0].emailAddress;
+      setEmail(userEmail);
+      setChannelConfigs(prev => ({ ...prev, email: userEmail }));
     }
-  }, [isAuthenticated, user, email]);
+  }, [isSignedIn, user, email]);
 
   const channelIcons = {
     email: Mail,
@@ -458,7 +458,7 @@ function App() {
   };
 
   const handleEmailClick = () => {
-    if (!isAuthenticated) {
+    if (!isSignedIn) {
       setShowEmailTooltip(true);
       setTimeout(() => {
         setShowEmailTooltip(false);
@@ -469,7 +469,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Submit started - isAuthenticated:', isAuthenticated);
+    console.log('Submit started - isSignedIn:', isSignedIn);
     console.log('User:', user);
     
     if (!prompt.trim() || !email.trim()) {
@@ -485,8 +485,8 @@ function App() {
       return;
     }
 
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
+    if (!isSignedIn) {
+      // Clerk will handle the sign-in modal automatically
       return;
     }
 
@@ -504,31 +504,11 @@ function App() {
     setIsLoading(true);
 
     try {
-      console.log('Getting access token...');
-      // Get token with proper error handling
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE || 'https://notificamy.com/api',
-          scope: 'openid profile email offline_access'
-        },
-        cacheMode: 'cache-only' // Try cache first, then refresh if needed
-      });
+      console.log('Getting Clerk token...');
+      const token = await getToken();
       
       console.log('Token obtained successfully, length:', token?.length);
-      console.log('User email for API:', user?.email);
-      
-      // Debug: Verifica il contenuto del token
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          console.log('🔍 Token payload:', payload);
-          console.log('📧 Email in token:', payload['https://notificamy.com/email']);
-          console.log('👤 User ID in token:', payload['https://notificamy.com/user_id']);
-          console.log('🏷️ All custom claims:', Object.keys(payload).filter(key => key.includes('notificamy.com')));
-        } catch (e) {
-          console.log('❌ Could not decode token:', e);
-        }
-      }
+      console.log('User email for API:', user?.emailAddresses?.[0]?.emailAddress);
       
       console.log('Making API call...');
       
@@ -538,7 +518,7 @@ function App() {
         timezone: userTimezone || 'UTC',
         channels: selectedChannels,
         channelConfigs: channelConfigs
-      }, token, user?.email);
+      }, token, user?.emailAddresses?.[0]?.emailAddress);
       
       console.log('API call successful:', validationData);
 
@@ -555,7 +535,7 @@ function App() {
       if (isValid) {
         setPrompt('');
         // Keep email and channels for authenticated users
-        if (!isAuthenticated) {
+        if (!isSignedIn) {
           setEmail('');
           setSelectedChannels(['email']);
           setChannelConfigs({});
@@ -566,8 +546,8 @@ function App() {
       console.error('Validation failed:', error);
       console.error('Error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
-        isAuthenticated,
-        userEmail: user?.email,
+        isSignedIn,
+        userEmail: user?.emailAddresses?.[0]?.emailAddress,
         apiBaseUrl: import.meta.env.VITE_API_BASE_URL
       });
       
@@ -584,7 +564,6 @@ function App() {
                    error.message.includes('Invalid or expired token')) {
           errorMessage = t.errorAuth;
           console.log('Auth error detected, showing login modal');
-          setShowLoginModal(true);
         } else {
           // Show the actual error message for debugging
           errorMessage = error.message;
@@ -623,7 +602,7 @@ function App() {
   };
 
   // Show loading state while Auth0 is initializing
-  if (authLoading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -716,7 +695,7 @@ function App() {
           </div>
 
           {/* Dashboard Button for Authenticated Users */}
-          {isAuthenticated && (
+          {isSignedIn && (
             <div className="mb-8">
               <button
                 onClick={() => {
@@ -861,15 +840,15 @@ function App() {
                   onClick={handleEmailClick}
                   placeholder={t.emailPlaceholder}
                   className={`w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 ${
-                    !isAuthenticated ? 'cursor-pointer' : ''
+                    !isSignedIn ? 'cursor-pointer' : ''
                   }`}
                   required
-                  disabled={isLoading || (!isAuthenticated)}
-                  readOnly={!isAuthenticated}
+                  disabled={isLoading || (!isSignedIn)}
+                  readOnly={!isSignedIn}
                 />
                 
                 {/* Email Tooltip */}
-                {showEmailTooltip && !isAuthenticated && (
+                {showEmailTooltip && !isSignedIn && (
                   <div className="absolute top-full left-0 mt-2 z-50">
                     <div className="bg-gray-800 border border-fuchsia-500/30 rounded-lg p-3 shadow-lg backdrop-blur-sm">
                       <div className="flex items-center space-x-2 text-sm">
@@ -897,7 +876,7 @@ function App() {
                   ) : (
                     <Zap className="w-5 h-5" />
                   )}
-                  <span>{isLoading ? t.processing : (isAuthenticated ? t.getStarted : t.loginToUse)}</span>
+                  <span>{isLoading ? t.processing : (isSignedIn ? t.getStarted : t.loginToUse)}</span>
                 </span>
               </button>
             </div>
@@ -1037,12 +1016,6 @@ function App() {
       </footer>
 
       {/* Modals */}
-      <SocialLoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        language={language}
-      />
-
       <ChannelConfigModal
         isOpen={showChannelConfigModal}
         onClose={() => setShowChannelConfigModal(false)}
