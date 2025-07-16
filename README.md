@@ -6,13 +6,13 @@ A modern web application that transforms natural language requests into smart no
 
 - **Frontend**: React 18 + TypeScript + Tailwind CSS (questo progetto)
 - **Backend**: Gestito separatamente
-- **Authentication**: Auth0 OAuth2/JWT
+- **Authentication**: Clerk
 - **Build Tool**: Vite
 
 ## Features
 
 - 🤖 AI-powered prompt validation
-- 🔐 Secure Auth0 authentication
+- 🔐 Secure Clerk authentication
 - 🌐 Multi-language support (EN/IT)
 - 📱 Responsive cyberpunk design
 - 🚀 Multi-platform notification delivery
@@ -20,7 +20,7 @@ A modern web application that transforms natural language requests into smart no
 ## Prerequisites
 
 - Node.js 18+ and npm
-- Auth0 account
+- Clerk account
 - Backend API separato già configurato
 
 ## Setup Instructions
@@ -46,22 +46,19 @@ This script:
 
 The application includes a robust fallback system that automatically switches to demo data when the backend is unavailable (503/502 errors). This ensures users can still explore the application even during maintenance.
 
-### 1. Auth0 Configuration
+### 1. Clerk Configuration
 
-1. Create an Auth0 application (Single Page Application type)
-2. Set allowed callback URLs: `http://localhost:5173, https://notificamy.com`
-3. Set allowed logout URLs: `http://localhost:5173, https://notificamy.com`
-4. Create an API in Auth0 with identifier: `https://notificamy.com/api`
+1. Create a Clerk application at https://clerk.com
+2. Get your publishable key from the Clerk dashboard
+3. Configure allowed origins: `http://localhost:5173, https://notificamy.com`
 
 ### 2. Environment Variables
 
 Create a `.env` file in the root directory for production:
 
 ```bash
-# Auth0 Configuration
-VITE_AUTH0_DOMAIN=dev-ksochydsohqywqbm.us.auth0.com
-VITE_AUTH0_CLIENT_ID=your-actual-client-id-here
-VITE_AUTH0_AUDIENCE=https://notificamy.com/api
+# Clerk Configuration
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_your-publishable-key-here
 
 # API Configuration
 VITE_API_BASE_URL=https://notificamy.com
@@ -70,7 +67,7 @@ VITE_API_BASE_URL=https://notificamy.com
 VITE_ENVIRONMENT=production
 ```
 
-**Important**: Make sure to replace `your-actual-client-id-here` with the real Auth0 client ID.
+**Important**: Make sure to replace `pk_live_your-publishable-key-here` with your actual Clerk publishable key.
 
 ## Development
 
@@ -91,9 +88,7 @@ The frontend will be available at `http://localhost:5173`
 For local development, create a `.env.local` file:
 
 ```bash
-VITE_AUTH0_DOMAIN=dev-ksochydsohqywqbm.us.auth0.com
-VITE_AUTH0_CLIENT_ID=your-client-id
-VITE_AUTH0_AUDIENCE=https://notificamy.com/api
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your-publishable-key-here
 VITE_API_BASE_URL=http://localhost:3001
 VITE_ENVIRONMENT=development
 ```
@@ -184,8 +179,8 @@ Il frontend si aspetta che il backend esponga:
 
 ## Authentication Flow
 
-1. User clicks "Sign In" → Redirected to Auth0
-2. Auth0 authenticates → Returns to frontend with JWT
+1. User clicks "Sign In" → Clerk modal opens
+2. Clerk authenticates → Returns JWT token
 3. Frontend stores JWT → Makes API calls with Bearer token
 4. Backend validates JWT → Processes requests
 
@@ -195,7 +190,7 @@ Il frontend si aspetta che il backend esponga:
 - **React 18.3.1** - UI Framework
 - **TypeScript 5.5.3** - Type Safety
 - **Tailwind CSS 3.4.1** - Styling
-- **Auth0 React SDK** - Authentication
+- **Clerk React** - Authentication
 - **Lucide React Icons** - Icons
 - **Vite 5.4.2** - Build Tool
 - **React Router DOM** - Routing
@@ -203,7 +198,7 @@ Il frontend si aspetta che il backend esponga:
 
 ### Key Features
 - 🌐 Multi-language support (EN, IT, ES, FR, DE, ZH)
-- 🔐 Secure Auth0 authentication with refresh tokens
+- 🔐 Secure Clerk authentication
 - 📱 Fully responsive design
 - 🎨 Modern cyberpunk-inspired UI
 - 🔄 Automatic backend fallback system
