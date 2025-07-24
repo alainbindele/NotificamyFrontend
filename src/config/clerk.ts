@@ -1,5 +1,5 @@
 export const clerkConfig = {
-  publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_your-key-here',
+  publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
   signInUrl: '/sign-in',
   signUpUrl: '/sign-up',
   afterSignInUrl: '/',
@@ -7,7 +7,9 @@ export const clerkConfig = {
 };
 
 // Debug info
-console.log('🔧 Clerk Configuration:', {
-  publishableKey: clerkConfig.publishableKey ? 'SET' : 'NOT SET',
-  environment: import.meta.env.VITE_ENVIRONMENT
-});
+if (import.meta.env.DEV) {
+  console.log('🔧 Clerk Configuration:', {
+    publishableKey: clerkConfig.publishableKey ? 'SET' : 'NOT SET',
+    environment: import.meta.env.VITE_ENVIRONMENT
+  });
+}
