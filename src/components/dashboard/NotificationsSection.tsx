@@ -532,12 +532,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (query.nextExecution && query.dateSpecific) {
       const nextExecUTC = new Date(query.nextExecution);
       if (nextExecUTC < nowUTC) {
-      return { 
-        status: 'expired', 
-        label: t.status.expired, 
-        color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
-        icon: <Clock className="w-4 h-4" />
-      };
+        return true;
+      }
     }
     
     return false;
@@ -824,18 +820,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{t.createdOn}: {formatDateWithTimezone(query.createdAt, query.timezone)}</span>
+                        <span>{t.createdOn}: {formatDate(query.createdAt)}</span>
                       </div>
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
-                        </div>
-                      )}
-                      {query.validTo && (
-                        <div className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4 text-orange-400" />
-                          <span className="text-orange-400">Scade: {formatDateWithTimezone(query.validTo, query.timezone)}</span>
+                          <span>{t.nextExecution}: {formatDate(query.nextExecution)}</span>
                         </div>
                       )}
                       {query.cronParams && (
