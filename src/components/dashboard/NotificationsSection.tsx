@@ -28,14 +28,355 @@ interface NotificationsSectionProps {
   queries: NotificationQuery[];
   queryStats: QueryStatistics;
   onQueriesUpdate: (queries: NotificationQuery[]) => void;
+  language: Language;
 }
 
-type FilterType = 'all' | 'active' | 'cron' | 'specific' | 'check' | 'closed';
+type FilterType = 'all' | 'active' | 'cron' | 'specific' | 'check';
+
+const notificationsTranslations = {
+  en: {
+    title: 'My Notifications',
+    subtitle: 'Manage your active notifications',
+    statistics: 'Notification Statistics',
+    total: 'Total',
+    recurring: 'Recurring',
+    scheduled: 'Scheduled',
+    conditional: 'Conditional',
+    searchPlaceholder: 'Search notifications...',
+    filterAll: 'All',
+    filterActive: 'Active Only',
+    filterRecurring: 'Recurring',
+    filterScheduled: 'Scheduled',
+    filterConditional: 'Conditional',
+    createNew: 'Create New',
+    noNotifications: 'No notifications found',
+    noNotificationsMessage: 'Try modifying your search filters.',
+    noNotificationsEmpty: 'Create your first notification to get started.',
+    createFirst: 'Create Your First Notification',
+    details: 'Details',
+    close: 'Close',
+    createdOn: 'Created',
+    nextExecution: 'Next',
+    confidence: 'confidence',
+    createNotification: 'Create New Notification',
+    cancel: 'Cancel',
+    create: 'Create Notification',
+    creating: 'Creating...',
+    describeNotification: 'Describe your notification',
+    descriptionPlaceholder: 'E.g.: Notify me every day at 9 AM about tech news...',
+    email: 'Email',
+    timezone: 'Timezone',
+    notificationClosed: 'Notification Closed',
+    notificationClosedMessage: 'The notification has been closed successfully.',
+    closeError: 'Error',
+    createSuccess: 'Notification Created',
+    createSuccessMessage: 'Your notification has been created successfully.',
+    createError: 'Creation Error',
+    types: {
+      recurring: 'Recurring',
+      scheduled: 'Scheduled',
+      conditional: 'Conditional',
+      unknown: 'Unknown'
+    },
+    status: {
+      active: 'Active',
+      invalid: 'Invalid',
+      expired: 'Expired'
+    },
+    channels: {
+      email: 'Email',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  },
+  it: {
+    title: 'Le Mie Notifiche',
+    subtitle: 'Gestisci le tue notifiche attive',
+    statistics: 'Statistiche Notifiche',
+    total: 'Totali',
+    recurring: 'Ricorrenti',
+    scheduled: 'Programmate',
+    conditional: 'Condizionali',
+    searchPlaceholder: 'Cerca notifiche...',
+    filterAll: 'Tutte',
+    filterActive: 'Solo Attive',
+    filterRecurring: 'Ricorrenti',
+    filterScheduled: 'Programmate',
+    filterConditional: 'Condizionali',
+    createNew: 'Crea Nuova',
+    noNotifications: 'Nessuna notifica trovata',
+    noNotificationsMessage: 'Prova a modificare i filtri di ricerca.',
+    noNotificationsEmpty: 'Crea la tua prima notifica per iniziare.',
+    createFirst: 'Crea la Tua Prima Notifica',
+    details: 'Dettagli',
+    close: 'Chiudi',
+    createdOn: 'Creata',
+    nextExecution: 'Prossima',
+    confidence: 'fiducia',
+    createNotification: 'Crea Nuova Notifica',
+    cancel: 'Annulla',
+    create: 'Crea Notifica',
+    creating: 'Creazione...',
+    describeNotification: 'Descrivi la tua notifica',
+    descriptionPlaceholder: 'Es: Notificami ogni giorno alle 9 sulle notizie di tecnologia...',
+    email: 'Email',
+    timezone: 'Fuso Orario',
+    notificationClosed: 'Notifica Chiusa',
+    notificationClosedMessage: 'La notifica è stata chiusa con successo.',
+    closeError: 'Errore',
+    createSuccess: 'Notifica Creata',
+    createSuccessMessage: 'La tua notifica è stata creata con successo.',
+    createError: 'Errore Creazione',
+    types: {
+      recurring: 'Ricorrente',
+      scheduled: 'Programmata',
+      conditional: 'Condizionale',
+      unknown: 'Sconosciuto'
+    },
+    status: {
+      active: 'Attiva',
+      invalid: 'Non Valida',
+      expired: 'Scaduta'
+    },
+    channels: {
+      email: 'Email',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  },
+  es: {
+    title: 'Mis Notificaciones',
+    subtitle: 'Gestiona tus notificaciones activas',
+    statistics: 'Estadísticas de Notificaciones',
+    total: 'Total',
+    recurring: 'Recurrentes',
+    scheduled: 'Programadas',
+    conditional: 'Condicionales',
+    searchPlaceholder: 'Buscar notificaciones...',
+    filterAll: 'Todas',
+    filterActive: 'Solo Activas',
+    filterRecurring: 'Recurrentes',
+    filterScheduled: 'Programadas',
+    filterConditional: 'Condicionales',
+    createNew: 'Crear Nueva',
+    noNotifications: 'No se encontraron notificaciones',
+    noNotificationsMessage: 'Intenta modificar los filtros de búsqueda.',
+    noNotificationsEmpty: 'Crea tu primera notificación para comenzar.',
+    createFirst: 'Crear Tu Primera Notificación',
+    details: 'Detalles',
+    close: 'Cerrar',
+    createdOn: 'Creada',
+    nextExecution: 'Próxima',
+    confidence: 'confianza',
+    createNotification: 'Crear Nueva Notificación',
+    cancel: 'Cancelar',
+    create: 'Crear Notificación',
+    creating: 'Creando...',
+    describeNotification: 'Describe tu notificación',
+    descriptionPlaceholder: 'Ej: Notifícame todos los días a las 9 AM sobre noticias de tecnología...',
+    email: 'Email',
+    timezone: 'Zona Horaria',
+    notificationClosed: 'Notificación Cerrada',
+    notificationClosedMessage: 'La notificación ha sido cerrada exitosamente.',
+    closeError: 'Error',
+    createSuccess: 'Notificación Creada',
+    createSuccessMessage: 'Tu notificación ha sido creada exitosamente.',
+    createError: 'Error de Creación',
+    types: {
+      recurring: 'Recurrente',
+      scheduled: 'Programada',
+      conditional: 'Condicional',
+      unknown: 'Desconocido'
+    },
+    status: {
+      active: 'Activa',
+      invalid: 'Inválida',
+      expired: 'Expirada'
+    },
+    channels: {
+      email: 'Email',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  },
+  fr: {
+    title: 'Mes Notifications',
+    subtitle: 'Gérer vos notifications actives',
+    statistics: 'Statistiques des Notifications',
+    total: 'Total',
+    recurring: 'Récurrentes',
+    scheduled: 'Programmées',
+    conditional: 'Conditionnelles',
+    searchPlaceholder: 'Rechercher des notifications...',
+    filterAll: 'Toutes',
+    filterActive: 'Actives Seulement',
+    filterRecurring: 'Récurrentes',
+    filterScheduled: 'Programmées',
+    filterConditional: 'Conditionnelles',
+    createNew: 'Créer Nouvelle',
+    noNotifications: 'Aucune notification trouvée',
+    noNotificationsMessage: 'Essayez de modifier les filtres de recherche.',
+    noNotificationsEmpty: 'Créez votre première notification pour commencer.',
+    createFirst: 'Créer Votre Première Notification',
+    details: 'Détails',
+    close: 'Fermer',
+    createdOn: 'Créée',
+    nextExecution: 'Prochaine',
+    confidence: 'confiance',
+    createNotification: 'Créer Nouvelle Notification',
+    cancel: 'Annuler',
+    create: 'Créer Notification',
+    creating: 'Création...',
+    describeNotification: 'Décrivez votre notification',
+    descriptionPlaceholder: 'Ex: Me notifier tous les jours à 9h sur les actualités tech...',
+    email: 'Email',
+    timezone: 'Fuseau Horaire',
+    notificationClosed: 'Notification Fermée',
+    notificationClosedMessage: 'La notification a été fermée avec succès.',
+    closeError: 'Erreur',
+    createSuccess: 'Notification Créée',
+    createSuccessMessage: 'Votre notification a été créée avec succès.',
+    createError: 'Erreur de Création',
+    types: {
+      recurring: 'Récurrente',
+      scheduled: 'Programmée',
+      conditional: 'Conditionnelle',
+      unknown: 'Inconnu'
+    },
+    status: {
+      active: 'Active',
+      invalid: 'Invalide',
+      expired: 'Expirée'
+    },
+    channels: {
+      email: 'Email',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  },
+  de: {
+    title: 'Meine Benachrichtigungen',
+    subtitle: 'Verwalten Sie Ihre aktiven Benachrichtigungen',
+    statistics: 'Benachrichtigungsstatistiken',
+    total: 'Gesamt',
+    recurring: 'Wiederkehrend',
+    scheduled: 'Geplant',
+    conditional: 'Bedingt',
+    searchPlaceholder: 'Benachrichtigungen suchen...',
+    filterAll: 'Alle',
+    filterActive: 'Nur Aktive',
+    filterRecurring: 'Wiederkehrend',
+    filterScheduled: 'Geplant',
+    filterConditional: 'Bedingt',
+    createNew: 'Neue Erstellen',
+    noNotifications: 'Keine Benachrichtigungen gefunden',
+    noNotificationsMessage: 'Versuchen Sie, die Suchfilter zu ändern.',
+    noNotificationsEmpty: 'Erstellen Sie Ihre erste Benachrichtigung, um zu beginnen.',
+    createFirst: 'Ihre Erste Benachrichtigung Erstellen',
+    details: 'Details',
+    close: 'Schließen',
+    createdOn: 'Erstellt',
+    nextExecution: 'Nächste',
+    confidence: 'Vertrauen',
+    createNotification: 'Neue Benachrichtigung Erstellen',
+    cancel: 'Abbrechen',
+    create: 'Benachrichtigung Erstellen',
+    creating: 'Erstellen...',
+    describeNotification: 'Beschreiben Sie Ihre Benachrichtigung',
+    descriptionPlaceholder: 'Z.B.: Benachrichtige mich jeden Tag um 9 Uhr über Tech-News...',
+    email: 'E-Mail',
+    timezone: 'Zeitzone',
+    notificationClosed: 'Benachrichtigung Geschlossen',
+    notificationClosedMessage: 'Die Benachrichtigung wurde erfolgreich geschlossen.',
+    closeError: 'Fehler',
+    createSuccess: 'Benachrichtigung Erstellt',
+    createSuccessMessage: 'Ihre Benachrichtigung wurde erfolgreich erstellt.',
+    createError: 'Erstellungsfehler',
+    types: {
+      recurring: 'Wiederkehrend',
+      scheduled: 'Geplant',
+      conditional: 'Bedingt',
+      unknown: 'Unbekannt'
+    },
+    status: {
+      active: 'Aktiv',
+      invalid: 'Ungültig',
+      expired: 'Abgelaufen'
+    },
+    channels: {
+      email: 'E-Mail',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  },
+  zh: {
+    title: '我的通知',
+    subtitle: '管理您的活动通知',
+    statistics: '通知统计',
+    total: '总计',
+    recurring: '重复',
+    scheduled: '计划',
+    conditional: '条件',
+    searchPlaceholder: '搜索通知...',
+    filterAll: '全部',
+    filterActive: '仅活动',
+    filterRecurring: '重复',
+    filterScheduled: '计划',
+    filterConditional: '条件',
+    createNew: '创建新的',
+    noNotifications: '未找到通知',
+    noNotificationsMessage: '尝试修改搜索过滤器。',
+    noNotificationsEmpty: '创建您的第一个通知以开始。',
+    createFirst: '创建您的第一个通知',
+    details: '详情',
+    close: '关闭',
+    createdOn: '创建于',
+    nextExecution: '下次',
+    confidence: '置信度',
+    createNotification: '创建新通知',
+    cancel: '取消',
+    create: '创建通知',
+    creating: '创建中...',
+    describeNotification: '描述您的通知',
+    descriptionPlaceholder: '例如：每天上午9点通知我科技新闻...',
+    email: '电子邮件',
+    timezone: '时区',
+    notificationClosed: '通知已关闭',
+    notificationClosedMessage: '通知已成功关闭。',
+    closeError: '错误',
+    createSuccess: '通知已创建',
+    createSuccessMessage: '您的通知已成功创建。',
+    createError: '创建错误',
+    types: {
+      recurring: '重复',
+      scheduled: '计划',
+      conditional: '条件',
+      unknown: '未知'
+    },
+    status: {
+      active: '活动',
+      invalid: '无效',
+      expired: '已过期'
+    },
+    channels: {
+      email: '电子邮件',
+      whatsapp: 'WhatsApp',
+      slack: 'Slack',
+      discord: 'Discord'
+    }
+  }
+};
 
 export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   queries,
   queryStats,
-  onQueriesUpdate
+  onQueriesUpdate,
+  language
 }) => {
   const { user } = useUser();
   const api = useNotifyMeAPI();
@@ -55,6 +396,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     channelConfigs: {} as Record<string, string>
   });
 
+  const t = notificationsTranslations[language];
+
   // Filter queries based on current filter and search
   const filteredQueries = queries.filter(query => {
     const matchesFilter = (() => {
@@ -64,7 +407,6 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         case 'cron': return query.cron && !query.dateSpecific && !query.toCheck;
         case 'specific': return !query.cron && query.dateSpecific && !query.toCheck;
         case 'check': return query.toCheck;
-        case 'closed': return query.closed;
         default: return true;
       }
     })();
@@ -80,17 +422,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (!query.isValid) {
       return { 
         status: 'invalid', 
-        label: 'Non Valida', 
+        label: t.status.invalid, 
         color: 'text-red-400 bg-red-500/20 border-red-500/30',
-        icon: <XCircle className="w-4 h-4" />
-      };
-    }
-    
-    if (query.closed) {
-      return { 
-        status: 'closed', 
-        label: 'Chiusa', 
-        color: 'text-gray-400 bg-gray-500/20 border-gray-500/30',
         icon: <XCircle className="w-4 h-4" />
       };
     }
@@ -101,7 +434,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (nextExec && nextExec < now && query.dateSpecific) {
       return { 
         status: 'expired', 
-        label: 'Scaduta', 
+        label: t.status.expired, 
         color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
         icon: <Clock className="w-4 h-4" />
       };
@@ -109,7 +442,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     
     return { 
       status: 'active', 
-      label: 'Attiva', 
+      label: t.status.active, 
       color: 'text-green-400 bg-green-500/20 border-green-500/30',
       icon: <CheckCircle className="w-4 h-4" />
     };
@@ -120,7 +453,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (query.cron && !query.dateSpecific && !query.toCheck) {
       return { 
         type: 'recurring', 
-        label: 'Ricorrente', 
+        label: t.types.recurring, 
         color: 'text-purple-400 bg-purple-500/20 border-purple-500/30',
         icon: <Repeat className="w-4 h-4" />
       };
@@ -129,7 +462,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (!query.cron && query.dateSpecific && !query.toCheck) {
       return { 
         type: 'scheduled', 
-        label: 'Programmata', 
+        label: t.types.scheduled, 
         color: 'text-cyan-400 bg-cyan-500/20 border-cyan-500/30',
         icon: <Calendar className="w-4 h-4" />
       };
@@ -138,7 +471,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     if (query.toCheck) {
       return { 
         type: 'conditional', 
-        label: 'Condizionale', 
+        label: t.types.conditional, 
         color: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30',
         icon: <AlertCircle className="w-4 h-4" />
       };
@@ -146,14 +479,15 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     
     return { 
       type: 'unknown', 
-      label: 'Sconosciuto', 
+      label: t.types.unknown, 
       color: 'text-gray-400 bg-gray-500/20 border-gray-500/30',
       icon: <Bell className="w-4 h-4" />
     };
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('it-IT', {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
+    return new Date(dateString).toLocaleString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -172,9 +506,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       );
       onQueriesUpdate(updatedQueries);
       
-      success('Notifica Chiusa', 'La notifica è stata chiusa con successo.');
+      success(t.notificationClosed, t.notificationClosedMessage);
     } catch (err) {
-      error('Errore', err instanceof Error ? err.message : 'Impossibile chiudere la notifica');
+      error(t.closeError, err instanceof Error ? err.message : 'Impossibile chiudere la notifica');
     } finally {
       setLoading(false);
     }
@@ -211,15 +545,15 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       setShowCreateForm(false);
       setCreateForm({
         prompt: '',
-        email: user?.email || '',
+        email: user?.emailAddresses?.[0]?.emailAddress || '',
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
         channels: ['email'],
         channelConfigs: {}
       });
       
-      success('Notifica Creata', 'La tua notifica è stata creata con successo.');
+      success(t.createSuccess, t.createSuccessMessage);
     } catch (err) {
-      error('Errore Creazione', err instanceof Error ? err.message : 'Impossibile creare la notifica');
+      error(t.createError, err instanceof Error ? err.message : 'Impossibile creare la notifica');
     } finally {
       setLoading(false);
     }
@@ -252,25 +586,25 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
             <BarChart3 className="w-6 h-6 text-green-400" />
           </div>
-          <span>Statistiche Notifiche</span>
+          <span>{t.statistics}</span>
         </h3>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-white/5 rounded-xl">
             <div className="text-2xl font-bold text-blue-400 mb-1">{queryStats.totalQueries}</div>
-            <div className="text-sm text-gray-400">Totali</div>
+            <div className="text-sm text-gray-400">{t.total}</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
             <div className="text-2xl font-bold text-purple-400 mb-1">{queryStats.cronQueries}</div>
-            <div className="text-sm text-gray-400">Ricorrenti</div>
+            <div className="text-sm text-gray-400">{t.recurring}</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
             <div className="text-2xl font-bold text-cyan-400 mb-1">{queryStats.specificQueries}</div>
-            <div className="text-sm text-gray-400">Programmate</div>
+            <div className="text-sm text-gray-400">{t.scheduled}</div>
           </div>
           <div className="text-center p-4 bg-white/5 rounded-xl">
             <div className="text-2xl font-bold text-yellow-400 mb-1">{queryStats.checkQueries}</div>
-            <div className="text-sm text-gray-400">Condizionali</div>
+            <div className="text-sm text-gray-400">{t.conditional}</div>
           </div>
         </div>
       </div>
@@ -283,7 +617,10 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <div className="w-10 h-10 bg-fuchsia-500/20 rounded-xl flex items-center justify-center">
                 <Bell className="w-5 h-5 text-fuchsia-400" />
               </div>
-              <h3 className="text-xl font-semibold">Le Mie Notifiche</h3>
+              <div>
+                <h3 className="text-xl font-semibold">{t.title}</h3>
+                <p className="text-sm text-gray-400">{t.subtitle}</p>
+              </div>
             </div>
           </div>
 
@@ -293,9 +630,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                value={createForm.email || user?.emailAddresses?.[0]?.emailAddress || ''}
+                value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Cerca notifiche..."
+                placeholder={t.searchPlaceholder}
                 className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
               />
             </div>
@@ -306,12 +643,11 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               onChange={(e) => setFilter(e.target.value as FilterType)}
               className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
             >
-              <option value="all">Tutte</option>
-              <option value="active">Solo Attive</option>
-              <option value="cron">Ricorrenti</option>
-              <option value="specific">Programmate</option>
-              <option value="check">Condizionali</option>
-              <option value="closed">Chiuse</option>
+              <option value="all">{t.filterAll}</option>
+              <option value="active">{t.filterActive}</option>
+              <option value="cron">{t.filterRecurring}</option>
+              <option value="specific">{t.filterScheduled}</option>
+              <option value="check">{t.filterConditional}</option>
             </select>
 
             {/* Create Button */}
@@ -320,7 +656,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-lg font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
-              <span>Crea Nuova</span>
+              <span>{t.createNew}</span>
             </button>
           </div>
         </div>
@@ -331,11 +667,11 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         {filteredQueries.length === 0 ? (
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-12 text-center">
             <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">Nessuna notifica trovata</h3>
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">{t.noNotifications}</h3>
             <p className="text-gray-500 mb-6">
               {searchTerm || filter !== 'all' 
-                ? 'Prova a modificare i filtri di ricerca.'
-                : 'Crea la tua prima notifica per iniziare.'
+                ? t.noNotificationsMessage
+                : t.noNotificationsEmpty
               }
             </p>
             {!searchTerm && filter === 'all' && (
@@ -343,7 +679,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                 onClick={() => setShowCreateForm(true)}
                 className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transition-all duration-300"
               >
-                Crea la Tua Prima Notifica
+                {t.createFirst}
               </button>
             )}
           </div>
@@ -388,7 +724,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                         {channels.map((channel, index) => (
                           <div key={index} className="flex items-center space-x-1 px-2 py-1 bg-white/10 rounded-md">
                             {getChannelIcon(channel)}
-                            <span className="text-xs text-gray-300 capitalize">{channel}</span>
+                            <span className="text-xs text-gray-300 capitalize">{t.channels[channel as keyof typeof t.channels]}</span>
                           </div>
                         ))}
                       </div>
@@ -396,7 +732,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                       {/* Confidence Score */}
                       {query.confidenceScore && (
                         <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-md">
-                          {Math.round(query.confidenceScore * 100)}% fiducia
+                          {Math.round(query.confidenceScore * 100)}% {t.confidence}
                         </span>
                       )}
                     </div>
@@ -404,12 +740,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>Creata: {formatDate(query.createdAt)}</span>
+                        <span>{t.createdOn}: {formatDate(query.createdAt)}</span>
                       </div>
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>Prossima: {formatDate(query.nextExecution)}</span>
+                          <span>{t.nextExecution}: {formatDate(query.nextExecution)}</span>
                         </div>
                       )}
                       {query.cronParams && (
@@ -427,17 +763,17 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                       className="flex items-center space-x-1 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-300 text-blue-400"
                     >
                       <Eye className="w-4 h-4" />
-                      <span className="text-sm">Dettagli</span>
+                      <span className="text-sm">{t.details}</span>
                     </button>
                     
-                    {!query.closed && query.isValid && (
+                    {query.isValid && (
                       <button
                         onClick={() => handleCloseQuery(query.id)}
                         disabled={loading}
                         className="flex items-center space-x-1 px-3 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-all duration-300 text-red-400 disabled:opacity-50"
                       >
                         <XCircle className="w-4 h-4" />
-                        <span className="text-sm">Chiudi</span>
+                        <span className="text-sm">{t.close}</span>
                       </button>
                     )}
                   </div>
@@ -455,7 +791,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           
           <div className="relative bg-gray-900 border border-white/20 rounded-2xl p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold">Crea Nuova Notifica</h3>
+              <h3 className="text-xl font-semibold">{t.createNotification}</h3>
               <button
                 onClick={() => setShowCreateForm(false)}
                 className="text-gray-400 hover:text-white transition-colors"
@@ -466,22 +802,18 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
             <form onSubmit={handleCreateNotification} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Descrivi la tua notifica
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.describeNotification}</label>
                 <textarea
                   value={createForm.prompt}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, prompt: e.target.value }))}
-                  placeholder="Es: Notificami ogni giorno alle 9 sulle notizie di tecnologia..."
+                  placeholder={t.descriptionPlaceholder}
                   className="w-full h-32 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 resize-none focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.email}</label>
                 <input
                   type="email"
                   value={createForm.email}
@@ -493,9 +825,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Fuso Orario
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.timezone}</label>
                 <input
                   type="text"
                   value={createForm.timezone}
@@ -512,14 +842,14 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   onClick={() => setShowCreateForm(false)}
                   className="px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 rounded-xl font-semibold text-gray-300 transition-all duration-300"
                 >
-                  Annulla
+                  {t.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50"
                 >
-                  {loading ? 'Creazione...' : 'Crea Notifica'}
+                  {loading ? t.creating : t.create}
                 </button>
               </div>
             </form>
@@ -534,7 +864,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           
           <div className="relative bg-gray-900 border border-white/20 rounded-2xl p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold">Dettagli Notifica</h3>
+              <h3 className="text-xl font-semibold">{t.details}</h3>
               <button
                 onClick={() => setSelectedQuery(null)}
                 className="text-gray-400 hover:text-white transition-colors"
@@ -583,7 +913,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   {parseEnabledChannels(selectedQuery.enabledChannels).map((channel, index) => (
                     <div key={index} className="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg">
                       {getChannelIcon(channel)}
-                      <span className="text-sm capitalize">{channel}</span>
+                      <span className="text-sm capitalize">{t.channels[channel as keyof typeof t.channels]}</span>
                     </div>
                   ))}
                 </div>
@@ -591,12 +921,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Creata</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">{t.createdOn}</label>
                   <p className="text-white">{formatDate(selectedQuery.createdAt)}</p>
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Prossima Esecuzione</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
                     <p className="text-white">{formatDate(selectedQuery.nextExecution)}</p>
                   </div>
                 )}
