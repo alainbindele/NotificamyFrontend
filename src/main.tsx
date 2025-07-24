@@ -12,29 +12,29 @@ import './index.css';
 if (import.meta.env.DEV) {
   console.log('🔍 Environment Variables Check:', {
     CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? 'SET' : 'NOT SET',
-    CLERK_KEY_VALUE: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.substring(0, 20) + '...',
+    CLERK_KEY_VALUE: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.substring(0, 30) + '...',
+    CLERK_KEY_LENGTH: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.length,
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
     ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
     MODE: import.meta.env.MODE,
     DEV: import.meta.env.DEV,
     PROD: import.meta.env.PROD,
-    ENV_FILES_LOADED: 'Check console for .env file loading'
+    ALL_VITE_VARS: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
   });
-  
-  // Show all VITE_ environment variables
-  console.log('🔍 All VITE_ Environment Variables:', 
-    Object.keys(import.meta.env)
-      .filter(key => key.startsWith('VITE_'))
-      .reduce((obj, key) => {
-        obj[key] = import.meta.env[key];
-        return obj;
-      }, {})
-  );
+}
+
+// Validate Clerk key before rendering
+if (!clerkConfig.publishableKey) {
+  console.error('❌ CRITICAL: Clerk publishable key is missing!');
+  console.error('Check your .env file for VITE_CLERK_PUBLISHABLE_KEY');
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={clerkConfig.publishableKey}>
+    <ClerkProvider 
+      publishableKey={clerkConfig.publishableKey}
+      navigate={(to) => window.location.href = to}
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
