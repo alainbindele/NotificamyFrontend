@@ -319,9 +319,8 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
     setLoading(true);
     try {
       // Note: This would need a restore endpoint in the API
-    // Parse UTC date string and convert to local timezone
-    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
-    
+      // For now, we'll simulate the restore by updating the local state
+      const updatedQueries = queries.map(q => 
         q.id === queryId ? { ...q, closed: false } : q
       );
       
