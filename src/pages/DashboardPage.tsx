@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { Bell, User, Settings, ArrowLeft, Loader2 } from 'lucide-react';
+import { Bell, User, Settings, ArrowLeft, Loader2, Archive } from 'lucide-react';
 import { AuthButton } from '../components/AuthButton';
 import { LanguageSelector, Language } from '../components/LanguageSelector';
 import { ProfileSection } from '../components/dashboard/ProfileSection';
 import { NotificationsSection } from '../components/dashboard/NotificationsSection';
+import { ArchivedSection } from '../components/dashboard/ArchivedSection';
 import { ToastContainer } from '../components/Toast';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useToast } from '../hooks/useToast';
 import { UserProfile } from '../types/api';
 
-type TabType = 'notifications' | 'profile';
+type TabType = 'notifications' | 'archived' | 'profile';
 
 const detectBrowserLanguage = (): Language => {
   const browserLang = navigator.language.toLowerCase();
@@ -31,6 +32,7 @@ const translations = {
     dashboard: "Dashboard",
     backToHome: "← Back to Home",
     notifications: "Notifications",
+    archived: "Archived",
     profile: "Profile",
     loading: "Loading dashboard...",
     error: "Failed to load dashboard",
@@ -42,6 +44,7 @@ const translations = {
     dashboard: "Dashboard",
     backToHome: "← Torna alla Home",
     notifications: "Notifiche",
+    archived: "Archiviate",
     profile: "Profilo",
     loading: "Caricamento dashboard...",
     error: "Errore nel caricamento dashboard",
@@ -53,6 +56,7 @@ const translations = {
     dashboard: "Panel de Control",
     backToHome: "← Volver al Inicio",
     notifications: "Notificaciones",
+    archived: "Archivadas",
     profile: "Perfil",
     loading: "Cargando panel...",
     error: "Error al cargar el panel",
@@ -64,6 +68,7 @@ const translations = {
     dashboard: "Tableau de Bord",
     backToHome: "← Retour à l'Accueil",
     notifications: "Notifications",
+    archived: "Archivées",
     profile: "Profil",
     loading: "Chargement du tableau de bord...",
     error: "Échec du chargement du tableau de bord",
@@ -75,6 +80,7 @@ const translations = {
     dashboard: "Dashboard",
     backToHome: "← Zurück zur Startseite",
     notifications: "Benachrichtigungen",
+    archived: "Archiviert",
     profile: "Profil",
     loading: "Dashboard wird geladen...",
     error: "Dashboard konnte nicht geladen werden",
@@ -86,6 +92,7 @@ const translations = {
     dashboard: "仪表板",
     backToHome: "← 返回首页",
     notifications: "通知",
+    archived: "已归档",
     profile: "个人资料",
     loading: "正在加载仪表板...",
     error: "加载仪表板失败",
@@ -275,29 +282,41 @@ export const DashboardPage: React.FC = () => {
       {/* Navigation Tabs */}
       <nav className="relative z-10 px-4 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex space-x-1 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-2">
+          <div className="grid grid-cols-3 gap-1 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-2">
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 justify-center ${
+              className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 justify-center ${
                 activeTab === 'notifications'
                   ? 'bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-lg'
                   : 'text-gray-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <Bell className="w-5 h-5" />
-              <span>{t.notifications}</span>
+              <span className="hidden sm:inline">{t.notifications}</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('archived')}
+              className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 justify-center ${
+                activeTab === 'archived'
+                  ? 'bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <Archive className="w-5 h-5" />
+              <span className="hidden sm:inline">{t.archived}</span>
             </button>
             
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 justify-center ${
+              className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 justify-center ${
                 activeTab === 'profile'
                   ? 'bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-lg'
                   : 'text-gray-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <User className="w-5 h-5" />
-              <span>{t.profile}</span>
+              <span className="hidden sm:inline">{t.profile}</span>
             </button>
           </div>
         </div>
@@ -308,9 +327,18 @@ export const DashboardPage: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           {activeTab === 'notifications' && (
             <NotificationsSection
-              queries={queries}
+              queries={queries.filter(q => !q.closed)}
               queryStats={queryStats}
               onQueriesUpdate={setQueries}
+              language={language}
+            />
+          )}
+          
+          {activeTab === 'archived' && (
+            <ArchivedSection
+              queries={queries.filter(q => q.closed)}
+              onQueriesUpdate={setQueries}
+              language={language}
             />
           )}
           
@@ -319,6 +347,7 @@ export const DashboardPage: React.FC = () => {
               userProfile={userProfile}
               userStats={userStats}
               onProfileUpdate={setUserProfile}
+              language={language}
             />
           )}
         </div>
