@@ -23,6 +23,7 @@ import {
 import { NotificationQuery, QueryStatistics, CreateNotificationRequest } from '../../types/api';
 import { useNotifyMeAPI } from '../../hooks/useNotifyMeAPI';
 import { useToast } from '../../hooks/useToast';
+import { Language } from '../LanguageSelector';
 
 interface NotificationsSectionProps {
   queries: NotificationQuery[];
@@ -57,6 +58,7 @@ const notificationsTranslations = {
     close: 'Close',
     createdOn: 'Created',
     nextExecution: 'Next',
+    expiresOn: 'Expires',
     confidence: 'confidence',
     createNotification: 'Create New Notification',
     cancel: 'Cancel',
@@ -113,6 +115,7 @@ const notificationsTranslations = {
     close: 'Chiudi',
     createdOn: 'Creata',
     nextExecution: 'Prossima',
+    expiresOn: 'Scade',
     confidence: 'fiducia',
     createNotification: 'Crea Nuova Notifica',
     cancel: 'Annulla',
@@ -169,6 +172,7 @@ const notificationsTranslations = {
     close: 'Cerrar',
     createdOn: 'Creada',
     nextExecution: 'Próxima',
+    expiresOn: 'Expira',
     confidence: 'confianza',
     createNotification: 'Crear Nueva Notificación',
     cancel: 'Cancelar',
@@ -225,6 +229,7 @@ const notificationsTranslations = {
     close: 'Fermer',
     createdOn: 'Créée',
     nextExecution: 'Prochaine',
+    expiresOn: 'Expire',
     confidence: 'confiance',
     createNotification: 'Créer Nouvelle Notification',
     cancel: 'Annuler',
@@ -281,6 +286,7 @@ const notificationsTranslations = {
     close: 'Schließen',
     createdOn: 'Erstellt',
     nextExecution: 'Nächste',
+    expiresOn: 'Läuft ab',
     confidence: 'Vertrauen',
     createNotification: 'Neue Benachrichtigung Erstellen',
     cancel: 'Abbrechen',
@@ -337,6 +343,7 @@ const notificationsTranslations = {
     close: '关闭',
     createdOn: '创建于',
     nextExecution: '下次',
+    expiresOn: '到期',
     confidence: '置信度',
     createNotification: '创建新通知',
     cancel: '取消',
@@ -398,12 +405,15 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
   const t = notificationsTranslations[language];
 
-  // Filter queries based on current filter and search
+  // Filter queries based on current filter and search - only show active (non-closed) notifications
   const filteredQueries = queries.filter(query => {
+    // Only show non-closed notifications in this section
+    if (query.closed) return false;
+    
     const matchesFilter = (() => {
       switch (filter) {
         case 'all': return true;
-        case 'active': return query.isValid && !query.closed;
+        case 'active': return query.isValid;
         case 'cron': return query.cron && !query.dateSpecific && !query.toCheck;
         case 'specific': return !query.cron && query.dateSpecific && !query.toCheck;
         case 'check': return query.toCheck;
@@ -431,7 +441,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     // Get current time in UTC for proper comparison
     const nowUTC = new Date();
     
-    // Check if notification is expired based on valid_to (UTC)
+    // Check if notification is expired based on validTo (UTC)
     if (query.validTo) {
       const validToUTC = new Date(query.validTo);
       if (validToUTC < nowUTC) {
@@ -463,22 +473,6 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       color: 'text-green-400 bg-green-500/20 border-green-500/30',
       icon: <CheckCircle className="w-4 h-4" />
     };
-  };
-
-  // Format date considering user's timezone for display
-  const formatDate = (dateString: string) => {
-    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
-    
-    // Parse UTC date and display in user's local timezone
-    const date = new Date(dateString);
-    return date.toLocaleString(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
   };
 
   // Format date for display with timezone info
@@ -516,27 +510,20 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     });
   };
 
-  // Check if notification is expired (for filtering)
-  const isNotificationExpired = (query: NotificationQuery) => {
-    const nowUTC = new Date();
+  // Format date considering user's timezone for display
+  const formatDate = (dateString: string) => {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
     
-    // Check valid_to first
-    if (query.validTo) {
-      const validToUTC = new Date(query.validTo);
-      if (validToUTC < nowUTC) {
-        return true;
-      }
-    }
-    
-    // Check nextExecution for specific date notifications
-    if (query.nextExecution && query.dateSpecific) {
-      const nextExecUTC = new Date(query.nextExecution);
-      if (nextExecUTC < nowUTC) {
-        return true;
-      }
-    }
-    
-    return false;
+    // Parse UTC date and display in user's local timezone
+    const date = new Date(dateString);
+    return date.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
   };
 
   // Get notification type with proper styling
@@ -581,6 +568,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     try {
       await api.closeQuery(queryId);
       
+      // Update queries to mark as closed - this will automatically move it to archived section
       const updatedQueries = queries.map(q => 
         q.id === queryId ? { ...q, closed: true } : q
       );
@@ -820,12 +808,18 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{t.createdOn}: {formatDate(query.createdAt)}</span>
+                        <span>{t.createdOn}: {formatDateWithTimezone(query.createdAt, query.timezone)}</span>
                       </div>
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDate(query.nextExecution)}</span>
+                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
+                        </div>
+                      )}
+                      {query.validTo && (
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4 text-orange-400" />
+                          <span className="text-orange-400">{t.expiresOn}: {formatDateWithTimezone(query.validTo, query.timezone)}</span>
                         </div>
                       )}
                       {query.cronParams && (
@@ -1002,15 +996,22 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">{t.createdOn}</label>
-                  <p className="text-white">{formatDate(selectedQuery.createdAt)}</p>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.createdAt, selectedQuery.timezone)}</p>
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
-                    <p className="text-white">{formatDate(selectedQuery.nextExecution)}</p>
+                    <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
                   </div>
                 )}
               </div>
+              
+              {selectedQuery.validTo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Data Scadenza</label>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.validTo, selectedQuery.timezone)}</p>
+                </div>
+              )}
 
               {selectedQuery.cronParams && (
                 <div>
