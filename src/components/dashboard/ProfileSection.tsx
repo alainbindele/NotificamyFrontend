@@ -4,6 +4,7 @@ import { User, Mail, Calendar, Settings, Trash2, Save, Eye, EyeOff, MessageSquar
 import { UserProfile, UserStatistics, UpdateProfileRequest, UpdateChannelsRequest } from '../../types/api';
 import { useNotifyMeAPI } from '../../hooks/useNotifyMeAPI';
 import { useToast } from '../../hooks/useToast';
+import { Language } from '../LanguageSelector';
 
 interface ProfileSectionProps {
   userProfile: UserProfile;
