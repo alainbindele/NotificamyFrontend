@@ -120,7 +120,9 @@ const notificationsTranslations = {
     creating: 'Creazione...',
     describeNotification: 'Descrivi la tua notifica',
     descriptionPlaceholder: 'Es: Notificami ogni giorno alle 9 sulle notizie di tecnologia...',
-    email: 'Email',
+    email:
+  }
+} 'Email',
     timezone: 'Fuso Orario',
     notificationClosed: 'Notifica Chiusa',
     notificationClosedMessage: 'La notifica è stata chiusa con successo.',
@@ -1012,22 +1014,15 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">{t.createdOn}</label>
-                  <p className="text-white">{formatDateWithTimezone(selectedQuery.createdAt, selectedQuery.timezone)}</p>
+                  <p className="text-white">{formatDate(selectedQuery.createdAt)}</p>
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
-                    <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
+                    <p className="text-white">{formatDate(selectedQuery.nextExecution)}</p>
                   </div>
                 )}
               </div>
-              
-              {selectedQuery.validTo && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Scade il</label>
-                  <p className="text-white">{formatDateWithTimezone(selectedQuery.validTo, selectedQuery.timezone)}</p>
-                </div>
-              )}
 
               {selectedQuery.cronParams && (
                 <div>
