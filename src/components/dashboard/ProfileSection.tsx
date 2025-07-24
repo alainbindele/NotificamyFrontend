@@ -127,7 +127,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    // Parse UTC date string and convert to local timezone
+    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
+    
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'

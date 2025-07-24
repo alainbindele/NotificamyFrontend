@@ -301,27 +301,10 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
   const formatDateWithTimezone = (dateString: string, timezone?: string) => {
     const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
     
-    const date = new Date(dateString);
+    // Parse UTC date string and convert to local timezone
+    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
     
-    // If we have timezone info, try to display in that timezone
-    if (timezone) {
-      try {
-        return date.toLocaleString(locale, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: timezone,
-          timeZoneName: 'short'
-        });
-      } catch (error) {
-        // Fallback to user's local timezone if specified timezone is invalid
-        console.warn('Invalid timezone:', timezone);
-      }
-    }
-    
-    // Default to user's local timezone
+    // Always display in user's local timezone (client timezone)
     return date.toLocaleString(locale, {
       year: 'numeric',
       month: 'short',
@@ -336,8 +319,9 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
     setLoading(true);
     try {
       // Note: This would need a restore endpoint in the API
-      // For now, we'll simulate by updating the local state
-      const updatedQueries = queries.map(q => 
+    // Parse UTC date string and convert to local timezone
+    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
+    
         q.id === queryId ? { ...q, closed: false } : q
       );
       
