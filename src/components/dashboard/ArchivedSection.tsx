@@ -281,13 +281,54 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
     };
   };
 
+  // Format date considering user's timezone for display
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString(language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN', {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
+    
+    // Parse UTC date and display in user's local timezone
+    const date = new Date(dateString);
+    return date.toLocaleString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+  };
+
+  // Format date for display with timezone info
+  const formatDateWithTimezone = (dateString: string, timezone?: string) => {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
+    
+    const date = new Date(dateString);
+    
+    // If we have timezone info, try to display in that timezone
+    if (timezone) {
+      try {
+        return date.toLocaleString(locale, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: timezone,
+          timeZoneName: 'short'
+        });
+      } catch (error) {
+        // Fallback to user's local timezone if specified timezone is invalid
+        console.warn('Invalid timezone:', timezone);
+      }
+    }
+    
+    // Default to user's local timezone
+    return date.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
     });
   };
 
@@ -437,12 +478,18 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{t.createdOn}: {formatDate(query.createdAt)}</span>
+                        <span>{t.createdOn}: {formatDateWithTimezone(query.createdAt, query.timezone)}</span>
                       </div>
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDate(query.nextExecution)}</span>
+                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
+                        </div>
+                      )}
+                      {query.validTo && (
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4 text-orange-400" />
+                          <span className="text-orange-400">Scadeva: {formatDateWithTimezone(query.validTo, query.timezone)}</span>
                         </div>
                       )}
                       {query.cronParams && (
@@ -544,15 +591,22 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">{t.createdOn}</label>
-                  <p className="text-white">{formatDate(selectedQuery.createdAt)}</p>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.createdAt, selectedQuery.timezone)}</p>
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
-                    <p className="text-white">{formatDate(selectedQuery.nextExecution)}</p>
+                    <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
                   </div>
                 )}
               </div>
+              
+              {selectedQuery.validTo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Data Scadenza</label>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.validTo, selectedQuery.timezone)}</p>
+                </div>
+              )}
 
               {selectedQuery.cronParams && (
                 <div>

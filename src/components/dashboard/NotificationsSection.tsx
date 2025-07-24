@@ -428,16 +428,33 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       };
     }
     
-    const now = new Date();
-    const nextExec = query.nextExecution ? new Date(query.nextExecution) : null;
+    // Get current time in UTC for proper comparison
+    const nowUTC = new Date();
     
-    if (nextExec && nextExec < now && query.dateSpecific) {
-      return { 
-        status: 'expired', 
-        label: t.status.expired, 
-        color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
-        icon: <Clock className="w-4 h-4" />
-      };
+    // Check if notification is expired based on valid_to (UTC)
+    if (query.validTo) {
+      const validToUTC = new Date(query.validTo);
+      if (validToUTC < nowUTC) {
+        return { 
+          status: 'expired', 
+          label: t.status.expired, 
+          color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
+          icon: <Clock className="w-4 h-4" />
+        };
+      }
+    }
+    
+    // Check if specific date notification has passed (UTC comparison)
+    if (query.nextExecution && query.dateSpecific) {
+      const nextExecUTC = new Date(query.nextExecution);
+      if (nextExecUTC < nowUTC) {
+        return { 
+          status: 'expired', 
+          label: t.status.expired, 
+          color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
+          icon: <Clock className="w-4 h-4" />
+        };
+      }
     }
     
     return { 
@@ -446,6 +463,84 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       color: 'text-green-400 bg-green-500/20 border-green-500/30',
       icon: <CheckCircle className="w-4 h-4" />
     };
+  };
+
+  // Format date considering user's timezone for display
+  const formatDate = (dateString: string) => {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
+    
+    // Parse UTC date and display in user's local timezone
+    const date = new Date(dateString);
+    return date.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+  };
+
+  // Format date for display with timezone info
+  const formatDateWithTimezone = (dateString: string, timezone?: string) => {
+    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
+    
+    const date = new Date(dateString);
+    
+    // If we have timezone info, try to display in that timezone
+    if (timezone) {
+      try {
+        return date.toLocaleString(locale, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: timezone,
+          timeZoneName: 'short'
+        });
+      } catch (error) {
+        // Fallback to user's local timezone if specified timezone is invalid
+        console.warn('Invalid timezone:', timezone);
+      }
+    }
+    
+    // Default to user's local timezone
+    return date.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+  };
+
+  // Check if notification is expired (for filtering)
+  const isNotificationExpired = (query: NotificationQuery) => {
+    const nowUTC = new Date();
+    
+    // Check valid_to first
+    if (query.validTo) {
+      const validToUTC = new Date(query.validTo);
+      if (validToUTC < nowUTC) {
+        return true;
+      }
+    }
+    
+    // Check nextExecution for specific date notifications
+    if (query.nextExecution && query.dateSpecific) {
+      const nextExecUTC = new Date(query.nextExecution);
+      if (nextExecUTC < nowUTC) {
+      return { 
+        status: 'expired', 
+        label: t.status.expired, 
+        color: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
+        icon: <Clock className="w-4 h-4" />
+      };
+    }
+    
+    return false;
   };
 
   // Get notification type with proper styling
@@ -483,17 +578,6 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       color: 'text-gray-400 bg-gray-500/20 border-gray-500/30',
       icon: <Bell className="w-4 h-4" />
     };
-  };
-
-  const formatDate = (dateString: string) => {
-    const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
-    return new Date(dateString).toLocaleString(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   const handleCloseQuery = async (queryId: number) => {
@@ -740,12 +824,18 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{t.createdOn}: {formatDate(query.createdAt)}</span>
+                        <span>{t.createdOn}: {formatDateWithTimezone(query.createdAt, query.timezone)}</span>
                       </div>
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDate(query.nextExecution)}</span>
+                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
+                        </div>
+                      )}
+                      {query.validTo && (
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4 text-orange-400" />
+                          <span className="text-orange-400">Scade: {formatDateWithTimezone(query.validTo, query.timezone)}</span>
                         </div>
                       )}
                       {query.cronParams && (
@@ -922,15 +1012,22 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">{t.createdOn}</label>
-                  <p className="text-white">{formatDate(selectedQuery.createdAt)}</p>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.createdAt, selectedQuery.timezone)}</p>
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
-                    <p className="text-white">{formatDate(selectedQuery.nextExecution)}</p>
+                    <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
                   </div>
                 )}
               </div>
+              
+              {selectedQuery.validTo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Scade il</label>
+                  <p className="text-white">{formatDateWithTimezone(selectedQuery.validTo, selectedQuery.timezone)}</p>
+                </div>
+              )}
 
               {selectedQuery.cronParams && (
                 <div>
