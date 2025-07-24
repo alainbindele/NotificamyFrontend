@@ -58,6 +58,7 @@ const notificationsTranslations = {
     close: 'Close',
     createdOn: 'Created',
     nextExecution: 'Next',
+    lastExecution: 'Last',
     expiresOn: 'Expires',
     confidence: 'confidence',
     createNotification: 'Create New Notification',
@@ -115,6 +116,7 @@ const notificationsTranslations = {
     close: 'Chiudi',
     createdOn: 'Creata',
     nextExecution: 'Prossima',
+    lastExecution: 'Ultima',
     expiresOn: 'Scade',
     confidence: 'fiducia',
     createNotification: 'Crea Nuova Notifica',
@@ -172,6 +174,7 @@ const notificationsTranslations = {
     close: 'Cerrar',
     createdOn: 'Creada',
     nextExecution: 'Próxima',
+    lastExecution: 'Última',
     expiresOn: 'Expira',
     confidence: 'confianza',
     createNotification: 'Crear Nueva Notificación',
@@ -229,6 +232,7 @@ const notificationsTranslations = {
     close: 'Fermer',
     createdOn: 'Créée',
     nextExecution: 'Prochaine',
+    lastExecution: 'Dernière',
     expiresOn: 'Expire',
     confidence: 'confiance',
     createNotification: 'Créer Nouvelle Notification',
@@ -286,6 +290,7 @@ const notificationsTranslations = {
     close: 'Schließen',
     createdOn: 'Erstellt',
     nextExecution: 'Nächste',
+    lastExecution: 'Letzte',
     expiresOn: 'Läuft ab',
     confidence: 'Vertrauen',
     createNotification: 'Neue Benachrichtigung Erstellen',
@@ -343,6 +348,7 @@ const notificationsTranslations = {
     close: '关闭',
     createdOn: '创建于',
     nextExecution: '下次',
+    lastExecution: '上次',
     expiresOn: '到期',
     confidence: '置信度',
     createNotification: '创建新通知',
@@ -633,6 +639,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     }
   };
 
+  // Check if execution date is in the past
+  const isExecutionInPast = (executionDate: string): boolean => {
+    const execDate = new Date(executionDate + (executionDate.endsWith('Z') ? '' : 'Z'));
+    return execDate < new Date();
+  };
+
   return (
     <div className="space-y-8">
       {/* Statistics */}
@@ -800,7 +812,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
+                          <span>
+                            {isExecutionInPast(query.nextExecution) ? t.lastExecution : t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}
+                          </span>
                         </div>
                       )}
                       {query.validTo && (
@@ -987,7 +1001,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                      {isExecutionInPast(selectedQuery.nextExecution) ? t.lastExecution : t.nextExecution}
+                    </label>
                     <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
                   </div>
                 )}

@@ -40,6 +40,7 @@ const archivedTranslations = {
     archivedOn: 'Archived on',
     createdOn: 'Created on',
     nextExecution: 'Next execution',
+    lastExecution: 'Last execution',
     restoreSuccess: 'Notification Restored',
     restoreSuccessMessage: 'The notification has been restored successfully.',
     restoreError: 'Restore Failed',
@@ -72,6 +73,7 @@ const archivedTranslations = {
     archivedOn: 'Archiviata il',
     createdOn: 'Creata il',
     nextExecution: 'Prossima esecuzione',
+    lastExecution: 'Ultima esecuzione',
     restoreSuccess: 'Notifica Ripristinata',
     restoreSuccessMessage: 'La notifica è stata ripristinata con successo.',
     restoreError: 'Ripristino Fallito',
@@ -104,6 +106,7 @@ const archivedTranslations = {
     archivedOn: 'Archivada el',
     createdOn: 'Creada el',
     nextExecution: 'Próxima ejecución',
+    lastExecution: 'Última ejecución',
     restoreSuccess: 'Notificación Restaurada',
     restoreSuccessMessage: 'La notificación ha sido restaurada exitosamente.',
     restoreError: 'Restauración Fallida',
@@ -136,6 +139,7 @@ const archivedTranslations = {
     archivedOn: 'Archivée le',
     createdOn: 'Créée le',
     nextExecution: 'Prochaine exécution',
+    lastExecution: 'Dernière exécution',
     restoreSuccess: 'Notification Restaurée',
     restoreSuccessMessage: 'La notification a été restaurée avec succès.',
     restoreError: 'Restauration Échouée',
@@ -168,6 +172,7 @@ const archivedTranslations = {
     archivedOn: 'Archiviert am',
     createdOn: 'Erstellt am',
     nextExecution: 'Nächste Ausführung',
+    lastExecution: 'Letzte Ausführung',
     restoreSuccess: 'Benachrichtigung Wiederhergestellt',
     restoreSuccessMessage: 'Die Benachrichtigung wurde erfolgreich wiederhergestellt.',
     restoreError: 'Wiederherstellung Fehlgeschlagen',
@@ -200,6 +205,7 @@ const archivedTranslations = {
     archivedOn: '归档于',
     createdOn: '创建于',
     nextExecution: '下次执行',
+    lastExecution: '上次执行',
     restoreSuccess: '通知已恢复',
     restoreSuccessMessage: '通知已成功恢复。',
     restoreError: '恢复失败',
@@ -361,6 +367,12 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
     }
   };
 
+  // Check if execution date is in the past
+  const isExecutionInPast = (executionDate: string): boolean => {
+    const execDate = new Date(executionDate + (executionDate.endsWith('Z') ? '' : 'Z'));
+    return execDate < new Date();
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -468,7 +480,9 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
                       {query.nextExecution && (
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}</span>
+                          <span>
+                            {isExecutionInPast(query.nextExecution) ? t.lastExecution : t.nextExecution}: {formatDateWithTimezone(query.nextExecution, query.timezone)}
+                          </span>
                         </div>
                       )}
                       {query.validTo && (
@@ -580,7 +594,9 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
                 </div>
                 {selectedQuery.nextExecution && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">{t.nextExecution}</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                      {isExecutionInPast(selectedQuery.nextExecution) ? t.lastExecution : t.nextExecution}
+                    </label>
                     <p className="text-white">{formatDateWithTimezone(selectedQuery.nextExecution, selectedQuery.timezone)}</p>
                   </div>
                 )}
