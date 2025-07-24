@@ -285,8 +285,9 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
   const formatDate = (dateString: string) => {
     const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
     
-    // Parse UTC date and display in user's local timezone
-    const date = new Date(dateString);
+    // IMPORTANTE: Le date dall'API sono in UTC ma senza 'Z'
+    // Devo forzare l'interpretazione come UTC
+    const date = new Date(dateString + 'Z');
     return date.toLocaleString(locale, {
       year: 'numeric',
       month: 'short',
@@ -301,8 +302,9 @@ export const ArchivedSection: React.FC<ArchivedSectionProps> = ({
   const formatDateWithTimezone = (dateString: string, timezone?: string) => {
     const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
     
-    // Parse UTC date string and convert to local timezone
-    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
+    // IMPORTANTE: Le date dall'API sono in UTC ma senza 'Z'
+    // Devo forzare l'interpretazione come UTC
+    const date = new Date(dateString + 'Z');
     
     // Always display in user's local timezone (client timezone)
     return date.toLocaleString(locale, {

@@ -443,7 +443,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     
     // Check if notification is expired based on validTo (UTC)
     if (query.validTo) {
-      const validToUTC = new Date(query.validTo);
+      // IMPORTANTE: validTo è in UTC ma senza 'Z', devo forzare UTC
+      const validToUTC = new Date(query.validTo + 'Z');
       if (validToUTC < nowUTC) {
         return { 
           status: 'expired', 
@@ -456,7 +457,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     
     // Check if specific date notification has passed (UTC comparison)
     if (query.nextExecution && query.dateSpecific) {
-      const nextExecUTC = new Date(query.nextExecution);
+      // IMPORTANTE: nextExecution è in UTC ma senza 'Z', devo forzare UTC
+      const nextExecUTC = new Date(query.nextExecution + 'Z');
       if (nextExecUTC < nowUTC) {
         return { 
           status: 'expired', 
@@ -497,8 +499,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   const formatDate = (dateString: string) => {
     const locale = language === 'en' ? 'en-US' : language === 'it' ? 'it-IT' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'zh-CN';
     
-    // Parse UTC date string and convert to local timezone
-    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
+    // IMPORTANTE: Le date dall'API sono in UTC ma senza 'Z'
+    // Devo forzare l'interpretazione come UTC
+    const date = new Date(dateString + 'Z');
     
     return date.toLocaleString(locale, {
       year: 'numeric',

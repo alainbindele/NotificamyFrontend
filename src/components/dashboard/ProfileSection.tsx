@@ -127,8 +127,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   };
 
   const formatDate = (dateString: string) => {
-    // Parse UTC date string and convert to local timezone
-    const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
+    // IMPORTANTE: Le date dall'API sono in UTC ma senza 'Z'
+    // Devo forzare l'interpretazione come UTC
+    const date = new Date(dateString + 'Z');
     
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
