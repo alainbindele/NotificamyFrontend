@@ -120,9 +120,7 @@ const notificationsTranslations = {
     creating: 'Creazione...',
     describeNotification: 'Descrivi la tua notifica',
     descriptionPlaceholder: 'Es: Notificami ogni giorno alle 9 sulle notizie di tecnologia...',
-    email:
-  }
-} 'Email',
+    email: 'Email',
     timezone: 'Fuso Orario',
     notificationClosed: 'Notifica Chiusa',
     notificationClosedMessage: 'La notifica è stata chiusa con successo.',
