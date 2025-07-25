@@ -92,7 +92,7 @@ const notificationsTranslations = {
       invalid: 'Invalid',
       expired: 'Expired'
     },
-    channels: {
+    channelNames: {
       email: 'Email',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -156,7 +156,7 @@ const notificationsTranslations = {
       invalid: 'Non Valida',
       expired: 'Scaduta'
     },
-    channels: {
+    channelNames: {
       email: 'Email',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -220,7 +220,7 @@ const notificationsTranslations = {
       invalid: 'Inválida',
       expired: 'Expirada'
     },
-    channels: {
+    channelNames: {
       email: 'Email',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -284,7 +284,7 @@ const notificationsTranslations = {
       invalid: 'Invalide',
       expired: 'Expirée'
     },
-    channels: {
+    channelNames: {
       email: 'Email',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -348,7 +348,7 @@ const notificationsTranslations = {
       invalid: 'Ungültig',
       expired: 'Abgelaufen'
     },
-    channels: {
+    channelNames: {
       email: 'E-Mail',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -412,7 +412,7 @@ const notificationsTranslations = {
       invalid: '无效',
       expired: '已过期'
     },
-    channels: {
+    channelNames: {
       email: '电子邮件',
       whatsapp: 'WhatsApp',
       slack: 'Slack',
@@ -828,7 +828,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                         {channels.map((channel, index) => (
                           <div key={index} className="flex items-center space-x-1 px-2 py-1 bg-white/10 rounded-md">
                             {getChannelIcon(channel)}
-                            <span className="text-xs text-gray-300 capitalize">{t.channels[channel as keyof typeof t.channels]}</span>
+                            <span className="text-xs text-gray-300 capitalize">{t.channelNames[channel as keyof typeof t.channelNames]}</span>
                           </div>
                         ))}
                       </div>
@@ -1117,7 +1117,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   {parseEnabledChannels(selectedQuery.enabledChannels).map((channel, index) => (
                     <div key={index} className="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg">
                       {getChannelIcon(channel)}
-                      <span className="text-sm capitalize">{t.channels[channel as keyof typeof t.channels]}</span>
+                      <span className="text-sm capitalize">{t.channelNames[channel as keyof typeof t.channelNames]}</span>
                     </div>
                   ))}
                 </div>
