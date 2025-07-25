@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { 
   Bell, 
@@ -546,6 +546,13 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       setCurrentPage(1);
     }
   }, [filter, searchTerm]);
+
+  // Reset to first page if current page is beyond available pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   // Pagination handlers
   const goToPage = (page: number) => {
