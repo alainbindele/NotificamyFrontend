@@ -486,7 +486,11 @@ function App() {
     }
 
     if (!isSignedIn) {
-      // Clerk will handle the sign-in modal automatically
+      setPopup({
+        isOpen: true,
+        isSuccess: false,
+        message: t.errorAuth
+      });
       return;
     }
 

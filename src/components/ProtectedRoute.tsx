@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUser, SignUpButton } from '@clerk/clerk-react';
+import { useUser, useClerk } from '@clerk/clerk-react';
 import { Loader2, Lock } from 'lucide-react';
 import { Language } from './LanguageSelector';
 
@@ -49,6 +49,7 @@ const protectedTranslations = {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, language }) => {
   const { isSignedIn, isLoaded } = useUser();
+  const { openSignIn } = useClerk();
   const t = protectedTranslations[language];
 
   if (!isLoaded) {
@@ -68,11 +69,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, langua
         </div>
         <h3 className="text-xl font-semibold mb-4 text-fuchsia-400">{t.loginRequired}</h3>
         <p className="text-gray-400 mb-6">{t.loginMessage}</p>
-        <SignUpButton mode="modal">
-          <button className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300">
-            {t.signIn}
-          </button>
-        </SignUpButton>
+        <button 
+          onClick={() => openSignIn()}
+          className="px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-xl font-semibold text-white hover:from-fuchsia-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300"
+        >
+          {t.signIn}
+        </button>
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUser, useClerk, SignUpButton, UserButton } from '@clerk/clerk-react';
+import { useUser, useClerk, UserButton } from '@clerk/clerk-react';
 import { LogIn, Loader2 } from 'lucide-react';
 import { Language } from './LanguageSelector';
 
@@ -42,6 +42,7 @@ const authTranslations = {
 
 export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
   const { isSignedIn, user, isLoaded } = useUser();
+  const { openSignIn } = useClerk();
   const t = authTranslations[language];
 
   if (!isLoaded) {
@@ -81,11 +82,12 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
   }
 
   return (
-    <SignUpButton mode="modal">
-      <button className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 backdrop-blur-sm border border-fuchsia-500/30 hover:border-fuchsia-500/50 hover:from-fuchsia-500/30 hover:to-cyan-500/30 transition-all duration-300">
-        <LogIn className="w-4 h-4" />
-        <span className="text-xs md:text-sm font-medium">{t.login}</span>
-      </button>
-    </SignUpButton>
+    <button 
+      onClick={() => openSignIn()}
+      className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 backdrop-blur-sm border border-fuchsia-500/30 hover:border-fuchsia-500/50 hover:from-fuchsia-500/30 hover:to-cyan-500/30 transition-all duration-300"
+    >
+      <LogIn className="w-4 h-4" />
+      <span className="text-xs md:text-sm font-medium">{t.login}</span>
+    </button>
   );
 };

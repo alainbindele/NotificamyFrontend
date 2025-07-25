@@ -33,7 +33,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ClerkProvider 
       publishableKey={clerkConfig.publishableKey}
-      navigate={(to) => window.location.href = to}
+      appearance={clerkConfig.appearance}
+      afterSignInUrl={clerkConfig.afterSignInUrl}
+      afterSignUpUrl={clerkConfig.afterSignUpUrl}
+      signInUrl={clerkConfig.signInUrl}
+      signUpUrl={clerkConfig.signUpUrl}
     >
       <BrowserRouter>
         <Routes>

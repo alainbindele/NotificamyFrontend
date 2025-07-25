@@ -1,9 +1,9 @@
 export const clerkConfig = {
   publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-  signInUrl: '/sign-up',
-  signUpUrl: '/sign-up', 
-  afterSignUpUrl: '/',
-  afterSignInUrl: '/',
+  signInUrl: '/sign-in',
+  signUpUrl: '/sign-up',
+  afterSignUpUrl: '/dashboard',
+  afterSignInUrl: '/dashboard',
   appearance: {
     theme: {
       primaryColor: '#d946ef'
@@ -11,7 +11,9 @@ export const clerkConfig = {
     elements: {
       formButtonPrimary: 'bg-gradient-to-r from-fuchsia-500 to-cyan-500 hover:from-fuchsia-600 hover:to-cyan-600',
       socialButtonsBlockButton: 'border-white/20 hover:border-fuchsia-500/50 bg-white/10 hover:bg-fuchsia-500/20',
-      card: 'bg-gray-900 border border-white/20'
+      card: 'bg-gray-900 border border-white/20',
+      modalContent: 'bg-gray-900 border border-white/20',
+      modalCloseButton: 'text-white hover:text-fuchsia-400'
     }
   }
 };
