@@ -708,7 +708,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as FilterType)}
-              className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
+              className="px-4 py-2 bg-gray-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
             >
               <option value="all">{t.filterAll}</option>
               <option value="active">{t.filterActive}</option>

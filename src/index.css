@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix for dropdown and select visibility */
+select option {
+  background-color: #1f2937 !important;
+  color: white !important;
+  padding: 8px 12px !important;
+}
+
+select option:hover {
+  background-color: #374151 !important;
+}
+
+select option:checked {
+  background-color: #d946ef !important;
+  color: white !important;
+}
+
+/* Clerk UserButton dropdown styling */
+.cl-userButtonPopoverCard {
+  background-color: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  color: white !important;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-userButtonPopoverActionButtonText {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon {
+  color: white !important;
+}

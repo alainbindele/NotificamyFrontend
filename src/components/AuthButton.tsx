@@ -70,9 +70,10 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ language }) => {
           appearance={{
             elements: {
               avatarBox: "w-8 h-8 md:w-10 md:h-10",
-              userButtonPopoverCard: "bg-gray-900 border border-white/20",
-              userButtonPopoverActionButton: "text-white hover:bg-white/10",
-              userButtonPopoverActionButtonText: "text-white",
+              userButtonPopoverCard: "bg-gray-900 border border-white/20 shadow-2xl",
+              userButtonPopoverActionButton: "text-white hover:bg-white/10 transition-colors",
+              userButtonPopoverActionButtonText: "text-white font-medium",
+              userButtonPopoverActionButtonIcon: "text-white",
               userButtonPopoverFooter: "hidden"
             }
           }}
