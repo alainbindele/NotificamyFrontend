@@ -212,6 +212,8 @@ export class NotifyMeApiService {
 
   static async createNotification(token: string, userEmail: string | undefined, data: CreateNotificationRequest): Promise<any> {
     try {
+      console.log('NotifyMeApiService sending data:', JSON.stringify(data, null, 2));
+      
       const response = await this.makeRequestWithFallback(
         '/api/v1/validate-prompt',
         token,

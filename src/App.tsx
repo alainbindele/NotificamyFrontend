@@ -519,9 +519,9 @@ function App() {
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim(),
-        timezone: userTimezone || 'UTC',
         channels: selectedChannels,
-        channelConfigs: channelConfigs
+        channelConfigs: channelConfigs,
+        timezone: userTimezone || 'UTC'
       }, token, user?.emailAddresses?.[0]?.emailAddress);
       
       console.log('API call successful:', validationData);

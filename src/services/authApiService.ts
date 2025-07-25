@@ -80,6 +80,8 @@ export class AuthApiService {
     userEmail?: string
   ): Promise<ParsedValidationData> {
     try {
+      console.log('Sending request to validate-prompt:', JSON.stringify(request, null, 2));
+      
       const response = await this.makeAuthenticatedRequest<ValidatePromptResponse>(
         API_CONFIG.ENDPOINTS.VALIDATE_PROMPT,
         token,

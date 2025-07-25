@@ -25,9 +25,9 @@ if (import.meta.env.DEV) {
 export interface ValidatePromptRequest {
   prompt: string;
   email: string;
-  timezone?: string;
-  channels?: string[];
-  channelConfigs?: Record<string, any>;
+  channels: string[];
+  channelConfigs: Record<string, string>;
+  timezone: string;
 }
 
 export interface ValidatePromptResponse {

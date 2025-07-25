@@ -212,6 +212,9 @@ export class MockApiService {
 
   static async createNotification(data: CreateNotificationRequest): Promise<any> {
     await this.delay();
+    
+    console.log('Mock API received data:', JSON.stringify(data, null, 2));
+    
     return {
       success: true,
       message: 'Notifica creata con successo (modalità demo)',

@@ -623,17 +623,23 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           channelConfigs.email = createForm.email;
         } else if (channel === 'slack') {
           channelConfigs.slack = createForm.channelConfigs.slack || '';
+        } else if (channel === 'discord') {
+          channelConfigs.discord = createForm.channelConfigs.discord || '';
+        } else if (channel === 'whatsapp') {
+          channelConfigs.whatsapp = createForm.channelConfigs.whatsapp || '';
         }
       });
 
       const requestData: CreateNotificationRequest = {
         prompt: createForm.prompt,
         email: createForm.email,
-        timezone: createForm.timezone,
         channels: createForm.channels,
-        channelConfigs
+        channelConfigs,
+        timezone: createForm.timezone
       };
 
+      console.log('Creating notification with data:', JSON.stringify(requestData, null, 2));
+      
       await api.createNotification(requestData);
       
       // Refresh queries list
