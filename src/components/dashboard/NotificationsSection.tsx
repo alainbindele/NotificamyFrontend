@@ -519,6 +519,11 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                          (query.summaryText && query.summaryText.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return matchesFilter && matchesSearch;
+  }).sort((a, b) => {
+    // Sort by creation date in descending order (newest first)
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+    return dateB.getTime() - dateA.getTime();
   });
 
   // Pagination calculations
