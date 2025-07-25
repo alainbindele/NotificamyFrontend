@@ -524,13 +524,27 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   // Pagination calculations
   const totalItems = filteredQueries.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const startIndex = Math.max(0, (currentPage - 1) * itemsPerPage);
   const endIndex = startIndex + itemsPerPage;
   const paginatedQueries = filteredQueries.slice(startIndex, endIndex);
+  
+  // Debug logging
+  console.log('Pagination Debug:', {
+    totalQueries: filteredQueries.length,
+    currentPage,
+    itemsPerPage,
+    startIndex,
+    endIndex,
+    paginatedQueriesCount: paginatedQueries.length,
+    firstQueryId: paginatedQueries[0]?.id,
+    allQueryIds: filteredQueries.map(q => q.id).slice(0, 10)
+  });
 
   // Reset to first page when filters change
   React.useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage > 1) {
+      setCurrentPage(1);
+    }
   }, [filter, searchTerm]);
 
   // Pagination handlers
