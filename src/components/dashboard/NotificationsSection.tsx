@@ -18,7 +18,7 @@ import {
   Phone,
   Repeat,
   AlertCircle,
-  Zap
+  Zap,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
