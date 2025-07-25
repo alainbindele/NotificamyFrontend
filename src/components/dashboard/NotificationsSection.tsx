@@ -19,6 +19,8 @@ import {
   Repeat,
   AlertCircle,
   Zap
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { NotificationQuery, QueryStatistics, CreateNotificationRequest } from '../../types/api';
 import { useNotifyMeAPI } from '../../hooks/useNotifyMeAPI';
@@ -54,6 +56,14 @@ const notificationsTranslations = {
     noNotificationsMessage: 'Try modifying your search filters.',
     noNotificationsEmpty: 'Create your first notification to get started.',
     createFirst: 'Create Your First Notification',
+    itemsPerPage: 'Items per page',
+    page: 'Page',
+    of: 'of',
+    previous: 'Previous',
+    next: 'Next',
+    showing: 'Showing',
+    to: 'to',
+    totalItems: 'of',
     details: 'Details',
     close: 'Close',
     channels: 'Channels',
@@ -118,6 +128,14 @@ const notificationsTranslations = {
     noNotificationsMessage: 'Prova a modificare i filtri di ricerca.',
     noNotificationsEmpty: 'Crea la tua prima notifica per iniziare.',
     createFirst: 'Crea la Tua Prima Notifica',
+    itemsPerPage: 'Elementi per pagina',
+    page: 'Pagina',
+    of: 'di',
+    previous: 'Precedente',
+    next: 'Successiva',
+    showing: 'Visualizzando',
+    to: 'a',
+    totalItems: 'di',
     details: 'Dettagli',
     close: 'Chiudi',
     channels: 'Canali',
@@ -182,6 +200,14 @@ const notificationsTranslations = {
     noNotificationsMessage: 'Intenta modificar los filtros de búsqueda.',
     noNotificationsEmpty: 'Crea tu primera notificación para comenzar.',
     createFirst: 'Crear Tu Primera Notificación',
+    itemsPerPage: 'Elementos por página',
+    page: 'Página',
+    of: 'de',
+    previous: 'Anterior',
+    next: 'Siguiente',
+    showing: 'Mostrando',
+    to: 'a',
+    totalItems: 'de',
     details: 'Detalles',
     close: 'Cerrar',
     channels: 'Canales',
@@ -246,6 +272,14 @@ const notificationsTranslations = {
     noNotificationsMessage: 'Essayez de modifier les filtres de recherche.',
     noNotificationsEmpty: 'Créez votre première notification pour commencer.',
     createFirst: 'Créer Votre Première Notification',
+    itemsPerPage: 'Éléments par page',
+    page: 'Page',
+    of: 'de',
+    previous: 'Précédent',
+    next: 'Suivant',
+    showing: 'Affichage',
+    to: 'à',
+    totalItems: 'de',
     details: 'Détails',
     close: 'Fermer',
     channels: 'Canaux',
@@ -310,6 +344,14 @@ const notificationsTranslations = {
     noNotificationsMessage: 'Versuchen Sie, die Suchfilter zu ändern.',
     noNotificationsEmpty: 'Erstellen Sie Ihre erste Benachrichtigung, um zu beginnen.',
     createFirst: 'Ihre Erste Benachrichtigung Erstellen',
+    itemsPerPage: 'Elemente pro Seite',
+    page: 'Seite',
+    of: 'von',
+    previous: 'Zurück',
+    next: 'Weiter',
+    showing: 'Anzeige',
+    to: 'bis',
+    totalItems: 'von',
     details: 'Details',
     close: 'Schließen',
     channels: 'Kanäle',
@@ -374,6 +416,14 @@ const notificationsTranslations = {
     noNotificationsMessage: '尝试修改搜索过滤器。',
     noNotificationsEmpty: '创建您的第一个通知以开始。',
     createFirst: '创建您的第一个通知',
+    itemsPerPage: '每页项目',
+    page: '页面',
+    of: '的',
+    previous: '上一页',
+    next: '下一页',
+    showing: '显示',
+    to: '到',
+    totalItems: '的',
     details: '详情',
     close: '关闭',
     channels: '渠道',
@@ -436,6 +486,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<NotificationQuery | null>(null);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   
   const [createForm, setCreateForm] = useState({
     prompt: '',
@@ -468,6 +520,28 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     
     return matchesFilter && matchesSearch;
   });
+
+  // Pagination calculations
+  const totalItems = filteredQueries.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedQueries = filteredQueries.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchTerm]);
+
+  // Pagination handlers
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+  };
 
   // Get notification status with proper styling
   const getNotificationStatus = (query: NotificationQuery) => {
@@ -770,11 +844,59 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Pagination Controls Top */}
+        {totalItems > 0 && (
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 pt-4 border-t border-white/10">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-400">{t.itemsPerPage}:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="px-3 py-1 bg-gray-800 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-fuchsia-500"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+              <div className="text-sm text-gray-400">
+                {t.showing} {startIndex + 1} {t.to} {Math.min(endIndex, totalItems)} {t.totalItems} {totalItems}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center space-x-1 px-3 py-1 bg-gray-800 border border-white/20 rounded text-white text-sm hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>{t.previous}</span>
+              </button>
+              
+              <span className="text-sm text-gray-400">
+                {t.page} {currentPage} {t.of} {totalPages}
+              </span>
+              
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center space-x-1 px-3 py-1 bg-gray-800 border border-white/20 rounded text-white text-sm hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                <span>{t.next}</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Notifications List */}
       <div className="space-y-4">
-        {filteredQueries.length === 0 ? (
+        {totalItems === 0 ? (
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-12 text-center">
             <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">{t.noNotifications}</h3>
@@ -794,7 +916,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
             )}
           </div>
         ) : (
-          filteredQueries.map((query) => {
+          paginatedQueries.map((query) => {
             const status = getNotificationStatus(query);
             const type = getNotificationType(query);
             const channels = parseEnabledChannels(query.enabledChannels);
@@ -901,6 +1023,41 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           })
         )}
       </div>
+
+      {/* Pagination Controls Bottom */}
+      {totalItems > 0 && (
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
+            <div className="text-sm text-gray-400">
+              {t.showing} {startIndex + 1} {t.to} {Math.min(endIndex, totalItems)} {t.totalItems} {totalItems}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center space-x-1 px-3 py-2 bg-gray-800 border border-white/20 rounded-lg text-white text-sm hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>{t.previous}</span>
+              </button>
+              
+              <span className="text-sm text-gray-300 px-3 py-2">
+                {t.page} {currentPage} {t.of} {totalPages}
+              </span>
+              
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center space-x-1 px-3 py-2 bg-gray-800 border border-white/20 rounded-lg text-white text-sm hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                <span>{t.next}</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Notification Modal */}
       {showCreateForm && (
