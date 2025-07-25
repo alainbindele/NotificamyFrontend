@@ -539,6 +539,7 @@ export const PlansPage: React.FC = () => {
 
   const getChannelAvailability = (planKey: string, channelKey: string) => {
     if (channelKey === 'email') return true;
+    if (channelKey === 'slack') return true; // Slack now available for all plans
     if (planKey === 'free') return false;
     return true;
   };

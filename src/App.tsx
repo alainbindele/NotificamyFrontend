@@ -433,7 +433,7 @@ function App() {
   };
 
   // Disabled channels for alpha
-  const disabledChannels: NotificationChannel[] = ['whatsapp', 'slack', 'discord'];
+  const disabledChannels: NotificationChannel[] = ['whatsapp', 'discord'];
 
   const toggleChannel = (channel: NotificationChannel) => {
     // Prevent toggling disabled channels

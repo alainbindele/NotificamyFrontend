@@ -56,6 +56,12 @@ const notificationsTranslations = {
     createFirst: 'Create Your First Notification',
     details: 'Details',
     close: 'Close',
+    channels: 'Channels',
+    selectChannels: 'Select notification channels',
+    channelEmail: 'Email',
+    channelSlack: 'Slack',
+    slackWebhook: 'Slack Webhook URL',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: 'Created',
     nextExecution: 'Next',
     lastExecution: 'Last',
@@ -114,6 +120,12 @@ const notificationsTranslations = {
     createFirst: 'Crea la Tua Prima Notifica',
     details: 'Dettagli',
     close: 'Chiudi',
+    channels: 'Canali',
+    selectChannels: 'Seleziona i canali di notifica',
+    channelEmail: 'Email',
+    channelSlack: 'Slack',
+    slackWebhook: 'URL Webhook Slack',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: 'Creata',
     nextExecution: 'Prossima',
     lastExecution: 'Ultima',
@@ -172,6 +184,12 @@ const notificationsTranslations = {
     createFirst: 'Crear Tu Primera Notificación',
     details: 'Detalles',
     close: 'Cerrar',
+    channels: 'Canales',
+    selectChannels: 'Seleccionar canales de notificación',
+    channelEmail: 'Email',
+    channelSlack: 'Slack',
+    slackWebhook: 'URL Webhook Slack',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: 'Creada',
     nextExecution: 'Próxima',
     lastExecution: 'Última',
@@ -230,6 +248,12 @@ const notificationsTranslations = {
     createFirst: 'Créer Votre Première Notification',
     details: 'Détails',
     close: 'Fermer',
+    channels: 'Canaux',
+    selectChannels: 'Sélectionner les canaux de notification',
+    channelEmail: 'Email',
+    channelSlack: 'Slack',
+    slackWebhook: 'URL Webhook Slack',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: 'Créée',
     nextExecution: 'Prochaine',
     lastExecution: 'Dernière',
@@ -288,6 +312,12 @@ const notificationsTranslations = {
     createFirst: 'Ihre Erste Benachrichtigung Erstellen',
     details: 'Details',
     close: 'Schließen',
+    channels: 'Kanäle',
+    selectChannels: 'Benachrichtigungskanäle auswählen',
+    channelEmail: 'E-Mail',
+    channelSlack: 'Slack',
+    slackWebhook: 'Slack Webhook URL',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: 'Erstellt',
     nextExecution: 'Nächste',
     lastExecution: 'Letzte',
@@ -346,6 +376,12 @@ const notificationsTranslations = {
     createFirst: '创建您的第一个通知',
     details: '详情',
     close: '关闭',
+    channels: '渠道',
+    selectChannels: '选择通知渠道',
+    channelEmail: '电子邮件',
+    channelSlack: 'Slack',
+    slackWebhook: 'Slack Webhook URL',
+    slackWebhookPlaceholder: 'https://hooks.slack.com/services/...',
     createdOn: '创建于',
     nextExecution: '下次',
     lastExecution: '上次',
@@ -405,7 +441,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     prompt: '',
     email: user?.emailAddresses?.[0]?.emailAddress || '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
-    channels: ['email'] as string[],
+    channels: ['email', 'slack'] as string[],
     channelConfigs: {} as Record<string, string>
   });
 
@@ -585,8 +621,9 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       createForm.channels.forEach(channel => {
         if (channel === 'email') {
           channelConfigs.email = createForm.email;
+        } else if (channel === 'slack') {
+          channelConfigs.slack = createForm.channelConfigs.slack || '';
         }
-        // Add other channel configs as needed
       });
 
       const requestData: CreateNotificationRequest = {
@@ -608,7 +645,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         prompt: '',
         email: user?.emailAddresses?.[0]?.emailAddress || '',
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
-        channels: ['email'],
+        channels: ['email', 'slack'],
         channelConfigs: {}
       });
       
@@ -910,6 +947,98 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   required
                 />
               </div>
+
+              {/* Channel Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.selectChannels}</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newChannels = createForm.channels.includes('email') 
+                        ? createForm.channels.filter(c => c !== 'email')
+                        : [...createForm.channels, 'email'];
+                      setCreateForm(prev => ({ ...prev, channels: newChannels }));
+                    }}
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                      createForm.channels.includes('email')
+                        ? 'border-red-500 bg-red-500/20 shadow-lg'
+                        : 'border-white/20 bg-white/5 hover:border-red-500/50'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <Mail className={`w-6 h-6 ${createForm.channels.includes('email') ? 'text-red-400' : 'text-gray-400'}`} />
+                      <span className={`text-sm font-medium ${createForm.channels.includes('email') ? 'text-red-400' : 'text-gray-400'}`}>
+                        {t.channelEmail}
+                      </span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newChannels = createForm.channels.includes('slack') 
+                        ? createForm.channels.filter(c => c !== 'slack')
+                        : [...createForm.channels, 'slack'];
+                      setCreateForm(prev => ({ ...prev, channels: newChannels }));
+                    }}
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                      createForm.channels.includes('slack')
+                        ? 'border-purple-500 bg-purple-500/20 shadow-lg'
+                        : 'border-white/20 bg-white/5 hover:border-purple-500/50'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <MessageSquare className={`w-6 h-6 ${createForm.channels.includes('slack') ? 'text-purple-400' : 'text-gray-400'}`} />
+                      <span className={`text-sm font-medium ${createForm.channels.includes('slack') ? 'text-purple-400' : 'text-gray-400'}`}>
+                        {t.channelSlack}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+                
+                {/* Selected Channels Summary */}
+                {createForm.channels.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {createForm.channels.map((channel) => (
+                      <div
+                        key={channel}
+                        className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs border ${
+                          channel === 'email' 
+                            ? 'border-red-500/50 bg-red-500/20 text-red-300'
+                            : 'border-purple-500/50 bg-purple-500/20 text-purple-300'
+                        }`}
+                      >
+                        {channel === 'email' ? <Mail className="w-3 h-3" /> : <MessageSquare className="w-3 h-3" />}
+                        <span className="capitalize">{channel}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Channel Configuration */}
+              {createForm.channels.includes('slack') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <div className="flex items-center space-x-2">
+                      <MessageSquare className="w-4 h-4 text-purple-400" />
+                      <span>{t.slackWebhook}</span>
+                    </div>
+                  </label>
+                  <input
+                    type="url"
+                    value={createForm.channelConfigs.slack || ''}
+                    onChange={(e) => setCreateForm(prev => ({ 
+                      ...prev, 
+                      channelConfigs: { ...prev.channelConfigs, slack: e.target.value }
+                    }))}
+                    placeholder={t.slackWebhookPlaceholder}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                    required={createForm.channels.includes('slack')}
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3">
                 <button
