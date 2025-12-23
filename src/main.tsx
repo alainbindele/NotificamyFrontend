@@ -5,6 +5,7 @@ import { LogtoProvider } from '@logto/react';
 import App from './App.tsx';
 import { PlansPage } from './pages/PlansPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
+import { CallbackPage } from './pages/CallbackPage.tsx';
 import { logtoConfig } from './config/logto';
 import './index.css';
 
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/callback" element={<CallbackPage />} />
           <Route path="/plans" element={<PlansPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
