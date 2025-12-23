@@ -17,7 +17,6 @@ const getPostLogoutRedirectUri = () => {
 export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
-  resources: [import.meta.env.VITE_API_URL || 'http://localhost:3000'],
   scopes: ['openid', 'profile', 'email'],
   redirectUri: getRedirectUri(),
   postLogoutRedirectUri: getPostLogoutRedirectUri(),
