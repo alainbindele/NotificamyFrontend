@@ -1,22 +1,20 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLogto } from '@logto/react';
+import { useHandleSignInCallback } from '@logto/react';
 import { Loader2 } from 'lucide-react';
 
 export const CallbackPage = () => {
-  const { isAuthenticated, isLoading, handleSignInCallback } = useLogto();
   const navigate = useNavigate();
+  const { isLoading, error } = useHandleSignInCallback(() => {
+    navigate('/dashboard', { replace: true });
+  });
 
   useEffect(() => {
-    if (!isLoading) {
-      handleSignInCallback().then(() => {
-        navigate('/dashboard');
-      }).catch((error) => {
-        console.error('Callback error:', error);
-        navigate('/');
-      });
+    if (error) {
+      console.error('Callback error:', error);
+      navigate('/', { replace: true });
     }
-  }, [isLoading, handleSignInCallback, navigate]);
+  }, [error, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
