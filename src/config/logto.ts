@@ -1,14 +1,21 @@
 import { LogtoConfig } from '@logto/react';
 
+const isProduction = () => {
+  if (typeof window !== 'undefined') {
+    return window.location.hostname === 'notificamy.com';
+  }
+  return import.meta.env.VITE_ENVIRONMENT === 'production';
+};
+
 const getRedirectUri = () => {
-  if (import.meta.env.VITE_ENVIRONMENT === 'production') {
+  if (isProduction()) {
     return 'https://notificamy.com/callback';
   }
   return 'http://localhost:5173/callback';
 };
 
 const getPostLogoutRedirectUri = () => {
-  if (import.meta.env.VITE_ENVIRONMENT === 'production') {
+  if (isProduction()) {
     return 'https://notificamy.com';
   }
   return 'http://localhost:5173';
@@ -29,7 +36,8 @@ console.log('🔧 Logto Configuration:', {
   redirectUri: logtoConfig.redirectUri,
   postLogoutRedirectUri: logtoConfig.postLogoutRedirectUri,
   scopes: logtoConfig.scopes,
-  environment: import.meta.env.VITE_ENVIRONMENT || 'development',
+  isProduction: isProduction(),
+  hostname: typeof window !== 'undefined' ? window.location.hostname : 'SSR',
 });
 
 if (import.meta.env.VITE_ENVIRONMENT !== 'production') {

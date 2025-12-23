@@ -1,5 +1,17 @@
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname === 'notificamy.com') {
+    return 'http://notificamy.com:8080';
+  }
+
+  return 'http://localhost:8080';
+};
+
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  BASE_URL: getApiBaseUrl(),
   ENDPOINTS: {
     VALIDATE_PROMPT: '/api/v1/validate-prompt',
     USER_PROFILE: '/api/v1/user/profile',
