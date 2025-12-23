@@ -4,6 +4,10 @@ export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
   resources: [import.meta.env.VITE_API_URL || 'http://localhost:3000'],
+  // Explicitly set redirect URIs for production
+  ...(import.meta.env.PROD && {
+    scopes: ['openid', 'profile', 'email'],
+  }),
 };
 
 // Enhanced debug info
