@@ -1,13 +1,26 @@
 import { LogtoConfig } from '@logto/react';
 
+const getRedirectUri = () => {
+  if (import.meta.env.PROD) {
+    return 'https://notificamy.com/callback';
+  }
+  return 'http://localhost:5173/callback';
+};
+
+const getPostLogoutRedirectUri = () => {
+  if (import.meta.env.PROD) {
+    return 'https://notificamy.com';
+  }
+  return 'http://localhost:5173';
+};
+
 export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
   resources: [import.meta.env.VITE_API_URL || 'http://localhost:3000'],
-  // Explicitly set redirect URIs for production
-  ...(import.meta.env.PROD && {
-    scopes: ['openid', 'profile', 'email'],
-  }),
+  scopes: ['openid', 'profile', 'email'],
+  redirectUri: getRedirectUri(),
+  postLogoutRedirectUri: getPostLogoutRedirectUri(),
 };
 
 // Enhanced debug info
