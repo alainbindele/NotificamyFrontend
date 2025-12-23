@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useLogto } from '@logto/react';
 import { Bell, User, Settings, ArrowLeft, Loader2, Archive } from 'lucide-react';
 import { AuthButton } from '../components/AuthButton';
 import { LanguageSelector, Language } from '../components/LanguageSelector';
@@ -101,11 +101,11 @@ const translations = {
 };
 
 export const DashboardPage: React.FC = () => {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isAuthenticated, isLoading } = useLogto();
   const [language, setLanguage] = useState<Language>(detectBrowserLanguage());
   const [activeTab, setActiveTab] = useState<TabType>('notifications');
   const { toasts, removeToast } = useToast();
-  
+
   const {
     userProfile,
     userStats,
@@ -122,18 +122,18 @@ export const DashboardPage: React.FC = () => {
 
   // Redirect to home if not authenticated
   React.useEffect(() => {
-    if (isLoaded && !isSignedIn) {
+    if (!isLoading && !isAuthenticated) {
       console.log('Redirecting to home - not authenticated');
-      // Use a timeout to avoid immediate redirect during Auth0 initialization
+      // Use a timeout to avoid immediate redirect during Logto initialization
       const timer = setTimeout(() => {
         window.location.href = '/';
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     }
-  }, [isSignedIn, isLoaded]);
+  }, [isAuthenticated, isLoading]);
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -144,7 +144,7 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  if (!isSignedIn) {
+  if (!isAuthenticated) {
     return null; // Will redirect via useEffect
   }
 

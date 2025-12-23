@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useLogto } from '@logto/react';
 import { Bell, Mail, MessageSquare, Slack, Hash, Calendar, Clock, Zap, Smartphone, Monitor, Loader2, Lock, Info, ArrowRight, Settings } from 'lucide-react';
 import { ApiService } from './services/apiService';
 import { AuthApiService } from './services/authApiService';
@@ -365,8 +365,8 @@ const detectBrowserLanguage = (): Language => {
 };
 
 function App() {
-  const { isSignedIn, user, isLoaded } = useUser();
-  const { getToken } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, getAccessToken, fetchUserInfo } = useLogto();
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [prompt, setPrompt] = useState('');
   const [email, setEmail] = useState('');
@@ -409,14 +409,21 @@ function App() {
 
   const t = translations[language];
 
+  // Load user info when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !userInfo) {
+      fetchUserInfo().then(setUserInfo).catch(console.error);
+    }
+  }, [isAuthenticated, fetchUserInfo, userInfo]);
+
   // Auto-fill email from authenticated user
   useEffect(() => {
-    if (isSignedIn && user?.emailAddresses?.[0]?.emailAddress && !email) {
-      const userEmail = user.emailAddresses[0].emailAddress;
+    if (isAuthenticated && userInfo?.email && !email) {
+      const userEmail = userInfo.email;
       setEmail(userEmail);
       setChannelConfigs(prev => ({ ...prev, email: userEmail }));
     }
-  }, [isSignedIn, user, email]);
+  }, [isAuthenticated, userInfo, email]);
 
   const channelIcons = {
     email: Mail,
@@ -458,7 +465,7 @@ function App() {
   };
 
   const handleEmailClick = () => {
-    if (!isSignedIn) {
+    if (!isAuthenticated) {
       setShowEmailTooltip(true);
       setTimeout(() => {
         setShowEmailTooltip(false);
@@ -468,10 +475,10 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log('Submit started - isSignedIn:', isSignedIn);
-    console.log('User:', user);
-    
+
+    console.log('Submit started - isAuthenticated:', isAuthenticated);
+    console.log('User:', userInfo);
+
     if (!prompt.trim() || !email.trim()) {
       return;
     }
@@ -485,7 +492,7 @@ function App() {
       return;
     }
 
-    if (!isSignedIn) {
+    if (!isAuthenticated) {
       setPopup({
         isOpen: true,
         isSuccess: false,
@@ -508,22 +515,22 @@ function App() {
     setIsLoading(true);
 
     try {
-      console.log('Getting Clerk token...');
-      const token = await getToken();
-      
+      console.log('Getting Logto access token...');
+      const token = await getAccessToken(import.meta.env.VITE_API_URL);
+
       console.log('Token obtained successfully, length:', token?.length);
-      console.log('User email for API:', user?.emailAddresses?.[0]?.emailAddress);
-      
+      console.log('User email for API:', userInfo?.email);
+
       console.log('Making API call...');
-      
+
       const validationData = await AuthApiService.validatePromptAuthenticated({
         prompt: prompt.trim(),
         email: email.trim(),
         channels: selectedChannels,
         channelConfigs: channelConfigs,
         timezone: userTimezone || 'UTC'
-      }, token, user?.emailAddresses?.[0]?.emailAddress);
-      
+      }, token, userInfo?.email);
+
       console.log('API call successful:', validationData);
 
       const isValid = validationData.validity.valid_prompt;
@@ -539,7 +546,7 @@ function App() {
       if (isValid) {
         setPrompt('');
         // Keep email and channels for authenticated users
-        if (!isSignedIn) {
+        if (!isAuthenticated) {
           setEmail('');
           setSelectedChannels(['email']);
           setChannelConfigs({});
@@ -550,18 +557,18 @@ function App() {
       console.error('Validation failed:', error);
       console.error('Error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
-        isSignedIn,
-        userEmail: user?.emailAddresses?.[0]?.emailAddress,
+        isAuthenticated,
+        userEmail: userInfo?.email,
         apiBaseUrl: import.meta.env.VITE_API_BASE_URL
       });
-      
+
       let errorMessage = t.errorGeneric;
       if (error instanceof Error) {
-        if (error.message.includes('Failed to fetch') || 
-            error.message.includes('NetworkError') || 
+        if (error.message.includes('Failed to fetch') ||
+            error.message.includes('NetworkError') ||
             error.message.includes('Network error')) {
           errorMessage = t.errorNetwork;
-        } else if (error.message.includes('Authentication required') || 
+        } else if (error.message.includes('Authentication required') ||
                    error.message.includes('Missing Refresh Token') ||
                    error.message.includes('Unauthorized') ||
                    error.message.includes('Login required') ||
@@ -605,8 +612,8 @@ function App() {
     setPopup(prev => ({ ...prev, isOpen: false }));
   };
 
-  // Show loading state while Auth0 is initializing
-  if (!isLoaded) {
+  // Show loading state while Logto is initializing
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
@@ -699,7 +706,7 @@ function App() {
           </div>
 
           {/* Dashboard Button for Authenticated Users */}
-          {isSignedIn && (
+          {isAuthenticated && (
             <div className="mb-8">
               <button
                 onClick={() => {
@@ -844,15 +851,15 @@ function App() {
                   onClick={handleEmailClick}
                   placeholder={t.emailPlaceholder}
                   className={`w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-cyan-500/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 ${
-                    !isSignedIn ? 'cursor-pointer' : ''
+                    !isAuthenticated ? 'cursor-pointer' : ''
                   }`}
                   required
-                  disabled={isLoading || (!isSignedIn)}
-                  readOnly={!isSignedIn}
+                  disabled={isLoading || (!isAuthenticated)}
+                  readOnly={!isAuthenticated}
                 />
-                
+
                 {/* Email Tooltip */}
-                {showEmailTooltip && !isSignedIn && (
+                {showEmailTooltip && !isAuthenticated && (
                   <div className="absolute top-full left-0 mt-2 z-50">
                     <div className="bg-gray-800 border border-fuchsia-500/30 rounded-lg p-3 shadow-lg backdrop-blur-sm">
                       <div className="flex items-center space-x-2 text-sm">
@@ -880,7 +887,7 @@ function App() {
                   ) : (
                     <Zap className="w-5 h-5" />
                   )}
-                  <span>{isLoading ? t.processing : (isSignedIn ? t.getStarted : t.loginToUse)}</span>
+                  <span>{isLoading ? t.processing : (isAuthenticated ? t.getStarted : t.loginToUse)}</span>
                 </span>
               </button>
             </div>

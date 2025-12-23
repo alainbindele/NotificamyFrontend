@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useLogto } from '@logto/react';
 import { 
   Bell, 
   Plus, 
@@ -477,10 +477,11 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   onQueriesUpdate,
   language
 }) => {
-  const { user } = useUser();
+  const { fetchUserInfo } = useLogto();
+  const [userInfo, setUserInfo] = useState<any>(null);
   const api = useNotifyMeAPI();
   const { success, error } = useToast();
-  
+
   const [filter, setFilter] = useState<FilterType>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -488,14 +489,24 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  
+
   const [createForm, setCreateForm] = useState({
     prompt: '',
-    email: user?.emailAddresses?.[0]?.emailAddress || '',
+    email: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
     channels: ['email', 'slack'] as string[],
     channelConfigs: {} as Record<string, string>
   });
+
+  // Load user info
+  useEffect(() => {
+    fetchUserInfo().then(info => {
+      setUserInfo(info);
+      if (info?.email && !createForm.email) {
+        setCreateForm(prev => ({ ...prev, email: info.email }));
+      }
+    }).catch(console.error);
+  }, [fetchUserInfo]);
 
   const t = notificationsTranslations[language];
 
@@ -749,7 +760,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       setShowCreateForm(false);
       setCreateForm({
         prompt: '',
-        email: user?.emailAddresses?.[0]?.emailAddress || '',
+        email: userInfo?.email || '',
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome',
         channels: ['email', 'slack'],
         channelConfigs: {}

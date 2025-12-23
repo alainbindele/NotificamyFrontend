@@ -1,19 +1,18 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { LogtoProvider } from '@logto/react';
 import App from './App.tsx';
 import { PlansPage } from './pages/PlansPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
-import { clerkConfig } from './config/clerk';
+import { logtoConfig } from './config/logto';
 import './index.css';
 
 // Debug environment variables
 if (import.meta.env.DEV) {
   console.log('🔍 Environment Variables Check:', {
-    CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? 'SET' : 'NOT SET',
-    CLERK_KEY_VALUE: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.substring(0, 30) + '...',
-    CLERK_KEY_LENGTH: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.length,
+    LOGTO_ENDPOINT: import.meta.env.VITE_LOGTO_ENDPOINT ? 'SET' : 'NOT SET',
+    LOGTO_APP_ID: import.meta.env.VITE_LOGTO_APP_ID ? 'SET' : 'NOT SET',
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
     ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
     MODE: import.meta.env.MODE,
@@ -23,21 +22,16 @@ if (import.meta.env.DEV) {
   });
 }
 
-// Validate Clerk key before rendering
-if (!clerkConfig.publishableKey) {
-  console.error('❌ CRITICAL: Clerk publishable key is missing!');
-  console.error('Check your .env file for VITE_CLERK_PUBLISHABLE_KEY');
+// Validate Logto config before rendering
+if (!logtoConfig.endpoint || !logtoConfig.appId) {
+  console.error('❌ CRITICAL: Logto configuration is missing!');
+  console.error('Check your .env file for VITE_LOGTO_ENDPOINT and VITE_LOGTO_APP_ID');
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider 
-      publishableKey={clerkConfig.publishableKey}
-      appearance={clerkConfig.appearance}
-      afterSignInUrl={clerkConfig.afterSignInUrl}
-      afterSignUpUrl={clerkConfig.afterSignUpUrl}
-      signInUrl={clerkConfig.signInUrl}
-      signUpUrl={clerkConfig.signUpUrl}
+    <LogtoProvider
+      config={logtoConfig}
     >
       <BrowserRouter>
         <Routes>
@@ -46,6 +40,6 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </BrowserRouter>
-    </ClerkProvider>
+    </LogtoProvider>
   </StrictMode>
 );
