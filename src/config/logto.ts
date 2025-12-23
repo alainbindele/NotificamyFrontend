@@ -17,6 +17,7 @@ const getPostLogoutRedirectUri = () => {
 export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
+  resources: ['https://notificamy.com'],
   scopes: ['openid', 'profile', 'email'],
   redirectUri: getRedirectUri(),
   postLogoutRedirectUri: getPostLogoutRedirectUri(),
