@@ -20,7 +20,7 @@ export const useNotifyMeAPI = () => {
   }, [fetchUserInfo]);
 
   const getAuthToken = async (): Promise<string> => {
-    const token = await getAccessToken();
+    const token = await getAccessToken(import.meta.env.VITE_API_URL);
 
     if (!token) {
       throw new Error('No token available');
