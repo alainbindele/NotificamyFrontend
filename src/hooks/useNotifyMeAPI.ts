@@ -12,7 +12,7 @@ import {
 } from '../types/api';
 
 export const useNotifyMeAPI = () => {
-  const { getAccessToken, fetchUserInfo } = useLogto();
+  const { getIdToken, fetchUserInfo } = useLogto();
   const [userInfo, setUserInfo] = useState<any>(null);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export const useNotifyMeAPI = () => {
   }, [fetchUserInfo]);
 
   const getAuthToken = async (): Promise<string> => {
-    const token = await getAccessToken(import.meta.env.VITE_API_BASE_URL);
+    const token = await getIdToken();
 
     if (!token) {
       throw new Error('No token available');
