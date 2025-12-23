@@ -17,7 +17,6 @@ const getPostLogoutRedirectUri = () => {
 export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
-  resources: ['https://kyjtb7.logto.app/api'],
   scopes: ['openid', 'profile', 'email'],
   redirectUri: getRedirectUri(),
   postLogoutRedirectUri: getPostLogoutRedirectUri(),
@@ -27,7 +26,6 @@ export const logtoConfig: LogtoConfig = {
 console.log('🔧 Logto Configuration:', {
   endpoint: logtoConfig.endpoint ? 'SET' : 'NOT SET',
   appId: logtoConfig.appId ? 'SET' : 'NOT SET',
-  resources: logtoConfig.resources,
   redirectUri: logtoConfig.redirectUri,
   postLogoutRedirectUri: logtoConfig.postLogoutRedirectUri,
   scopes: logtoConfig.scopes,
