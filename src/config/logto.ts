@@ -21,10 +21,13 @@ const getPostLogoutRedirectUri = () => {
   return 'http://localhost:5173';
 };
 
+export const API_RESOURCE = 'https://notificamy.com/api';
+
 export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
   scopes: ['openid', 'profile', 'email'],
+  resources: [API_RESOURCE],
   redirectUri: getRedirectUri(),
   postLogoutRedirectUri: getPostLogoutRedirectUri(),
 };

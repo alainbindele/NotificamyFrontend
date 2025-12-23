@@ -1,6 +1,7 @@
 import { useLogto } from '@logto/react';
 import { NotifyMeApiService } from '../services/notifyMeApiService';
 import { useState, useEffect } from 'react';
+import { API_RESOURCE } from '../config/logto';
 import {
   UserProfile,
   UserStatistics,
@@ -12,7 +13,7 @@ import {
 } from '../types/api';
 
 export const useNotifyMeAPI = () => {
-  const { getIdToken, fetchUserInfo } = useLogto();
+  const { getAccessToken, fetchUserInfo } = useLogto();
   const [userInfo, setUserInfo] = useState<any>(null);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export const useNotifyMeAPI = () => {
   }, [fetchUserInfo]);
 
   const getAuthToken = async (): Promise<string> => {
-    const token = await getIdToken();
+    const token = await getAccessToken(API_RESOURCE);
 
     if (!token) {
       throw new Error('No token available');
