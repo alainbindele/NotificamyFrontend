@@ -24,14 +24,17 @@ export const logtoConfig: LogtoConfig = {
 };
 
 // Enhanced debug info
-if (import.meta.env.DEV) {
-  console.log('🔧 Logto Configuration Debug:', {
-    endpoint: logtoConfig.endpoint ? 'SET' : 'NOT SET',
-    appId: logtoConfig.appId ? 'SET' : 'NOT SET',
-    resources: logtoConfig.resources,
-    environment: import.meta.env.VITE_ENVIRONMENT,
-  });
+console.log('🔧 Logto Configuration:', {
+  endpoint: logtoConfig.endpoint ? 'SET' : 'NOT SET',
+  appId: logtoConfig.appId ? 'SET' : 'NOT SET',
+  resources: logtoConfig.resources,
+  redirectUri: logtoConfig.redirectUri,
+  postLogoutRedirectUri: logtoConfig.postLogoutRedirectUri,
+  scopes: logtoConfig.scopes,
+  environment: import.meta.env.PROD ? 'PRODUCTION' : 'DEVELOPMENT',
+});
 
+if (import.meta.env.DEV) {
   // Validate configuration
   if (!logtoConfig.endpoint) {
     console.error('❌ LOGTO ERROR: No endpoint found! Set VITE_LOGTO_ENDPOINT');
