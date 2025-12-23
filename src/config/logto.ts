@@ -18,6 +18,7 @@ export const logtoConfig: LogtoConfig = {
   endpoint: import.meta.env.VITE_LOGTO_ENDPOINT || '',
   appId: import.meta.env.VITE_LOGTO_APP_ID || '',
   scopes: ['openid', 'profile', 'email'],
+  resources: ['https://notificamy.com:8080'],
   redirectUri: getRedirectUri(),
   postLogoutRedirectUri: getPostLogoutRedirectUri(),
 };
